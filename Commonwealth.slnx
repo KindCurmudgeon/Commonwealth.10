@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Commonwealth.Client/Commonwealth.Client.csproj" />
+  <Project Path="Commonwealth.Server/Commonwealth.Server.csproj" />
+  <Project Path="Commonwealth.Shared/Commonwealth.Shared.csproj" />
+</Solution>

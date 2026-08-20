@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "Commonwealth.Server/1.0.0": {
+        "dependencies": {
+          "Commonwealth.Shared": "1.0.0"
+        },
+        "runtime": {
+          "Commonwealth.Server.dll": {}
+        }
+      },
+      "Commonwealth.Shared/1.0.0": {
+        "runtime": {
+          "Commonwealth.Shared.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Commonwealth.Server/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Commonwealth.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
