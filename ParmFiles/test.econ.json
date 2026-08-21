@@ -1,0 +1,206 @@
+{
+    "ParmFileInfo": {
+        "RootName": "test",
+        "Version": "0",
+        "Type": "econ"
+    },
+    "GoodParms": [
+        {
+            "Name": "Grain",
+            "Type": "Food"
+        },
+        {
+            "Name": "Fish",
+            "Type": "Food"
+        },
+        {
+            "Name": "Wood",
+            "Type": "Construction"
+        },
+        {
+            "Name": "Brick",
+            "Type": "Construction"
+        },
+        {
+            "Name": "Gems",
+            "Type": "Currency"
+        }
+    ],
+    "Resources": [
+        {
+            "Name": "WildFish",
+            "Abbr": "Fish",
+            "Constraint": "SeaCoast",
+            "Existence": 0.80
+        },
+        {
+            "Name": "Farmland",
+            "Abbr": "Farm",
+            "Existence": 0.40
+        },
+        {
+            "Name": "Forest",
+            "Existence": 0.40
+        },
+        {
+            "Name": "Clay",
+            "Existence": 0.40
+        },
+        {
+            "Name": "GemOre",
+            "Abbr": "Ore",
+            "Existence": 0.30
+        }
+    ],
+    "VillageParms": [
+        {
+            "Type": "Farming",
+            "Abbr": "Farm",
+            "Class": "Production",
+            "Production": {
+                "Name": "Grain",
+                "Amount": 40
+            },
+            "ProductionType": "Food",
+            "Resource": "Farmland",
+            "Construction": [
+                {
+                    "Name": "Brick",
+                    "Amount": 20
+                },
+                {
+                    "Name": "Wood",
+                    "Amount": 20
+                }
+            ]
+        },
+        {
+            "Type": "Fishing",
+            "Abbr": "Fish",
+            "Class": "Production",
+            "Production": {
+                "Name": "Fish",
+                "Amount": 40
+            },
+            "ProductionType": "Food",
+            "Resource": "WildFish",
+            "Construction": [
+                {
+                    "Name": "Brick",
+                    "Amount": 20
+                },
+                {
+                    "Name": "Wood",
+                    "Amount": 20
+                }
+            ]
+        },
+        {
+            "Type": "Milling",
+            "Abbr": "Mill",
+            "Class": "Production",
+            "Production": {
+                "Name": "Wood",
+                "Amount": 50
+            },
+            "ProductionType": "Construction",
+            "Resource": "Forest",
+            "Construction": [
+                {
+                    "Name": "Brick",
+                    "Amount": 20
+                },
+                {
+                    "Name": "Wood",
+                    "Amount": 30
+                }
+            ]
+        },
+        {
+            "Type": "Brickmaking",
+            "Abbr": "Brick",
+            "Class": "Production",
+            "Production": {
+                "Name": "Brick",
+                "Amount": 50
+            },
+            "ProductionType": "Construction",
+            "Resource": "Clay",
+            "Construction": [
+                {
+                    "Name": "Brick",
+                    "Amount": 30
+                },
+                {
+                    "Name": "Wood",
+                    "Amount": 10
+                }
+            ]
+        },
+        {
+            "Type": "Mining",
+            "Abbr": "Mine",
+            "Class": "Production",
+            "Production": {
+                "Name": "Gems",
+                "Amount": 100
+            },
+            "ProductionType": "Currency",
+            "Resource": "GemOre",
+            "Construction": [
+                {
+                    "Name": "Brick",
+                    "Amount": 30
+                },
+                {
+                    "Name": "Wood",
+                    "Amount": 30
+                }
+            ]
+        }
+    ],
+    "SpyParms": {
+        "Training": [
+            {
+                "Name": "Gems",
+                "Amount": 2
+            }
+        ],
+        "Operation": [
+            {
+                "Name": "Gems",
+                "Amount": 1
+            }
+        ],
+        "Transfer": [
+            {
+                "Name": "Gems",
+                "Amount": 1
+            }
+        ]
+    },
+    "TaxRate": 0.3,
+    "ActivationCostFactor": 0.5,
+    "FoodConsumptionPerCapita": 0.01,
+    "FoodRationingThreshhold": 4,
+    "ProductionCapabilityCurve": [
+        {
+            "X": 0,
+            "Y": 0.5
+        },
+        {
+            "X": 0.01,
+            "Y": 0.5
+        },
+        {
+            "X": 0.1,
+            "Y": 1.0
+        }
+    ],
+    "MarketParms": {
+        "Commission": 0.20,
+        "MaxMarketBuyPercent": 0.5
+    },
+    "ImmigrationFactor": 2.0,
+    "MinVillagesNeededForDistrictOwnership": 2
+}

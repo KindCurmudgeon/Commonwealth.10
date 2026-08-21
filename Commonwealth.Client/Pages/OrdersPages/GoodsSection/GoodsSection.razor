@@ -1,0 +1,102 @@
+﻿
+@using System.Text
+@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.Common
+@using Commonwealth.Client.Components
+
+@namespace Commonwealth.Client.Pages
+@inject SharedDataService DataService
+
+@if (NationMgr is not null)
+{
+    <div class="tabletitle">Projected Goods at Season End</div>
+    <table class="table table-responsive align-middle">
+        <TableHeader HeadingClass="tablegoods-header" FirstHeading="Nation" Headings="@InfoPackage.NationGoodNames" />
+        <tbody>
+            <GoodsRow 
+                ActivityName = "@NationName"
+                Activity="@NationMgr"
+                HeaderClickCallback="HeaderClickCallback"
+                Goods="@NationMgr.Final"
+                InfoPackage="InfoPackage"
+                RowClass="tablegoods-nation" />
+            <GoodsRow 
+                ActivityName ="Districts" 
+                InfoPackage="InfoPackage" 
+                RowClass="tabledivider"/>
+            @foreach (DistrictMgr districtMgr in MgrPackage.DistrictMgrs)
+            {
+                <GoodsRow 
+                    ActivityName = "@districtMgr.Name"
+                    Activity="@districtMgr"
+                    SeasonsOfFood="@SeasonsOfFood(districtMgr)"
+                    HeaderClickCallback="HeaderClickCallback"
+                    Goods="districtMgr.Final"
+                    InfoPackage="InfoPackage"
+                    RowClass="tablegoods-district" />
+            }
+        </tbody>
+    </table>
+@*     <NationPopup @ref="NationPopupRef" InfoPackage="InfoPackage" MgrPackage="MgrPackage" /> *@
+@*     <DistrictGoodsPopup @ref="DistrictPopupRef" InfoPackage="InfoPackage"/> *@
+}
+@code {
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public MgrPackage MgrPackage { get; set; } = default!;
+
+    public NationMgr NationMgr { get; set; } = default!;
+    public string NationName { get; set; } = default!;
+
+    //  NationPopup NationPopupRef = new();
+ //   DistrictGoodsPopup DistrictPopupRef = new();
+
+    protected override void OnParametersSet()
+    {
+        NationMgr = MgrPackage.NationMgr;
+        NationName = NationMgr.Naming?.FormalNation ?? "unknown";
+    }
+
+
+    private void HeaderClickCallback(EconActivity mgr, string clicktype)
+    {
+        Type econType = mgr.GetType();
+        if (econType == typeof(NationMgr))
+        {
+            switch (clicktype){
+                case "left":
+                    Report report = NationMgr.CreateReport("Projection", MgrPackage.DistrictMgrs, InfoPackage.NationGoodNames);
+                    DataService.ShowReport(report);
+                    break;
+                case "right":
+                    DataService.ShowReport(((NationMgr)mgr).LastSeasonReport);
+                    break;
+            }
+        }
+        if (econType == typeof(DistrictMgr))
+        {
+            switch (clicktype)
+            {
+                case "left":
+                    Report report = ((DistrictMgr) mgr).CreateGoodsReport("Projection",InfoPackage.DistrictGoodNames);
+                    DataService.ShowReport(report);
+                    break;
+                
+                case "right": DataService.ShowReport(((DistrictMgr)mgr).LastSeasonGoodsReport); break;
+            }
+        }
+    }
+    private string? SeasonsOfFood(DistrictMgr mgr) {
+        StringBuilder builder = new();
+        FoodMetrics? metrics = mgr.FoodMetrics;
+        if (metrics is null) return null;
+        builder.Append($"({metrics.SeasonsOfFood.ToString("F1")})");
+        if (metrics.FoodStatus == FoodStatus.RATIONING) builder.Append(" - Rationing!");
+        if (metrics.FoodStatus == FoodStatus.FAMINE) builder.Append(" - FAMINE!!");
+        return builder.ToString();
+
+    }
+
+
+}

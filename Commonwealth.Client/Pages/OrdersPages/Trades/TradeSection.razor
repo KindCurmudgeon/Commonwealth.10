@@ -1,0 +1,80 @@
+﻿@using Commonwealth.Client.ClientEconomics
+@using Commonwealth.Economics
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.EndpointDTOs
+
+@namespace Commonwealth.Client.Pages
+
+<div class="tabletitle_left">Trades</div>
+<ul>
+    @foreach (TradeMgr tradeMgr in TradeMgrs ?? [])
+    {
+        <li>
+            <span class="clicktext" onclick="@(() => EditTradeClick(tradeMgr))">
+                @tradeMgr.Order?.Summary()
+            </span>
+            <span class="ms-1 clicktext text-danger" onclick="@(() => RemoveTrade(tradeMgr))">&#x274C</span>
+        </li>
+    }
+</ul>
+<div>
+    <span class="ps-2">
+        <button class="btn btnsave" onclick="@(() => AddTradeClick(TRADETYPE.DISTRICT))">Add Trade with a District</button>
+    </span>
+    @if (InfoPackage.NationTradeTargets is not null)
+    {
+        <span class="ps-2">
+            <button class="btn btnsave" onclick="@(() => AddTradeClick(TRADETYPE.NATION))">Add Trade with a Nation</button>
+        </span>
+    }
+    <span class="ps-2">
+        <button class="btn btnsave" onclick="@(() => AddTradeClick(TRADETYPE.MARKET))">Add Market Trade</button>
+    </span>
+</div>
+
+<TradePopup @ref="TradePopup"
+            EconomicsMgr="EconomicsUpdater"
+            InfoPackage="InfoPackage"
+            SubmitCallback="SubmitCallBack"
+            MgrPackage="MgrPackage" />
+
+@code {
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public ClientEconomicMgr EconomicsUpdater { get; set; } = default!;
+    [Parameter, EditorRequired] public MgrPackage MgrPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public Action RefreshOrders { get; set; } = default!;
+    private List<TradeMgr> TradeMgrs { get; set; } = default!;
+
+    private TradePopup TradePopup = new();
+
+    protected override void OnParametersSet()
+    {
+        TradeMgrs = MgrPackage.TradeMgrs;
+    }
+
+    public void EditTradeClick(TradeMgr mgr)
+    {
+
+        TradePopup.Show(mgr);
+    }
+    public void AddTradeClick(TRADETYPE tradeType)
+    {
+        TradeMgr mgr = TradeMgrFactory.Create(tradeType) ;//new TradeMgr(new TradeOrder(tradeType, MgrPackage.NationMgr.Identity.NationCode));
+        EditTradeClick(mgr);
+    }
+    public void RemoveTrade(TradeMgr mgr)
+    {
+        TradeMgrs.Remove(mgr);
+        RefreshOrders.Invoke();
+    }
+    public void SubmitCallBack(TradeMgr mgr)
+    {
+        mgr.HasChanged = true;
+        TradeMgr? match = TradeMgrs.Find(t => t.Id == mgr.Id);
+        if (match is null) { TradeMgrs.Add(mgr); }
+        else match = mgr;
+        TradePopup.Close();
+        RefreshOrders.Invoke();
+    }
+
+}

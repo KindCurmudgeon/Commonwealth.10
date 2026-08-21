@@ -5,7 +5,7 @@ using Commonwealth.Shared.EndpointDTOs;
 
 namespace Commonwealth.Shared.EconomicMgrs;
 
-public partial class VillageMgr : IMgr<VillageOrder>
+public class VillageMgr : IOrderMgr<VillageOrder>
 {
     public bool HasChanged { get; set; } = false;
     public VillageIdentity Identity { get => Order.Identity; }
@@ -18,14 +18,14 @@ public partial class VillageMgr : IMgr<VillageOrder>
     public int Active { get; set; }
     [JsonConstructor] public VillageMgr(VillageOrder order) { Order = order; }
 
-    [SetsRequiredMembers]
-    public VillageMgr(VillageOrder order, int? count = null, int? active = null)
-    {
-        Order = order;
-        Count = count ?? 0;
-        Active = active ?? 0;
-        Adjustments = [];
-    }
+    // [SetsRequiredMembers]
+    // public VillageMgr(VillageOrder order, int? count = null, int? active = null)
+    // {
+    //     Order = order;
+    //     Count = count ?? 0;
+    //     Active = active ?? 0;
+    //     Adjustments = [];
+    // }
     public void ChangeOrder(VillageOrder order)
     {
         Order = order;
@@ -39,7 +39,7 @@ public partial class VillageMgr : IMgr<VillageOrder>
     }
 
 }
-public partial class VillageOrder
+public class VillageOrder
 {
     public required VillageIdentity Identity { get; init; }
     public int Build { get; set; }
@@ -92,7 +92,7 @@ public partial class VillageIdentity
 
 public partial class EconomicMgr
 {
-    void VillageActivation(VillageMgr villageMgr, DistrictMgr districtMgr, NationMgr nationMgr)
+    public void VillageActivation(VillageMgr villageMgr, DistrictMgr districtMgr, NationMgr nationMgr)
     {
         List<Asset>? cost = FindVillageParm(villageMgr.Identity.Name)?.Activation;
         int villageCount = villageMgr.Order!.Activate;

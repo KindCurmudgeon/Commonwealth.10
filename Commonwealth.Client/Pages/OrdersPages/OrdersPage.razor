@@ -1,0 +1,177 @@
+﻿@page "/orders"
+@using Commonwealth.Shared.EndpointDTOs;
+@using Commonwealth.Shared.EconomicMgrs;
+@using Commonwealth.Shared.Common;
+@using Commonwealth.Client.Services;
+@using Commonwealth.Client.Components;
+@using Commonwealth.Client.ClientEconomics;
+
+@namespace Commonwealth.Client.Pages
+
+@inject SharedDataService DataService;
+@inject NavigationManager NavMgr;
+@inject ApiService ApiService;
+
+
+@if (!IsVisible)
+{
+    <h6>Loading...</h6>
+}
+else
+{
+    <div>
+        <span class="fw-bold text-decoration-underline fs-4">@($"{MgrPackage.NationMgr.Naming?.FormalNation}")</span>
+        <span class="ms-2 fs-6">@InfoPackage.SeasonString</span>
+    </div>
+    <div>
+        <span>@($"Game: \"{InfoPackage.GameName}\"")</span>
+        <button class="btn btnsubmit float-end" @onclick="Exit">Exit</button>
+    </div>
+    <hr />
+    <div>
+
+        <span class="clicktext" @onclick="(() => ShowReport(InfoPackage.GameNews))">Game News</span>
+        <span class="ms-5 clicktext" @onclick="(() => ShowReport(InfoPackage.WorldNews))">World News</span>
+    </div>
+
+    <div class="fw-bold text-center">
+
+        @switch (Status)
+        {
+            case OrderStatus.Saved:
+                <span>Orders Saved; Awaiting Authorization.</span>
+                break;
+            case OrderStatus.Changed:
+                <span class="text-danger ps-2">Orders Changed</span>
+                break;
+            case OrderStatus.Submitted:
+                <span class="text-success ps-2">Orders Saved and Authorized!!</span>
+                break;
+            default: break;
+        }
+    </div>
+    <div>
+        <button class="btn btnsave" disabled="@(Status == OrderStatus.Saved)" @onclick="(() => SubmitOrders(false))">
+            Save Orders
+        </button>
+        <button class="btn btnsubmit float-end" disabled="@(Status == OrderStatus.Submitted)"
+                @onclick="(() => SubmitOrders(true))">
+            Save & Authorize Orders
+        </button>
+    </div>
+    <br />
+    <VillageSection InfoPackage="@InfoPackage" MgrPackage="@MgrPackage" RefreshOrders="@RefreshOrders" />
+    <hr />
+    <GoodsSection InfoPackage="@InfoPackage" MgrPackage="@MgrPackage" />
+    <hr />
+    <TradeSection MgrPackage="@MgrPackage" InfoPackage="@InfoPackage" EconomicsUpdater="@ClientEconomicMgr" RefreshOrders="@RefreshOrders" />
+    <hr />
+    <SpySection MgrPackage="@MgrPackage" InfoPackage="@InfoPackage" RefreshOrders="@RefreshOrders" />
+    <hr />
+    <ConfirmPopup @ref="ConfirmPopupRef" TextTrue="Exit without Saving" TextFalse="Cancel Exit" CallbackAsync="@ConfirmCallback" />
+}
+
+@code {
+
+    private InfoPackage InfoPackage { get; set; } = default!;
+    private MgrPackage MgrPackage { get; set; } = default!;
+    private List<string> ExpansionDistricts { get; set; } = default!;
+    public OrderStatus Status { get; set; }
+    public bool IsVisible { get; set; } = false;
+    public ClientEconomicMgr ClientEconomicMgr { get; set; } = default!;
+
+    ConfirmPopup ConfirmPopupRef = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (DataService.Token is null || DataService.NationIdentity is null) NavMgr.NavigateTo(PageLink.Splash);
+        OrdersRequest request = new()
+        {
+            RequestType = OrdersRequestType.GET,
+            Identity = DataService.NationIdentity!,
+            Token = DataService.Token
+        };
+        OrdersResponse? response = await ApiService.SendRequest<OrdersRequest, OrdersResponse>(Endpoints.Orders, request);
+        if (response is null) return;
+        MgrPackage = response.MgrPackage;
+        InfoPackage = response.InfoPackage;
+        ClientEconomicMgr = new ClientEconomicMgr(MgrPackage, InfoPackage);
+        ExpansionDistricts = InfoPackage.ExpansionTargets ?? [];
+
+        Status = (MgrPackage.NationMgr.OrdersState == OrdersState.OrdersSubmitted) ? OrderStatus.Submitted : OrderStatus.Saved;
+        ClientEconomicMgr?.DetermineResults();
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+
+    public void ShowReport(Report? report)
+    {
+        if (report is null) return;
+        DataService.ShowReport(report);
+    }
+
+
+    public async Task<bool> SubmitOrders(bool readiness)
+    {
+        OrdersRequest request = new()
+        {
+            RequestType = OrdersRequestType.UPDATE,
+            Identity = MgrPackage.NationMgr.Identity,
+            SubmissionState = (readiness) ? OrdersState.OrdersSubmitted : OrdersState.AwaitOrders,
+
+            VillageMgrs = ExtractChangedMgrs<VillageMgr, VillageOrder>(ClientEconomicMgr.AllVillageMgrs),
+            UpdatedSpyMgrs = ExtractChangedMgrs<SpyMgr, SpyOrder>(ClientEconomicMgr.AllSpyMgrs),
+            TradeMgrs = ExtractChangedMgrs<TradeMgr, TradeOrder>(ClientEconomicMgr.AllTradeMgrs),
+            SeasonCount = MgrPackage.NationMgr.SeasonCount,
+            Token = DataService.Token
+        };
+        OrdersResponse? response = await ApiService.SendRequest<OrdersRequest, OrdersResponse>(Endpoints.Orders, request);
+        if (response?.Response.Status is true)
+        {
+            Status = readiness ? OrderStatus.Submitted : OrderStatus.Saved;
+            StateHasChanged();
+            return true;
+        }
+        return false;
+    }
+    
+         public List<U> ExtractChangedMgrs<U, T>(List<U> mgrs) where U : IOrderMgr<T> where T : class
+     {
+          List<U> changedMgrs = [];
+          foreach (IOrderMgr<T> mgr in mgrs)
+          {
+               if (mgr.Order is null) continue;
+               if (mgr.HasChanged) changedMgrs.Add((U)mgr);
+          }
+          return changedMgrs;
+     }
+        public void RefreshOrders()
+    {
+        Status = OrderStatus.Changed;
+        ClientEconomicMgr?.DetermineResults();
+        StateHasChanged();
+    }
+
+    public async Task ConfirmCallback(bool disposition, object _)
+    {
+
+        if (disposition)
+        {
+            bool isSuccess = await SubmitOrders(false);
+            if (isSuccess) NavMgr.NavigateTo(PageLink.Portfolio);
+        }
+    }
+    public void Exit()
+    {
+        if (Status != OrderStatus.Changed) NavMgr.NavigateTo(PageLink.Portfolio);
+        ConfirmPopupRef.Show("Orders have Changed. Save before Exit??", null);
+
+    }
+
+
+    public enum OrderStatus
+    {
+        Saved, Changed, Submitted
+    }
+}

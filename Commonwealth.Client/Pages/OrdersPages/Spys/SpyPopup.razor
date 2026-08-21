@@ -1,0 +1,55 @@
+﻿@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Client.Components
+
+@namespace Commonwealth.Client.Pages
+
+@if(IsVisible)
+{
+        <ModalBase Title="Select District" OnClose="Close" Submit="OnModalSubmit">
+        <select size="6" @onchange="OnDistrictSelected" class="form-select-lg px-3">
+            @foreach (string target in InfoPackage.SpyTargets)
+            {
+                <option value="@target">@target</option>
+            }
+        </select>
+    </ModalBase>
+}
+
+@code {
+    [Parameter, EditorRequired] public Action<SpyMgr>? Submit { get; set; }
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    private SpyMgr SpyMgr { get; set; } = default!;
+    private SpyOrder SpyOrder { get; set; } = default!;
+    public bool IsVisible { get; set; }
+
+    public void Show(SpyMgr spyMgr)
+    {
+        SpyMgr = spyMgr;
+        SpyOrder = spyMgr.Order.DeepCopy();
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+
+    private void OnDistrictSelected(ChangeEventArgs e)
+    {
+        string? item = e.Value?.ToString();
+        if (item is null) return;
+        SpyOrder.NewDistrict = item;
+    }
+
+
+    private void OnModalSubmit()
+    {
+        SpyMgr.ChangeOrder(SpyOrder!);
+        Submit?.Invoke(SpyMgr!);
+    }
+
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+}

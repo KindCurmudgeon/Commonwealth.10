@@ -15,7 +15,7 @@ public class Response
     public bool Status { get; set; } = true;
     public List<string> Messages { get; set; } = [];
     public string? ExceptionMessage { get; set;}
-    [JsonConstructor] public Response() {}
+
 }
 
 public static class Endpoints

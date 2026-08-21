@@ -33,20 +33,116 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ291bnRlci5yYXpvcg==
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/AlertPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbGVydFBvcHVwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/Home.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/ConfirmPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Db25maXJtUG9wdXAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/NotFound.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTm90Rm91bmQucmF6b3I=
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/FormEntryErrorMessages.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Gb3JtRW50cnlFcnJvck1lc3NhZ2VzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvV2VhdGhlci5yYXpvcg==
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/ModalBase.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Nb2RhbEJhc2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/Report/ReportList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9SZXBvcnQvUmVwb3J0TGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/Report/ReportPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9SZXBvcnQvUmVwb3J0UG9wdXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/Report/ReportTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9SZXBvcnQvUmVwb3J0VGFibGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/Report/ReportTableRow.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9SZXBvcnQvUmVwb3J0VGFibGVSb3cucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/SelectStringPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TZWxlY3RTdHJpbmdQb3B1cC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/TableHeader.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9UYWJsZUhlYWRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Components/UserPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Vc2VyUG9wdXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/Admin/Admin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/GoodsSection/DistrictGoodsPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvR29vZHNTZWN0aW9uL0Rpc3RyaWN0R29vZHNQb3B1cC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/GoodsSection/GoodsRow.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvR29vZHNTZWN0aW9uL0dvb2RzUm93LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/GoodsSection/GoodsSection.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvR29vZHNTZWN0aW9uL0dvb2RzU2VjdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/OrdersPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvT3JkZXJzUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/Spys/SpyPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvU3B5cy9TcHlQb3B1cC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/Spys/SpySection.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvU3B5cy9TcHlTZWN0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/Trades/TradePopup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvVHJhZGVzL1RyYWRlUG9wdXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/Trades/TradeSection.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvVHJhZGVzL1RyYWRlU2VjdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/VillagesSection/DistrictVillagesPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvVmlsbGFnZXNTZWN0aW9uL0Rpc3RyaWN0VmlsbGFnZXNQb3B1cC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/VillagesSection/VillagePopup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvVmlsbGFnZXNTZWN0aW9uL1ZpbGxhZ2VQb3B1cC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/VillagesSection/VillageRow.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvVmlsbGFnZXNTZWN0aW9uL1ZpbGxhZ2VSb3cucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/OrdersPages/VillagesSection/VillageSection.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXJzUGFnZXMvVmlsbGFnZXNTZWN0aW9uL1ZpbGxhZ2VTZWN0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/Portfolio/GameEditPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUG9ydGZvbGlvL0dhbWVFZGl0UG9wdXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/Portfolio/NationEditPopup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUG9ydGZvbGlvL05hdGlvbkVkaXRQb3B1cC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/Portfolio/Portfolio.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUG9ydGZvbGlvL1BvcnRmb2xpby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Pages/SigninPages/Splash.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU2lnbmluUGFnZXMvU3BsYXNoLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/_Imports.razor]
@@ -56,7 +152,3 @@ build_metadata.AdditionalFiles.CssScope =
 [/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L01haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-w2uo40ja1q
-
-[/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Client/Layout/NavMenu.razor]
-build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L05hdk1lbnUucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = b-4gv3401bb4

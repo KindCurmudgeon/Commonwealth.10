@@ -1,0 +1,52 @@
+﻿
+@namespace Commonwealth.Client.Components
+
+@if (IsVisible)
+{
+    <ModalBase Title="@Title" OnClose="Close">
+        <select size="@Size" @onchange="OnSelected" class="form-select-lg px-3">
+            @foreach (string? item in Items ?? [])
+            {
+                @if (item is null)
+                {
+                    <option value="">-------</option>
+                }
+                else { <option value="@item">@item</option>}
+            }
+        </select>
+    </ModalBase>
+}
+
+@code {
+
+    [Parameter] public EventCallback<string> Submit { get; set; }
+
+
+    private bool IsVisible = false;
+    public string? Title { get; set; }
+    public List<string>? Items { get; set; }
+    public int Size = 4;
+
+    private async Task OnSelected(ChangeEventArgs e)
+    {
+        string? item = e.Value?.ToString();
+        if (item is null) return;
+        await Submit.InvokeAsync(item);
+    }
+
+    public void Show(List<string>? items, string? title = null, int? size = null)
+    {
+        if (items is null || items.Count == 0) return;
+        Items = items;
+        Title = title ?? "Select Item";
+        int s = size ?? 4;
+        Size = (items.Count < s) ? items.Count : s;
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

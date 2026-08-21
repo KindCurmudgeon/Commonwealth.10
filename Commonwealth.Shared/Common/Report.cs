@@ -16,8 +16,9 @@ public partial class Report
         Title = title;
         Entries = [];
     }
-    public void AddTextEntry(string text)
+    public void AddTextEntry(string? text)
     {
+        if (text is null) return;
         Entries.Add(new ReportEntry(ENTRYTYPE.TEXT) { Text = text});
     }
     public void AddTitledList(string title, List<string>? listItems)

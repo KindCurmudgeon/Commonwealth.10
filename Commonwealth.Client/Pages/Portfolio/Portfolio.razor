@@ -1,0 +1,329 @@
+@using Commonwealth.Client;
+@using Commonwealth.Client.Components;
+@using Commonwealth.Shared.Common
+@using Commonwealth.Shared.EndpointDTOs
+@using Microsoft.AspNetCore.Components;
+
+@attribute [Route(PageLink.Portfolio)];
+
+@using Commonwealth.Client.Services;
+@inject NavigationManager NavMgr;
+@inject SharedDataService DataService;
+@inject ApiService ApiService;
+
+
+<h4 class="fw-bold"><u>Your Portfolio of Games</u>:</h4>
+@if (Response is null)
+{
+    <div>Loading ...</div>
+}
+else
+{
+    @if (Summaries.Count == 0)
+    {
+        <div>No Games in your current portfolio.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-auto">
+                <thead>
+                    <tr class="bg-light">
+                        <th>Nation</th>
+                        <th class="fs-7">Game</th>
+                    </tr>
+                </thead>
+                @foreach (GameSummaryDTO gameSummary in Summaries)
+                {
+                    string gmClick = gameSummary.IsGamemaster ? "clicktext" : "";
+                    NationSummaryDTO? nationSummary = gameSummary.NationSummary;
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div>
+                                    @if (nationSummary is not null)
+                                    {
+                                        <span class="ms-1 fw-bold clicktext" @onclick="(() => NationLeftClick(gameSummary))"
+                                              @oncontextmenu:preventDefault="true" @oncontextmenu="(() => NationRightClick(gameSummary))">
+                                            @(nationSummary.Naming?.FormalNation ?? "TBD")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="ms-1">(none)</span>
+                                    }
+                                </div>
+                                <div>
+                                    @if (nationSummary is not null)
+                                    {
+                                        @if (gameSummary.GameState == GameState.Created)
+                                        {
+                                            @switch (nationSummary.EntryState)
+                                            {
+                                                case LineupState.Invited:
+                                                    <span class="ps-2 clicktext text-success" onclick="@(() => AcceptAsync(nationSummary, true))">Accept</span>
+                                                    <span class="ps-2 clicktext text-danger" onclick="@(() => AcceptAsync(nationSummary, false))">Regrets</span>
+                                                    break;
+                                                case LineupState.Accepted:
+                                                    <span class="ps-2 text-success">Accepted</span>
+                                                    <span class="ps-2 clicktext" onclick="@(() => AcceptAsync(nationSummary, false))">Regrets</span>
+                                                    break;
+                                                case LineupState.Regrets:
+                                                    <span class="ps-2 text-danger">Regreted</span>
+                                                    <span class="ps-2 clicktext" onclick="@(() => AcceptAsync(nationSummary, true))">Accept</span>
+                                                    break;
+                                            }
+                                        }
+                                        @if (gameSummary.GameState == GameState.Activated)
+                                        {
+                                            @switch (nationSummary.OrdersState)
+                                            {
+                                                case OrdersState.AwaitOrders:
+                                                    <span class="ps-2">Awaiting Orders</span>
+                                                    break;
+                                                case OrdersState.OrdersSubmitted:
+                                                    <span class="ps-2 text-success">Orders Submitted</span>
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-between gap-5 fs-7">
+                                    <div>
+                                        <span class="clicktext fw-bold ms-1" @onclick="(() => GameLeftClick(gameSummary))" @oncontextmenu:preventDefault="true"
+                                              @oncontextmenu="(() => GameRightClick(gameSummary))">@gameSummary.GameName</span>
+                                        @if (gameSummary.GameState == GameState.Activated)
+                                        {
+                                            <span class="ms-2">@gameSummary.GameDate?.ToString()</span>
+                                        }
+                                    </div>
+                                    @if (gameSummary.IsGamemaster)
+                                    {
+                                        <span class="clicktext text-danger" @onclick="@(() => OnArchivalClick(gameSummary))">Remove</span>
+                                    }
+                                </div>
+                                <div class="fs-7">
+                                    @{
+                                        int? waitingCount = gameSummary.WaitingCount;
+                                    }
+
+                                    @if (gameSummary.GameState == GameState.Created)
+                                    {
+                                        <span class="ps-1">Forming:</span>
+                                        switch (waitingCount)
+                                        {
+                                            case null:
+                                                <span>No Nations </span>
+                                                break;
+                                            case 0:
+                                                <span class="text-success ps-2 @gmClick" onclick="@(() => Activate(gameSummary))">Ready to Activate</span>
+                                                break;
+                                            default:
+                                                <span class="ps-2">@($"Awaiting Acceptance from {"player".Pluralize((int)waitingCount!)}.")</span>
+                                                break;
+                                        }
+                                    }
+
+                                    @if (gameSummary.GameState == GameState.Activated)
+                                    {
+                                        <span class="ps-1">Active:</span>
+                                        @if (waitingCount == 0)
+                                        {
+                                            <span class="ps-2 text-success @gmClick" onclick="@(() => Advance(gameSummary))">Ready to Advance</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="ps-2">@($"Awaiting orders from {"nation".Pluralize(waitingCount ?? 0)}.")</span>
+                                        }
+                                    }
+
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                }
+            </table>
+        </div>
+    }
+
+    <hr style="height:4px;color:black; opacity:100">
+    <div class="clicktext my-1" @onclick="CreateGame">Create a New Game</div>
+    <hr style="height:4px;color:black; opacity:100">
+    <div class="clicktext my-1" @onclick="EditAccount">Edit Account</div>
+    <NationEditPopup @ref="NationEditRef" />
+    <GameEditPopup @ref="GameEditPopupRef" OnCreated="RefreshAsync" />
+    <UserPopup @ref="UserPopupRef" OnSubmit="OnUserSubmit" />
+    <ConfirmPopup @ref=ConfirmPopupRef CallbackAsync="ConfirmCallback" TextTrue="Remove" TextFalse="Cancel"></ConfirmPopup>
+}
+@code
+{
+    public UserResponse? Response { get; set; }
+    public required List<GameSummaryDTO> Summaries { get; set; }
+
+    private NationEditPopup NationEditRef = new();
+    private GameEditPopup GameEditPopupRef = new();
+    private ConfirmPopup ConfirmPopupRef = new();
+    private UserPopup UserPopupRef = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (DataService.Token is null) NavMgr.NavigateTo(PageLink.Splash);
+        await RefreshAsync();
+    }
+
+    private async Task RefreshAsync(bool? forceStateChange = null)
+    {
+        UserRequest request = new() { RequestType = UserRequestType.GET_PORTFOLIO, Token = DataService.Token };
+        UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+        if (response is not null && response.Response.Status is true)
+        {
+            Response = response;
+            Summaries = response.GameSummaries ?? [];
+            if (forceStateChange is true) StateHasChanged();
+        }
+    }
+    private void OnArchivalClick(GameSummaryDTO dto)
+    {
+        ConfirmPopupRef.Show($"Are you sure you want to remove {dto.GameName}", dto);
+    }
+    private async Task ConfirmCallback(bool disposition, object dto)
+    {
+        if (disposition == false) return;
+        GamemasterRequest request = new()
+        {
+            RequestType = GM_RequestType.Remove,
+            GameName = ((GameSummaryDTO)dto).GameName,
+            Token = DataService.Token
+        };
+        GamemasterResponse? response =
+            await ApiService.SendRequest<GamemasterRequest, GamemasterResponse>(Endpoints.Gamemaster, request);
+        if (response?.Response.Status is true) await RefreshAsync(true);
+
+    }
+    private string GameResponsibility(GameSummaryDTO dto)
+    {
+        if (dto.IsCreator) return "(C/GM)";
+        if (dto.IsGamemaster) return "(GM)";
+        return "";
+    }
+
+
+    private async Task GameLeftClick(GameSummaryDTO gameInfo)
+    {
+        //   if ((bool)gameInfo.IsCreator! || (bool)gameInfo.IsGamemaster!) GamemasterOptionsRef.Show(gameInfo);
+        //   else await GameEditPopupRef.Show(gameInfo.GameName, false);
+        if (gameInfo.IsCreator || gameInfo.IsGamemaster is true)
+        {
+            await GameEditPopupRef.Show(gameInfo.GameName, false);
+        }
+    }
+    private async Task GameRightClick(GameSummaryDTO gameInfo)
+    {
+        if (gameInfo.IsCreator is false && gameInfo.IsGamemaster is false) return;
+        await GameEditPopupRef.Show(gameInfo.GameName, true);
+    }
+
+    private void NationLeftClick(GameSummaryDTO dto)
+    {
+        if (dto.GameState == GameState.Activated)
+        {
+            DataService.NationIdentity = dto.NationSummary!.Identity;
+            NavMgr.NavigateTo(PageLink.Orders);
+        }
+    }
+
+    private void NationRightClick(GameSummaryDTO dto)
+    {
+        NationEditRef?.Show(dto.NationSummary!.Identity);
+    }
+    private async Task AcceptAsync(NationSummaryDTO nationInfo, bool accept)
+    {
+        NationRequest request = new()
+        {
+            RequestType = NationRequestType.AcceptReject,
+            Identity = nationInfo.Identity,
+            IsAccepted = accept,
+            Token = DataService.Token
+        };
+        NationResponse? response = await ApiService.SendRequest<NationRequest, NationResponse>
+        (Endpoints.Nation, request);
+        if (response?.Response.Status is true) await RefreshAsync(true);
+    }
+
+    private async Task CreateGame()
+    {
+        await GameEditPopupRef.Show(null, true);
+    }
+
+
+    private async Task Activate(GameSummaryDTO dto)
+    {
+        if (dto.IsGamemaster is false) return;
+        GamemasterRequest request = new()
+        {
+            RequestType = GM_RequestType.Activate,
+            GameName = dto.GameName,
+            Token = DataService.Token
+        };
+        await SendRequest(request);
+
+    }
+
+    private async Task Advance(GameSummaryDTO dto, bool? useHistory = false)
+    {
+        if (dto.IsGamemaster is false) return;
+        GamemasterRequest request = new()
+        {
+            RequestType = GM_RequestType.SeasonUpdate,
+            GameName = dto.GameName,
+            Token = DataService.Token,
+            UseHistory = useHistory
+        };
+        await SendRequest(request);
+    }
+    private async Task SendRequest(GamemasterRequest request)
+    {
+        GamemasterResponse? response =
+            await ApiService.SendRequest<GamemasterRequest, GamemasterResponse>(Endpoints.Gamemaster, request);
+        if (response?.Response.Status is true)
+        {
+            await RefreshAsync(true);
+        }
+    }
+    private void AdminFunctions() => NavMgr.NavigateTo(PageLink.Admin);
+
+
+    private async Task EditAccount()
+    {
+        UserDTO? dto = await GetUserDTO(DataService?.UserIdentity?.UserName);
+        UserPopupRef?.Show(dto);
+    }
+    private async Task<UserDTO?> GetUserDTO(string? userName)
+    {
+        if (ApiService is null || userName is null) return null;
+
+        UserRequest request = new()
+        {
+            RequestType = UserRequestType.GETUSERDTO,
+            UserName = userName,
+            Token = DataService?.Token
+        };
+        UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+        if (response is null || response.Response.Status is false) return null;
+        return response.UserDTO;
+    }
+    private async Task OnUserSubmit(UserDTO userDTO)
+    {
+        UserRequest request = new() { RequestType = UserRequestType.UPDATE, UserDTO = userDTO, Token = DataService.Token };
+        UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+        if (response is null) return;
+        if (response.Response.Status is false)
+        {
+            UserPopupRef.UpdateUserDTO(response.UserDTO);
+        }
+        else UserPopupRef.Close();
+    }
+
+}

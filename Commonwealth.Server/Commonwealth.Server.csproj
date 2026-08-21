@@ -1,13 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\Commonwealth.Shared\Commonwealth.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.29.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.22.0" />
   </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>70dbfca4-21c8-46ed-bf06-464f80fe9ffa</UserSecretsId>
   </PropertyGroup>
 
 </Project>

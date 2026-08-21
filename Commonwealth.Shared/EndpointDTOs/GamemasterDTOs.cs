@@ -23,7 +23,7 @@ public class GamemasterResponse : ResponseBase
     public List<string>? Friends { get; set; }
 }
 
-public partial class GameDTO
+public class GameDTO
 {
     public string? GameName { get; set; }
     public TimeSpan? OrdersPeriod { get; set; }
@@ -37,7 +37,6 @@ public partial class GameDTO
     public DateTime? CreationDateTime { get; set; }
     public List<UserIdentity>? Gamemasters { get; set; }
     public bool? IsActivated { get; set; }
-    [JsonConstructor] public GameDTO() { }
     public string? GameStateString()
     {
         switch (GameState)
@@ -50,7 +49,7 @@ public partial class GameDTO
             default: return null;
         }
     }
-    public GameDTO Copy()
+    public GameDTO DeepCopy()
     {
         return new GameDTO()
         {
@@ -66,21 +65,9 @@ public partial class GameDTO
             IsActivated = IsActivated
         };
     }
-    public static GameDTO CreateNew(string creator)
-    {
-        return new GameDTO()
-        {
-            GameName = null,
-            GameState = GameState.None,
-            CreationDateTime = DateTime.UtcNow,
-            Creator = creator,
-            OrdersPeriod = new(7, 0, 0, 0),
-            Gamemasters = [],
-            IsActivated = false
-        };
-    }
 }
-public partial class LineupDTO //: NationNaming
+
+public class LineupDTO
 {
     public Guid Id { get; set; }
     public required string UserName { get; set; }
@@ -90,16 +77,7 @@ public partial class LineupDTO //: NationNaming
     public string? HomeDistrict { get; set; }
     public string? NationName { get; set; }
     public string? NewUser { get; set; }
-    [JsonConstructor] public LineupDTO() : base() { }
 
-
-    [SetsRequiredMembers]
-    public LineupDTO(string userName)//: base(identity, new NationNaming())
-    {
-        Id = Guid.NewGuid();
-        UserName = userName;
-        LineupState = LineupState.Added;
-    }
     public string? StateString()
     {
         if (OrdersState == OrdersState.None)

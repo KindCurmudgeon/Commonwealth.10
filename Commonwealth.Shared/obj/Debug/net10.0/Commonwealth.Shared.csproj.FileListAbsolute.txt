@@ -9,3 +9,4 @@
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/refint/Commonwealth.Shared.dll
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.pdb
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/ref/Commonwealth.Shared.dll
+/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.sourcelink.json

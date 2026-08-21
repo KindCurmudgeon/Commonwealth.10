@@ -1,0 +1,478 @@
+{
+    "ParmFileInfo": {
+        "RootName": "test",
+        "Version": "0",
+        "Type": "geog"
+    },
+    "Regions": [
+        {
+            "PrimaryName": "Caelthwyn",
+            "PossessiveName": "Caelthwynan",
+            "Color": "Red"
+        },
+        {
+            "PrimaryName": "Drakmoor",
+            "PossessiveName": "Drakmooran",
+            "Color": "Red"
+        },
+        {
+            "PrimaryName": "Malacandra",
+            "PossessiveName": "Malicandrian",
+            "Color": "Green"
+        },
+        {
+            "PrimaryName": "Vamendir",
+            "PossessiveName": "Vamendrian",
+            "Color": "Green"
+        },
+        {
+            "PrimaryName": "Cyren",
+            "PossessiveName": "Cyrenian",
+            "Color": "Black"
+        },
+        {
+            "PrimaryName": "Dragonspire",
+            "PossessiveName": "Dragonien",
+            "Color": "Black"
+        }
+    ],
+    "Districts": [
+        {
+            "Name": "Caelnor",
+            "Region": "Caelthwyn",
+            "LandConnections": [
+                "Caelsur",
+                "Caelest"
+            ],
+            "SeaConnections": [
+                "Deep Brine",
+                "Low Stay"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Caelsur",
+            "Region": "Caelthwyn",
+            "LandConnections": [
+                "Caelnor",
+                "Caelest"
+            ],
+            "SeaConnections": [
+                "Deep Brine",
+                "Foam Gap"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Caelest",
+            "Region": "Caelthwyn",
+            "LandConnections": [
+                "Caelnor",
+                "Caelsur"
+            ],
+            "SeaConnections": [
+                "Low Stay",
+                "Northal Sea",
+                "Green Sea",
+                "Foam Gap"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Bithet",
+            "Region": "Drakmoor",
+            "LandConnections": [
+                "Orret",
+                "Luret",
+                "Arbul"
+            ],
+            "SeaConnections": [
+                "Shallow Brine",
+                "Central Blue"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Luret",
+            "Region": "Drakmoor",
+            "LandConnections": [
+                "Orret",
+                "Bithet",
+                "Elmoril",
+                "Tysol",
+                "Arbul"
+            ],
+            "SeaConnections": [
+                "Foam Gap",
+                "Green Sea"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Orret",
+            "Region": "Drakmoor",
+            "LandConnections": [
+                "Bithet",
+                "Luret"
+            ],
+            "SeaConnections": [
+                "Shallow Brine",
+                "Foam Gap"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Arbul",
+            "Region": "Malacandra",
+            "LandConnections": [
+                "Bithet",
+                "Welspor",
+                "Luret",
+                "Tysol"
+            ],
+            "SeaConnections": [
+                "Central Blue"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Tysol",
+            "Region": "Malacandra",
+            "LandConnections": [
+                "Luret",
+                "Arbul",
+                "Elmoril",
+                "Welspor",
+                "Uthoria"
+            ],
+            "Features": []
+        },
+        {
+            "Name": "Elmoril",
+            "Region": "Malacandra",
+            "LandConnections": [
+                "Luret",
+                "Tysol",
+                "Uthoria"
+            ],
+            "SeaConnections": [
+                "Green Sea",
+                "The Narrows"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Larandria",
+            "Region": "Vamendir",
+            "LandConnections": [
+                "Welspor",
+                "Uthoria"
+            ],
+            "SeaConnections": [
+                "Central Blue"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Welspor",
+            "Region": "Vamendir",
+            "LandConnections": [
+                "Arbul",
+                "Tysol",
+                "Larandria",
+                "Uthoria"
+            ],
+            "SeaConnections": [
+                "Central Blue"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Uthoria",
+            "Region": "Vamendir",
+            "LandConnections": [
+                "Welspor",
+                "Larandria",
+                "Tysol",
+                "Elmoril"
+            ],
+            "SeaConnections": [
+                "The Narrows",
+                "Gate Keeper"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Argos",
+            "Region": "Cyren",
+            "LandConnections": [
+                "Bardalan",
+                "Medolsta",
+                "Cailyen"
+            ],
+            "SeaConnections": [
+                "Green Sea",
+                "Tower Firth"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Bardalan",
+            "Region": "Cyren",
+            "LandConnections": [
+                "Argos",
+                "Medolsta",
+                "Edessa"
+            ],
+            "SeaConnections": [
+                "Green Sea",
+                "The Narrows"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Edessa",
+            "Region": "Dragonspire",
+            "LandConnections": [
+                "Bardalan",
+                "Medolsta",
+                "Kweldessa"
+            ],
+            "SeaConnections": [
+                "The Narrows",
+                "Gate Keeper",
+                "Standing Wave"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Medolsta",
+            "Region": "Dragonspire",
+            "LandConnections": [
+                "Bardalan",
+                "Argos",
+                "Cailyen",
+                "Kweldessa",
+                "Edessa"
+            ],
+            "Features": []
+        },
+        {
+            "Name": "Cailyen",
+            "Region": "Cyren",
+            "LandConnections": [
+                "Argos",
+                "Medolsta",
+                "Kweldessa"
+            ],
+            "SeaConnections": [
+                "Tower Firth"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Kweldessa",
+            "Region": "Dragonspire",
+            "LandConnections": [
+                "Edessa",
+                "Medolsta",
+                "Cailyen"
+            ],
+            "SeaConnections": [
+                "Standing Wave"
+            ],
+            "Features": [
+                "SeaCoast"
+            ]
+        },
+        {
+            "Name": "Blue Isle",
+            "SeaConnections": [
+                "Shallow Brine",
+                "Central Blue"
+            ],
+            "Features": [
+                "SeaCoast",
+                "Island"
+            ]
+        },
+        {
+            "Name": "Galleoch",
+            "SeaConnections": [
+                "Gate Keeper",
+                "Standing Wave"
+            ],
+            "Features": [
+                "SeaCoast",
+                "Island"
+            ]
+        }
+    ],
+    "Seas": [
+        {
+            "Name": "Deep Brine",
+            "LandConnections": [
+                "Caelnor",
+                "Caelsur"
+            ],
+            "SeaConnections": [
+                "Low Stay",
+                "Foam Gap",
+                "Shallow Brine"
+            ]
+        },
+        {
+            "Name": "Low Stay",
+            "LandConnections": [
+                "Caelnor",
+                "Caelest"
+            ],
+            "SeaConnections": [
+                "Deep Brine",
+                "Northal Sea"
+            ]
+        },
+        {
+            "Name": "Northal Sea",
+            "LandConnections": [
+                "Caelest"
+            ],
+            "SeaConnections": [
+                "Low Stay",
+                "Green Sea"
+            ]
+        },
+        {
+            "Name": "Shallow Brine",
+            "LandConnections": [
+                "Bithet",
+                "Orret",
+                "Blue Isle"
+            ],
+            "SeaConnections": [
+                "Deep Brine",
+                "Central Blue",
+                "Foam Gap"
+            ]
+        },
+        {
+            "Name": "Foam Gap",
+            "LandConnections": [
+                "Caelsur",
+                "Caelest",
+                "Orret",
+                "Luret"
+            ],
+            "SeaConnections": [
+                "Shallow Brine",
+                "Deep Brine",
+                "Green Sea"
+            ]
+        },
+        {
+            "Name": "Green Sea",
+            "LandConnections": [
+                "Caelest",
+                "Luret",
+                "Elmoril",
+                "Argos",
+                "Bardalan"
+            ],
+            "SeaConnections": [
+                "Northal Sea",
+                "The Narrows",
+                "Foam Gap",
+                "Tower Firth"
+            ]
+        },
+        {
+            "Name": "Tower Firth",
+            "LandConnections": [
+                "Argos",
+                "Cailyen"
+            ],
+            "SeaConnections": [
+                "Green Sea"
+            ]
+        },
+        {
+            "Name": "Central Blue",
+            "LandConnections": [
+                "Bithet",
+                "Arbul",
+                "Welspor",
+                "Larandria",
+                "Blue Isle"
+            ],
+            "SeaConnections": [
+                "Shallow Brine"
+            ]
+        },
+        {
+            "Name": "The Narrows",
+            "LandConnections": [
+                "Elmoril",
+                "Uthoria",
+                "Bardalan",
+                "Edessa"
+            ],
+            "SeaConnections": [
+                "Green Sea",
+                "Gate Keeper"
+            ]
+        },
+        {
+            "Name": "Gate Keeper",
+            "LandConnections": [
+                "Uthoria",
+                "Edessa",
+                "Galleoch"
+            ],
+            "SeaConnections": [
+                "The Narrows",
+                "Standing Wave"
+            ]
+        },
+        {
+            "Name": "Standing Wave",
+            "LandConnections": [
+                "Edessa",
+                "Kweldessa",
+                "Galleoch"
+            ],
+            "SeaConnections": [
+                "Gate Keeper"
+            ]
+        }
+    ]
+}

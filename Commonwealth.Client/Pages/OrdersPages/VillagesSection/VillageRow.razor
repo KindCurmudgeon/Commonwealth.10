@@ -1,0 +1,143 @@
+﻿@using System.Text
+@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.EndpointDTOs
+
+
+@namespace Commonwealth.Client.Pages
+@inject SharedDataService DataService;
+
+@if (IsVisible)
+{
+    <tr class="@RowClass">
+        <th scope="row">
+            <div>
+                <span class="clicktext" @onclick="OnDistrictLeftClick" @oncontextmenu:preventDefault="true"
+                    @oncontextmenu="OnDistrictRightClick">@DistrictMgr.Name</span>
+                @if (DistrictMgr.ForeignVillageCount > 0)
+                {
+                    <span class="ms-1">$"({DistrictMgr.ForeignVillageCount} F)"</span>
+                }
+@*                 @if (DistrictMgr.Owner != NationMgr.NationCode)
+                {
+                    <span class="ms-1 text-danger clicktext" @onclick="RemoveExpansion">&#x274C</span>
+                } *@
+            </div>
+        </th>
+        @foreach (string villageName in InfoPackage?.VillageNames ?? [])
+        {
+            CellData cell = GetCellData(villageName);
+            if (cell.Click is true)
+            {
+                <td class="text-center cellclick" @onclick="(() => ShowAdjustWrapper(villageName))">
+                    <div>@cell.Contents</div>
+                    <div>@cell.Activity</div>
+                </td>
+            }
+            else
+            {
+                <td class="text-center">@cell.Contents</td>
+            }
+        }
+    </tr>
+}
+
+@code {
+    bool IsVisible = false;
+
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public MgrPackage MgrPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public DistrictMgr DistrictMgr { get; set; } = default!;
+    [Parameter, EditorRequired] public List<VillageMgr> VillagesHere { get; set; } = default!;
+    [Parameter] public Action<VillageMgr?>? ShowAdjust { get; set; }
+    [Parameter] public Action<DistrictMgr>? DistrictLeftClick { get; set; }
+    [Parameter] public Action<DistrictMgr>? DistrictRightClick { get; set; }
+    [Parameter] public Action<DistrictMgr>? RemoveExpansionDistrict { get; set; }
+    [Parameter] public string? RowClass { get; set; }
+
+    private string? YearsOfFood;
+
+  //  private NationMgr NationMgr { get; set; } = default!;
+  
+
+    protected override void OnParametersSet()
+    {
+     //   NationMgr = InfoPackage.EconomicsUpdater.NationMgr;
+        if (RowClass is null)  RowClass = 
+            (DistrictMgr.Owner == MgrPackage.NationMgr.NationCode) ? "tablevillage-owned" :  "tablevillage-foreign";
+        YearsOfFood = DistrictMgr.FoodMetrics?.SeasonsOfFood.ToString("F1");
+        IsVisible = true;
+    }
+
+
+    private record CellData(string? Contents, string? Activity = null, bool Click = false);
+
+    private CellData GetCellData(string colName)
+    {
+        VillageMgr? result = VillagesHere?.Find(o => o.Identity.Name == colName);
+        if (result is null) return GetNoVillageCellData();
+        return GetVillageCellData(result);
+
+        CellData GetNoVillageCellData()
+        {
+            {
+                bool? canBuildHere = DistrictMgr?.AllowedVillages?.Contains(colName);
+                if (canBuildHere == true) return new CellData("+", null, true);
+                if (canBuildHere is null) return new CellData("?", null, true);
+                return new CellData("", null, false);
+            }
+        }
+        CellData GetVillageCellData(VillageMgr result)
+        {
+            VillageOrder orders = result.Order;
+            string contents = "";
+            string? activity = Activity();
+            if (result.Count == 0)
+            {
+                contents = (activity is null) ? "-" : "";
+            }
+            else
+            {
+                contents = (result!.Count == result.Active) ? result.Count.ToString() :
+                $"{result.Active}/{result.Count}";
+            }
+            return new CellData(contents, Activity(), true);
+
+            string? Activity()
+            {
+                if (orders.Build > 0) return $"\u21D2{result.Count + orders.Build}";
+                if (orders.Activate > 0)
+                {
+                    if (result.Active + orders.Activate == result.Count) return $"\u21D2{result.Count}";
+                    return $"\u21D2{result.Active + orders.Activate}/{result.Count}";
+                }
+                if (orders.Deactivate > 0) return $"\u21D2{result.Active - orders.Deactivate}/{result.Count}";
+                return null;
+            }
+        }
+    }
+
+    private void ShowAdjustWrapper(string villageName)
+    {
+        VillageMgr? result = VillagesHere?.Find(v => v.Identity.Name == villageName);
+        if (result is null)
+        {
+            VillageIdentity identity = new VillageIdentity(DistrictMgr.Name, villageName, MgrPackage.NationMgr.NationCode);
+            result = new VillageMgr(new VillageOrder(identity)) { HasChanged = true };
+            result.Order.Build = 1;
+        }
+        ShowAdjust?.Invoke(result);
+    }
+    private void RemoveExpansion()
+    {
+        RemoveExpansionDistrict?.Invoke(DistrictMgr);
+    }
+    private void OnDistrictLeftClick()
+    {
+        DistrictLeftClick?.Invoke(DistrictMgr);
+    }
+    private void OnDistrictRightClick()
+    {
+        DistrictRightClick?.Invoke(DistrictMgr);
+    }
+}

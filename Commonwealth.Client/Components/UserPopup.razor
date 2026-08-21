@@ -1,0 +1,202 @@
+﻿@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EndpointDTOs
+
+@inject SharedDataService DataService;
+
+
+@if (IsVisible)
+{
+    <ModalBase Title="@Title" OnClose="@Close" SubmitAsync="@HandleSubmit">
+        @if (IsNewUser)
+        {
+            <div class="row mb-3">
+                <label class="col-sm-5 text-end col-form-label">Username:</label>
+                <div class="col-sm-5">
+                    <input type="text" @bind-value="UserDTO!.UserName" class="form-control" />
+                </div>
+            </div>
+        }
+        <div class="row mb-3">
+            <label class="col-sm-5 text-end col-form-label">@(IsNewUser ? "Password:" : "Change Password:")</label>
+            <div class="col-sm-5">
+                <input type="password" @bind-value="UserDTO!.Password" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-sm-5 text-end col-form-label">Email:</label>
+            <div class="col-sm-5">
+                <input type="email" @bind-value="UserDTO.Email" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-sm-5 text-end col-form-label">First/Given Name:</label>
+            <div class="col-sm-5">
+                <input type="text" @bind-value="UserDTO.GivenName" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-sm-5 text-end col-form-label">Last/Family Name:</label>
+            <div class="col-sm-5">
+                <input type="text" @bind-value="UserDTO.FamilyName" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-sm-5 text-end col-form-label">Friends:</label>
+            <div class="col-sm-5">
+                @if (UserDTO.Friends.Count == 0)
+                {
+                    <span>none</span>
+                }
+                else
+                {
+                    <!-- Scrollable container for the list -->
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <ul class="list-group">
+                            @foreach (var item in UserDTO.Friends)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @item
+                                    <div class="text-danger clicktext fs-7" @onclick="() => RemoveFriend(item)">Remove</div>
+                                </li>
+                            }
+                        </ul>
+
+                    </div>
+                }
+                <div class="d-flex justify-content-between align-items-center">
+                <input type="text" @bind="NewFriend" @bind:event="oninput" placeholder="Enter User ID" class="form-control" />
+                <button class="btn btn-primary mt-2" @onclick="AddFriend">Add</button>
+                </div>
+            </div>
+        </div>
+
+
+        <FormEntryErrorMessages ErrorMessages="Errors" />
+    </ModalBase>
+}
+
+@code {
+
+    [Parameter] public Func<UserDTO, Task>? OnSubmit { get; set; }
+    [Parameter] public Func<string, Task<string>>? FriendConfirm { get; set; }
+
+    private bool IsNewUser { get; set; }
+    private string? Title { get; set; }
+    private List<string>? Errors { get; set; }
+
+    private bool IsVisible = false;
+    private UserDTO UserDTO { get; set; } = default!;
+    private string NewFriend { get; set; } = string.Empty;
+
+    public void Show(UserDTO? userDTO)
+    {
+        if (userDTO is null) return;
+        UserDTO = userDTO;
+        IsNewUser = string.IsNullOrEmpty(userDTO.UserName);
+        Title = IsNewUser ? "Create an Account" : $"Account for {UserDTO!.UserName}";
+        IsVisible = true;
+        StateHasChanged();
+
+    }
+
+    private void AddFriend()
+    {
+        if (string.IsNullOrEmpty(NewFriend)) return;
+        string trimmed = NewFriend.Trim();
+        if (UserDTO.Friends.Contains(trimmed, StringComparer.OrdinalIgnoreCase)) return;
+        UserDTO.Friends.Add(trimmed);
+        NewFriend = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit()
+    {
+        NewFriend = string.Empty;
+        if (OnSubmit is not null) await InvokeAsync(() => OnSubmit(UserDTO));
+    }
+
+    private void RemoveFriend(string item)
+    {
+        if (UserDTO.Friends.Contains(item))
+        {
+            UserDTO.Friends.Remove(item);
+        }
+    }
+    // private async Task HandleSubmit()
+    // {
+    //     if (IsSubmissionReady() is false) return;
+    //     if (IsNewUser)
+    //     {
+    //         SigninRequest request = new SigninRequest
+    //         {
+    //             RequestType = SigninRequestType.REGISTER,
+    //             UserDTO = UserDTO
+    //         };
+    //         SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
+    //         if (response?.Response.Status == true)
+    //         {
+    //             OnValidSubmission?.Invoke(response.Identity!, response.Token!);
+    //         }
+    //     }
+    //     else
+    //     {
+    //         UserRequest request = new UserRequest
+    //         {
+    //             RequestType = UserRequestType.UPDATE,
+    //             UserDTO = UserDTO,
+    //             Token = DataService.Token
+    //         };
+    //         UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+    //         if (response?.Response.Status == true) Close();
+    //     }
+    // }
+    bool IsSubmissionReady()
+    {
+        Errors = [];
+        Errors.CheckStringEntry(UserDTO!.UserName, "User Name", 20, 3);
+        if (IsNewUser) Errors.CheckStringEntry(UserDTO!.Password, "Password", 20, 3);
+        Errors.CheckForEmailAddress(UserDTO.Email);
+        return (Errors.Count == 0);
+    }
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+    public void UpdateUserDTO(UserDTO? dto)
+    {
+        if (dto is null) return;
+        UserDTO = dto;
+        StateHasChanged();
+    }
+
+
+    //  private async Task<UserDTO?> GetUserDTO(string userName)
+    //  {
+    //      UserRequest request = new()
+    //      {
+    //          RequestType = UserRequestType.GETUSERDTO,
+    //          UserName = userName,
+    //        Token = DataService?.Token
+    //      };
+    // //     UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+    //   private async Task<UserDTO?> GetUserDTO(string userName)
+    // {
+    //     if (ApiService is null)
+    //     {
+    //         return null;
+    //     }
+
+    //     UserRequest request = new()
+    //         {
+    //             RequestType = UserRequestType.GETUSERDTO,
+    //             UserName = userName,
+    //             Token = DataService?.Token
+    //         };
+    //     UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+    //     if (response is null || response.Response.Status is false) return null;
+    //     return response.UserDTO;
+    // }
+}
+
+

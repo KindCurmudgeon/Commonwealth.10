@@ -1,0 +1,139 @@
+﻿@using Commonwealth.Shared.EndpointDTOs;
+@using Commonwealth.Client.Components;
+@using Commonwealth.Client.Services;
+@inject SharedDataService DataService;
+@inject ApiService ApiService
+
+@if (IsVisible)
+{
+    <ModalBase Title="Edit Nation" OnClose="Close" SubmitAsync="SubmitAsync">
+        <EditForm Model="this" OnFieldChanged="() => IsChanged = true">
+        <div>
+            <div>@HomeDistrict</div>
+            @if (IsGameActivated is false)
+            {
+                <label for="stringSelect">Home District:</label>
+                <InputSelect id="stringSelect" @bind-Value="HomeDistrict">
+                    <option value="Random">Random</option>
+                    @foreach (var item in AvailableHomes ?? [])
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </InputSelect>
+            }
+            else
+            {
+                <span class="fw-bold">Home District: </span>
+                <span>@HomeDistrict</span>
+            }
+        </div>
+        <hr />
+        <div class="fw-bold text-decoration-underline">Fleshed Out Names:</div>
+        <div>@Naming!.FormalLeader</div>
+        <div>@Naming.FormalNation</div>
+        <div>@($"{Naming.Possessive} Village")</div>
+        <br />
+
+        <div>
+            <label for="NationName" class="form-label">Nation Name:</label>
+            <InputText id="NationName" class="form-control" @bind-Value="Naming.Name" />
+        </div>
+        <div>
+            <label for="NationPssv" class="form-label">Nation Possessive:</label>
+            <InputText id="NationPssv" class="form-control" @bind-Value="Naming.Possessive" />
+        </div>
+        <div>
+            <label for="LeaderTitle" class="form-label">Leader Title:</label>
+            <InputText id="LeaderTitle" class="form-control" @bind-Value="Naming.LeaderTitle" />
+        </div>
+        <div>
+            <label for="Govt" class="form-label">Governing Type:</label>
+            <InputText id="Govt" class="form-control" @bind-Value="Naming.Government" />
+        </div>
+        <hr>
+        <FormEntryErrorMessages ErrorMessages="Errors" />
+        </EditForm>
+    </ModalBase>
+}
+
+@code {
+        bool IsVisible = false;
+    private NationNaming? Naming { get; set; }
+    private NationIdentity? Identity { get; set; }
+    private string? HomeDistrict { get; set; }
+    private List<string>? AvailableHomes { get; set; }
+    private bool? IsGameActivated { get; set; }
+    private bool IsChanged = false;
+    private List<string> Errors = [];
+
+    public async Task Show(NationIdentity identity)
+    {
+        NationRequest request = new()
+        {
+            RequestType = NationRequestType.Get,
+            Identity = identity,
+            Token = DataService.Token
+        };
+        NationResponse? response = await
+            ApiService.SendRequest<NationRequest, NationResponse>(Endpoints.Nation, request);
+        if (response?.Response.Status is true)
+        {
+            Naming = response.Naming;
+            Identity = response.Identity;
+            AvailableHomes = response.AvailableHomes;
+            HomeDistrict = response.HomeDistrict ?? "Random";
+            IsGameActivated = response.IsGameActivated;
+            IsVisible = true;
+            StateHasChanged();
+        }
+    }
+    private async Task SubmitAsync()
+    {
+        if (IsChanged is false) Close();
+        ValidateRequest();
+        NationRequest request = new()
+        {
+            RequestType = NationRequestType.Update,
+            Identity = Identity,
+            Naming = Naming,
+            HomeDistrict = (IsGameActivated == true || HomeDistrict == "Random") ? null : HomeDistrict,
+            Token = DataService.Token
+        };
+        NationResponse? nationResponse = await
+            ApiService.SendRequest<NationRequest, NationResponse>(Endpoints.Nation, request);
+
+        if (nationResponse?.Response.Status is true)
+        {
+            Close();
+        }
+        bool ValidateRequest()
+        {
+
+            bool isError = false;
+            if (Naming?.Name is not null)
+            {
+                if (Naming.Possessive is null) isError = true;
+                if (Naming.LeaderTitle is null) isError = true;
+                if (Naming.Government is null) isError = true;
+            }
+            if (Naming?.Name is null)
+            {
+                if (Naming?.Possessive is not null) isError = true;
+                if (Naming?.LeaderTitle is not null) isError = true;
+                if (Naming?.Government is not null) isError = true;
+            }
+            if (isError)
+            {
+                Errors.Add("Naming Entires must be all null or all not null");
+            }
+            return (Errors.Count == 0);
+        }
+    }
+
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+}

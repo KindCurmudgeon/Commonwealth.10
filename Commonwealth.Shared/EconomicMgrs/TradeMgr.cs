@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 
 namespace Commonwealth.Shared.EconomicMgrs;
 
-public partial class TradeMgr : IMgr<TradeOrder>
+public class TradeMgr : IOrderMgr<TradeOrder>
 {
     public Guid Id { get => Order.Id; }
     public bool HasChanged { get; set; } = false;
     public TradeOrder Order { get; private set; }
     public List<string> Adjustments { get; set; } = [];
-    [JsonConstructor] public TradeMgr(TradeOrder order) { Order = order; }
+    [JsonConstructor] public TradeMgr(TradeOrder order, bool isNew = false) { Order = order; HasChanged = isNew; }
 
     public void ChangeOrder(TradeOrder tradeOrder)
     {
@@ -32,26 +32,29 @@ public partial class TradeOrder
     public bool IsStandingTrade { get; set; }
     public bool IsNullified { get; set; }
     [JsonConstructor] public TradeOrder() { }
-    public TradeOrder(TRADETYPE tradeType, int sendingNationCode)
-    {
-        Id = Guid.NewGuid();
-        SendingNationCode = sendingNationCode;
-        TradeType = tradeType;
-        ReceiverNationCode = null;
-        DistrictName = null;
-        Send = [];
-        Receive = null;
-        SendNeededFood = false;
-        SendNeededVillages = false;
-        IsStandingTrade = false;
-        IsNullified = false;
-    }
+    // public TradeOrder(TRADETYPE tradeType, int sendingNationCode)
+    // {
+    //     Id = Guid.NewGuid();
+    //     SendingNationCode = sendingNationCode;
+    //     TradeType = tradeType;
+    //     ReceiverNationCode = null;
+    //     DistrictName = null;
+    //     Send = [];
+    //     Receive = null;
+    //     SendNeededFood = false;
+    //     SendNeededVillages = false;
+    //     IsStandingTrade = false;
+    //     IsNullified = false;
+    // }
     public TradeOrder DeepCopy()
     {
-        return new TradeOrder(TradeType, SendingNationCode)
+        return new TradeOrder()
         {
             Id = Id,
+            SendingNationCode = SendingNationCode,
+            TradeType = TradeType,
             ReceiverNationCode = ReceiverNationCode,
+            ReceiverNationName = ReceiverNationName,
             DistrictName = DistrictName,
             Send = Send,
             SendNeededFood = SendNeededFood,

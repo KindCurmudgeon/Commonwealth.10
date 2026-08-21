@@ -1,0 +1,16 @@
+﻿@namespace Commonwealth.Client.Components
+
+<thead>
+    <tr class="@HeadingClass">
+        <th>@((MarkupString)(FirstHeading??string.Empty))</th>
+        @foreach (string item in Headings ?? [])
+        {
+            <th class="text-center">@item</th>
+        }
+    </tr>
+</thead>
+@code {
+    [Parameter] public string? FirstHeading { get; set; }
+    [Parameter] public List<string>? Headings { get; set; }
+    [Parameter] public string? HeadingClass { get; set; }
+}

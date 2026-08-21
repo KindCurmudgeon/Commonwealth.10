@@ -5,110 +5,100 @@ using System.Text.Json.Serialization;
 
 namespace Commonwealth.Shared.EconomicMgrs;
 
-public partial class SpyMgr : IMgr<SpyOrder>
+public class SpyMgr : IOrderMgr<SpyOrder>
 {
-    public bool HasChanged { get; set; } = false;
-    public int Id { get => Order.Id; }
+    public Guid Id { get; set; }
+    public bool HasChanged { get; set; }
     public int NationCode { get; set; }
-    public string Name { get => (Id == 0) ? "Unnamed" : Id.ToString("D3"); }
-    public SpyOrder Order { get; private set; }
+    public int NameCode { get; set; }
+    public SpyOrder Order { get => _order; }
+    [JsonRequired] private SpyOrder _order { get; set; }
     public string? District { get; set; }
     public Report? Report { get; set; }
     public List<string> Adjustments { get; set; } = [];
-    [JsonConstructor] public SpyMgr(SpyOrder order) { Order = order; }
+    public string Name { get => NameCode.ToString("D3"); }
 
-    [SetsRequiredMembers]
-    public SpyMgr(SpyOrder order, string? district, int nationCode, Report? report)
+    [JsonConstructor, SetsRequiredMembers]
+    public SpyMgr(SpyOrder order, bool isNew = false)
     {
-        Order = order;
-        District = district;
-        NationCode = nationCode;
-        Report = report;
+        Id = Guid.NewGuid();
+        _order = order;
+        HasChanged = isNew;
     }
 
     public void ChangeOrder(SpyOrder order)
     {
-        Order = order;
+        _order = order;
         HasChanged = true;
     }
 }
-public partial class SpyOrder
+
+public class SpyOrder
 {
-    public int Id { get; set; }
+    //  public int Id { get; set; }
     public SpyState Status { get; set; }
-    public SpyAction Action { get; set; }
+    //    public SpyAction Action { get; set; }
     public string? NewDistrict { get; set; }
 
-    [JsonConstructor] public SpyOrder() { }
-    [SetsRequiredMembers]
-    public SpyOrder(int id)
-    {
-        Id = id;
-        NewDistrict = null;
-        Status = SpyState.TRAINING;
-        Action = SpyAction.TOBEADDED;
-    }
     public SpyOrder DeepCopy()
     {
         return new SpyOrder()
         {
-            Id = Id,
+            //      Id = Id,
             Status = Status,
-            Action = Action,
+            //       Action = Action,
             NewDistrict = NewDistrict
         };
     }
 }
 
 
+// public class SpyIdentity(int nationCode, int spyId)
+// {
+//     public int SpyId { get; set; } = spyId;
+//     public int NationCode { get; set; } = nationCode;
 
-public class SpyIdentity(int nationCode, int spyId)
-{
-    public int SpyId { get; set; } = spyId;
-    public int NationCode { get; set; } = nationCode;
-
-    public bool Equals(SpyIdentity other)
-    {
-        if (NationCode != other.NationCode) return false;
-        if (SpyId != other.SpyId) return false;
-        return true;
-    }
-    public override string ToString() => SpyId.ToString("D3");
-}
-public enum SpyState { NONE = 0, TRAINING = 10, ACTIVE = 20, REASSIGNED = 30, INACTIVE = 99 }
-public enum SpyAction { NONE = 0, TOBEADDED = 10, TOBEREMOVED = 99 }
+//     public bool Equals(SpyIdentity other)
+//     {
+//         if (NationCode != other.NationCode) return false;
+//         if (SpyId != other.SpyId) return false;
+//         return true;
+//     }
+//     public override string ToString() => SpyId.ToString("D3");
+// }
+public enum SpyState { NONE = 0, Added = 10, Registered = 20, Active = 30, Inactive = 90, ToBeRetired = 99 }
+//public enum SpyAction { NONE = 0, TOBEADDED = 10, TOBEREMOVED = 99 }
 
 public partial class EconomicMgr
 {
     public void HandleSpy(SpyMgr spyMgr, NationMgr nationMgr)
     {
-
         List<Asset>? cost = GetCost(spyMgr);
         (int adjustedCount, REASON reason) = DependentConsume(1, cost, null, nationMgr, null, nameof(EconActivity.Spying), null);
-        if (adjustedCount == 0 && spyMgr.Order.Status == SpyState.INACTIVE)
+        if (adjustedCount == 0 && spyMgr.Order.Status == SpyState.Inactive)
         {
-            spyMgr.Order.Status = SpyState.ACTIVE;
+            spyMgr.Order.Status = SpyState.Active;
         }
         if (adjustedCount > 0)
         {
-            spyMgr.Order.Status = SpyState.INACTIVE;
+            spyMgr.Order.Status = SpyState.Active;
             nationMgr.Adjustments?.Add($"Spy {spyMgr.Name} inactive due to insufficient resources.");
         }
 
         List<Asset>? GetCost(SpyMgr mgr)
         {
-            switch (mgr.Order.Action)
-            {
-                case SpyAction.TOBEREMOVED: return null;
-            }
             switch (mgr.Order.Status)
             {
-                case SpyState.INACTIVE: return null;
-                case SpyState.TRAINING: return EconParms.SpyParms.Training;
-                case SpyState.ACTIVE: return EconParms.SpyParms.Operation;
-                case SpyState.REASSIGNED: return EconParms.SpyParms.Transfer;
-
-                default: return null;
+                case SpyState.ToBeRetired:
+                    return null;
+                case SpyState.Added:
+                case SpyState.Registered:
+                    return EconParms.SpyParms.Training;
+                case SpyState.Active:
+                    return (mgr.Order.NewDistrict is null) ? EconParms.SpyParms.Operation :EconParms.SpyParms.Transfer;
+                case SpyState.Inactive:
+                default:
+                    return null;
 
             }
         }

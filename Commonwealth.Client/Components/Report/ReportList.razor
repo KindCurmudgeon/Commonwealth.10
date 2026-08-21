@@ -1,0 +1,21 @@
+﻿@using System.Collections.Generic
+
+
+@namespace Commonwealth.Client.Components
+
+@if (Items != null && Items.Any())
+{
+    <ul>
+        @foreach (string item in Items ?? [])
+        {
+            <li>
+                @item
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter] public List<string>? Items { get; set; }
+
+}

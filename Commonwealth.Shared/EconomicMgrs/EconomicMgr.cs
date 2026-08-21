@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Commonwealth.Shared.Common;
 
@@ -14,7 +15,7 @@ public partial class EconomicMgr
      public List<MarketPrice> MarketPrices { get; set; } = [];
      public bool isClient { get; set; } = false;
      [JsonConstructor] public EconomicMgr() { }
-     public EconomicMgr(EconParms econParms)
+     [SetsRequiredMembers] public EconomicMgr(EconParms econParms)
      {
           EconParms = econParms;
      }

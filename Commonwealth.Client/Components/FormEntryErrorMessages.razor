@@ -1,0 +1,9 @@
+﻿@namespace Commonwealth.Client.Components
+
+@foreach (string error in ErrorMessages ??[])
+{
+    <div class="text-danger">@error</div>
+}
+@code {
+    [Parameter] public List<string>? ErrorMessages { get; set; }
+}

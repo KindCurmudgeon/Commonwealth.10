@@ -1,0 +1,59 @@
+{
+    "ParmFileInfo": {
+        "RootName": "test",
+        "Version": "0",
+        "Type": "init"
+    },
+    "InitialMarket": [
+        {
+            "Name": "Grain",
+            "PriceBasis": 10000,
+            "Inventory": 1000
+        },
+        {
+            "Name": "Fish",
+            "PriceBasis": 10000,
+            "Inventory": 1000
+        },
+        {
+            "Name": "Wood",
+            "PriceBasis": 10000,
+            "Inventory": 1000
+        },
+        {
+            "Name": "Brick",
+            "PriceBasis": 10000,
+            "Inventory": 1000
+        }
+    ],
+    "InitialDistrictGoods": [
+        {
+            "Name": "Grain",
+            "Amount": 100
+        },
+        {
+            "Name": "Fish",
+            "Amount": 100
+        },
+        {
+            "Name": "Wood",
+            "Amount": 100
+        },
+        {
+            "Name": "Brick",
+            "Amount": 100
+        },
+        {
+            "Name": "Gems",
+            "Amount": 100
+        }
+    ],
+    "InitialYearsStat": {
+        "Min": 300,
+        "Max": 1300
+    },
+    "InitialDistrictPopulationStat": {
+        "Min": 3000,
+        "Max": 9000
+    }
+}

@@ -1,0 +1,249 @@
+﻿
+@using Commonwealth.Economics
+@using Commonwealth.Client.Components
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.Common
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Client.ClientEconomics
+
+@namespace Commonwealth.Economics
+
+@if (IsVisible)
+{
+    <ModalBase Title="Trade Builder" OnClose="Close" Submit="OnModalSubmit">
+
+        <div>
+            @($"Trade Type: {TradeOrder!.TradeType}")
+        </div>
+
+        <br />
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    @foreach (string goodName in GoodNames ?? [])
+                    {
+                        <th>@goodName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @foreach (Asset asset in _Send)
+                    {
+                        <td>
+                            <input type="number" value="@asset.Amount" @onchange="@(e => SendChanged(e, asset))" class="form-control" />
+                        </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+        <br />
+        @if (TradeOrder!.TradeType == TRADETYPE.DISTRICT)
+        {
+            <div>
+                <span>Send to:</span>
+                <span>
+                    <select value="@TradeOrder!.DistrictName" @onchange="OnDistrictNameChanged">
+                        <option value="">Select</option>
+                        @foreach (var item in TradeTargets)
+                        {
+                            if (item is null)
+                            {
+                                <option value="">---------</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </span>
+            </div>
+            <div>
+                <span>
+                    <InputCheckbox @bind-Value="TradeOrder.SendNeededFood" @bind-Value:after="OnTradeChanged" />
+                </span>
+                <span class="ms-1">Food as needed</span>
+                <span class="ms-3">
+                    <InputCheckbox @bind-Value="TradeOrder.SendNeededVillages" @bind-Value:after="OnTradeChanged" />
+                </span>
+                <span class="ms-1">Village supplies as needed</span>
+            </div>
+        }
+
+        @if (TradeOrder!.TradeType == TRADETYPE.NATION)
+        {
+            <div>
+                <span>Send to:</span>
+                <span>
+                    <select value="@NationName" @onchange="OnNationNameChanged">
+                        <option value="">Select</option>
+                        @foreach (string nationName in InfoPackage?.NationTradeTargets ?? [])
+                        {
+                            <option value="@nationName">@nationName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        }
+
+        @if (TradeOrder!.TradeType == TRADETYPE.MARKET)
+        {
+            <span>For:</span>
+            <span>
+                <select value="@RcvName" @onchange="OnRcvNameChanged">
+                    @if (string.IsNullOrWhiteSpace(RcvName))
+                    {
+                        <option value="">Select</option>
+                    }
+                    @foreach (var item in InfoPackage?.NationGoodNames ?? [])
+                    {
+                        //      if (item == SendName) continue;
+                        <option value="@item">@item</option>
+                    }
+                </select>
+            </span>
+        }
+
+        <div>
+            <span>
+                <InputCheckbox @bind-Value="TradeOrder.IsStandingTrade" />
+            </span>
+            <span class="ms-2">Standing Trade</span>
+        </div>
+        <br />
+        <div>
+            @Summary
+        </div>
+    </ModalBase>
+}
+
+@code {
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public MgrPackage MgrPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public Action<TradeMgr> SubmitCallback { get; set; } = default!;
+    [Parameter, EditorRequired] public ClientEconomicMgr EconomicsMgr { get; set; } = default!;
+
+    private bool IsVisible { get; set; } = false;
+    private bool IsExistingTrade { get; set; } = false;
+    private string? NationName { get; set; }
+    private List<string?> TradeTargets { get; set; } = default!;
+
+    private TradeMgr TradeMgr { get; set; } = default!;
+    private TradeOrder TradeOrder { get; set; } = default!;
+    private string? Summary { get; set; }
+
+    private List<Asset> _Send { get; set; } = [];
+    private string? RcvName { get; set; }
+    private List<string>? GoodNames { get; set; }
+
+
+    public void Show(TradeMgr tradeMgr)
+    {
+        TradeMgr = tradeMgr;
+        TradeOrder = tradeMgr.Order.DeepCopy();
+        RcvName = TradeOrder.ReceiverNationName;
+        NationName = InfoPackage.NationNamings?.NameOf(TradeOrder.ReceiverNationCode ?? 0);
+        GoodNames = (TradeOrder.TradeType == TRADETYPE.DISTRICT) ? InfoPackage.DistrictGoodNames : InfoPackage.NationGoodNames;
+        IsExistingTrade = TradeOrder?.TradeType != TRADETYPE.NONE;
+        TradeTargets = InfoPackage.DistrictTradeTargets ?? [];
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+
+    public void OnRcvNameChanged(ChangeEventArgs eventArgs)
+    {
+        string? goodName = eventArgs.Value?.ToString();
+        if (goodName is null) return;
+        RcvName = goodName;
+        OnTradeChanged();
+    }
+    public void OnDistrictNameChanged(ChangeEventArgs eventArgs)
+    {
+        TradeOrder.DistrictName = eventArgs.Value?.ToString() ?? "";
+        OnTradeChanged();
+    }
+    public void OnNationNameChanged(ChangeEventArgs eventArgs)
+    {
+        string? name = eventArgs.Value?.ToString();
+
+        int? code = InfoPackage.NationNamings?.CodeOf(name);
+        if (name is null || code is null) return;
+        TradeOrder.ReceiverNationName = name;
+        TradeOrder.ReceiverNationCode = code;
+        OnTradeChanged();
+    }
+    // private void AsNeededClick()
+    // {
+    //     TradeOrder.SendNeeded = true;
+    //     OnTradeChanged();
+    // }
+    private void SendChanged(ChangeEventArgs eventArgs, Asset asset)
+    {
+        string? assetType = InfoPackage.EconParms.GetGoodType(asset);
+        if (assetType == GOODTYPE.FOOD) TradeOrder.SendNeededFood = false;
+        if (assetType == GOODTYPE.VILLAGE) TradeOrder.SendNeededVillages = false;
+        asset.Amount = GetValue(eventArgs);
+        OnTradeChanged();
+    }
+
+    public int GetValue(ChangeEventArgs changeEventArgs)
+    {
+        if (int.TryParse(changeEventArgs.Value?.ToString(), out int value))
+        {
+            return value;
+        }
+        return 0;
+    }
+
+
+    private void OnTradeChanged()
+    {
+        if (TradeOrder.TradeType == TRADETYPE.DISTRICT)
+        {
+            EconomicsMgr.ZeroType(TradeOrder.Send ?? [], GOODTYPE.CURRENCY);
+            TradeMgr.Order.Send = EconomicsMgr.GetNetSendWithNeeds(TradeOrder);
+        }
+
+        if (TradeOrder.TradeType == TRADETYPE.MARKET)
+        {
+            if (RcvName is not null)
+            {
+                TradeOrder.Receive = new Asset(RcvName, 0);
+                EconomicsMgr?.SetMarketTradeReceive(TradeOrder);
+            }
+        }
+        if (TradeOrder.TradeType == TRADETYPE.NATION)
+        {
+            TradeOrder.ReceiverNationCode = InfoPackage?.NationNamings?.CodeOf(NationName);
+            TradeOrder.ReceiverNationName = NationName;
+        }
+        _Send = FillIn();
+        Summary = TradeOrder?.Summary() ?? "[]";
+        StateHasChanged();
+    }
+    List<Asset> FillIn()
+    {
+        List<Asset> result = [];
+        foreach(string name in GoodNames ?? [])
+        {
+            Asset? match = TradeOrder.Send?.Find(w => w.Name == name);
+            result.Add(match ?? new Asset(name, 0));
+        }
+        return result;
+    }
+    public void OnModalSubmit()
+    {
+        if (TradeOrder.IsNullified is not false) return;
+        TradeMgr.ChangeOrder(TradeOrder);
+        SubmitCallback?.Invoke(TradeMgr);
+    }
+
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

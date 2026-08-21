@@ -1,0 +1,66 @@
+﻿@using Commonwealth.Shared.Common
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.EndpointDTOs
+
+@namespace Commonwealth.Client.Pages
+
+@if (HasAssets)
+{
+    <tr class="@RowClass">
+        @if (Assets is null)
+        {
+            <th scope="row">@ActivityName</th>
+        }
+        else {
+        <th scope="row">
+            <span class="clicktext" onclick="@(() => HeaderClick("left"))"
+                  @oncontextmenu:preventDefault="true"
+                  @oncontextmenu="@(() => HeaderClick("right"))">@ActivityName</span>
+            <span class="ms-1 small">@SeasonsOfFood</span>
+        </th>
+        }
+        @foreach (string goodName in InfoPackage?.NationGoodNames ?? [])
+        {
+            if (Assets is null)
+            {
+                <td></td>
+            }
+            else
+            {
+                Asset? x = Goods?.Find(a => a.Name == goodName);
+                string str = x?.Amount.ToString() ?? "-";
+                if (x?.Amount == 0) str = "-";
+                if (x?.Amount < 0)
+                {
+                    <td class="text-center text-danger">@str</td>
+                }
+                else
+                {
+                    <td class="text-center">@str</td>
+                }
+            }
+        }
+    </tr>
+}
+@code {
+    [Parameter] public List<Asset>? Goods { get; set; }
+    [Parameter] public string? ActivityName { get; set; }
+    [Parameter] public EconActivity Activity { get; set; } = default!;
+    [Parameter] public Action<EconActivity, string>? HeaderClickCallback { get; set; }
+    [Parameter] public string? SeasonsOfFood { get; set; }
+    [Parameter, EditorRequired] public InfoPackage? InfoPackage { get; set; }
+    [Parameter] public string? RowClass { get; set; }
+
+    private bool HasAssets { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        HasAssets = true;
+        // HasAssets = Assets != null && Assets.IsEmpty() is false;
+    }
+    void HeaderClick(string type)
+    {
+        if (Activity is null) return;
+        HeaderClickCallback?.Invoke(Activity, type);
+    }
+}

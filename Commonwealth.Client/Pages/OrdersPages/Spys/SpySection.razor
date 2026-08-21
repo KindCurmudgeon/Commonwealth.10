@@ -1,0 +1,109 @@
+﻿@using Commonwealth.Economics
+@using Commonwealth.Client.Components
+@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.Common
+
+@namespace Commonwealth.Client.Pages
+@inject SharedDataService DataService;
+
+<div class="tabletitle_left">Spies</div>
+<table class="table table-sm align-middle">
+
+    <TableHeader FirstHeading="Code Name" Headings=@(new List<string> { "Current Assignment", "Next Assignment",
+                              "Options" }) />
+    <tbody>
+        @foreach (SpyMgr spy in SpyMgrs ?? [])
+        {
+            <tr>
+                <th scope="row">
+                    <span>@spy.Name ?? "Training"</span>
+                </th>
+
+                <td class="text-center clicktext" @onclick="@(() => ShowReport(spy.Report))">@spy.District ?? "Unassigned"
+                </td>
+
+                <td class="text-center" @onclick="(() => OnAssignmentClick(spy))">@(spy.Order.NewDistrict ?? "TBD")</td>
+                <td>
+                    <span class="clicktext ms-2 text-danger"
+                          @onclick="(() => OnRetireClick(spy))">@GetActionOption(spy)</span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btnsave" onclick="@OnAddClicked">Add Spy</button>
+
+
+<SpyPopup Submit="SpyPopupSubmitCallBack" @ref="SpyPopup" InfoPackage="InfoPackage" />
+
+
+@code {
+    [Parameter, EditorRequired] public MgrPackage MgrPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public Action RefreshOrders { get; set; }
+
+    private List<SpyMgr> SpyMgrs { get; set; } = default!;
+
+    SpyPopup SpyPopup = new();
+
+
+    protected override void OnParametersSet()
+    {
+        SpyMgrs = MgrPackage.SpyMgrs;
+
+    }
+    string? GetActionOption(SpyMgr mgr)
+    {
+        switch (mgr.Order.Status)
+        {
+            case SpyState.Added:
+                return "Rescind";
+            case SpyState.Registered:
+            case SpyState.Active:
+                return "Retire";
+            default:
+                return "<error>";
+        }
+    }
+    void OnRetireClick(SpyMgr mgr)
+    {
+        switch (mgr.Order.Status)
+        {
+            case SpyState.Added:
+                SpyMgrs.RemoveAll(s => s.Id == mgr.Id);
+                RefreshOrders.Invoke();
+                break;
+            default:
+                mgr.Order.Status = SpyState.ToBeRetired;
+                break;
+        }
+    }
+
+    void OnAddClicked()
+    {
+
+        SpyMgr mgr = SpyMgrFactory.Create(MgrPackage.NationMgr.NationCode);
+        SpyPopup.Show(mgr);
+    }
+    void OnAssignmentClick(SpyMgr mgr)
+    {
+        SpyPopup.Show(mgr);
+    }
+
+    void SpyPopupSubmitCallBack(SpyMgr spyMgr)
+    {
+        SpyMgr? match = SpyMgrs.Find(t => t.Id == spyMgr.Id);
+        match?.ChangeOrder(spyMgr.Order);
+        SpyPopup.Close();
+        RefreshOrders.Invoke();
+    }
+
+
+    void ShowReport(Report? report)
+    {
+        DataService.ShowReport(report);
+    }
+}
+

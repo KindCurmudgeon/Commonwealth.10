@@ -5,7 +5,7 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
   "mainAssemblyName": "Commonwealth.Client",
   "applicationEnvironment": "Development",
   "resources": {
-    "hash": "sha256-Ak3QZMuPV+ap6CG3jNb33fWHRf8hDbAaFL3Rb9zOk9Q=",
+    "hash": "sha256-tk9DE0N8CMzyoomO2z0N1E6WFdN/DorBJdsj6k4dbJg=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.puryxhmhq9.js"
@@ -1236,8 +1236,8 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Commonwealth.Shared.wasm",
-        "name": "Commonwealth.Shared.abdodcqlc5.wasm",
-        "hash": "sha256-mumOA1dYt1vnPgv5Fti0LCnR9CL1ExPx8brXoQuVlU0=",
+        "name": "Commonwealth.Shared.ietbyqx8q8.wasm",
+        "hash": "sha256-ZnwuLTKOoxGATcE+KCtKH8HSfd8mhNW7/4Ul8YlsgV8=",
         "cache": "force-cache"
       },
       {
@@ -1248,22 +1248,22 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Commonwealth.Client.wasm",
-        "name": "Commonwealth.Client.5di2qd4n3y.wasm",
-        "hash": "sha256-eXeVGCQHC5Fl3cONUxkw3expz8w1u21xdcqOd8fc7RQ=",
+        "name": "Commonwealth.Client.qaprskdpiz.wasm",
+        "hash": "sha256-0jTMiVdjVfZDUgAvdOdScAx5JEmeUbc4CjJZRuUNVU0=",
         "cache": "force-cache"
       }
     ],
     "pdb": [
       {
         "virtualPath": "Commonwealth.Shared.pdb",
-        "name": "Commonwealth.Shared.xgsze1fffz.pdb",
-        "hash": "sha256-4ZxNmdF/lu54cM6fXukuW9rL7ZIwxVjMEuZJ1DLor4Y=",
+        "name": "Commonwealth.Shared.trqofbh9bz.pdb",
+        "hash": "sha256-iWhO+wx9Q2ZW/ksREhvQn6eTIG83RBeosMnxwfUOS3s=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Commonwealth.Client.pdb",
-        "name": "Commonwealth.Client.kj8sbuuz1a.pdb",
-        "hash": "sha256-QN3c7Wf2b9d8noe1CDvfzDS1azlyaXHSpprZRUWC83U=",
+        "name": "Commonwealth.Client.bml7fg046u.pdb",
+        "hash": "sha256-MxgHwYd0H2BOjg5WdOtFnT0VKcXKjicFBarlsgGcHi8=",
         "cache": "force-cache"
       }
     ],

@@ -1,0 +1,2 @@
+namespace Commonwealth.Server.Parameters;
+

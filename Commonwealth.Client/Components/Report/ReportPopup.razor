@@ -1,0 +1,45 @@
+﻿
+@namespace Commonwealth.Client.Components
+@using Commonwealth.Shared.Common
+
+@if (IsVisible)
+{
+    <ModalBase Title="@Report?.Title" OnClose="@Close" Size="modal-xl">
+        @foreach (ReportEntry row in Report?.Entries ?? [])
+        {
+            switch (row.RowType) 
+            {
+                case ENTRYTYPE.TEXT:
+                    <div>@((MarkupString)(row.Text ?? string.Empty))</div>
+                    break;
+                case ENTRYTYPE.LIST:
+                    <ReportList Items="row.ListItems" />
+                    break;
+                case ENTRYTYPE.TABLE: 
+                    <ReportTable TableData="row.TableData" />
+                    break;
+            }
+        }
+    </ModalBase>
+
+}
+@code {
+    public Report? Report { get; set; }
+    public bool IsVisible = false;
+
+    public void Show(Report? report)
+    {
+        if (report is null) return;
+        Report = report;
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+
+
+}

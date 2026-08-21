@@ -1,16 +1,125 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+﻿@using Commonwealth.Client.Services;
+@using Commonwealth.Shared.EndpointDTOs;
+@using Commonwealth.Client.Components;
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+@inherits LayoutComponentBase
+
+@inject NavigationManager NavMgr;
+@inject SharedDataService DataService;
+@inject ApiService ApiService;
+
+@namespace Commonwealth.Client.Layout
+
+<PageTitle>Commonwealth</PageTitle>
+<div class="container-fluid">
+    <div class="row px-2 py-0 my-0 py-0" style="background-color:black">
+        <div class="text-center py-0 my-0">
+            <img src="TitleBar.png" class="w-50 py-0 my-0" @onclick="() => ForDev()"></img>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+    </div>
+    @if (DataService.UserIdentity is not null)
+    {
+        <div class="row px-2 py-0 my-0" style="background-color:black">
+            <div class="col text-start">
+                <span class="text-warning">User ID:</span>
+                <span class="text-info"><b>@DataService.UserIdentity.UserName</b></span>
+            </div>
+            <div class="col text-center">
+                <div class="text-center text-warning clicktext" @onclick="Reshow">Show Last Alert</div>
+            </div>
+            <div class="col text-end">
+                <div class="text-warning text-end clicktext" @onclick="Logout" role="button">Logout</div>
+            </div>
+            }
+        </div>
+    }
+    <article class="content px-2">
+        @Body
+    </article>
+    <AlertPopup @ref="AlertPopup" />
+    <ReportPopup @ref="ReportPopupRef" />
 </div>
+@code {
+    public ReportPopup ReportPopupRef { get; set; } = new();
+    private AlertPopup AlertPopup = new();
+    private ResponseBase? lastResponse;
+
+    protected override void OnInitialized()
+    {
+        DataService.SetMainLayout(this);
+        DataService.SetApiService(ApiService);
+        ApiService.SetDataService(DataService);
+        DataService.NavMgr = NavMgr;
+    }
+
+    public void ShowAlert(ResponseBase responseBase)
+    {
+        lastResponse = responseBase;
+        AlertPopup.Show(responseBase, 1);
+    }
+    public void Reshow()
+    {
+        if (lastResponse is null) return;
+        AlertPopup.Show(lastResponse);
+    }
+
+    private void Logout()
+    {
+        DataService.SetPlayerIdentity(null);
+        DataService.SetToken(null);
+        NavMgr.NavigateTo(PageLink.Splash);
+    }
+    // private async Task EditAccount()
+    // {
+    //     UserDTO? dto = await GetUserDTO(DataService?.UserIdentity?.UserName);
+    //     UserPopupRef?.Show(dto);
+    // }
+    // private async Task<UserDTO?> GetUserDTO(string? userName)
+    // {
+    //     if (ApiService is null || userName is null) return null;
+
+    //     UserRequest request = new()
+    //     {
+    //         RequestType = UserRequestType.GETUSERDTO,
+    //         UserName = userName,
+    //         Token = DataService?.Token
+    //     };
+    //     UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+    //     if (response is null || response.Response.Status is false) return null;
+    //     return response.UserDTO;
+    // }
+    private void ForDev()
+    {
+        if (DataService.UserIdentity?.IsDeveloper is true)
+        {
+            NavMgr.NavigateTo(PageLink.Admin);
+        }
+    }
+    // private async Task UserAccountSubmit(UserDTO userDTO)
+    // {
+    //     //     if (IsSubmissionReady() is false) return;
+    //     //    if (IsNewUser)
+    //     //   {
+    //     // SigninRequest request = new SigninRequest
+    //     // {
+    //     //     RequestType = SigninRequestType.REGISTER,
+    //     //     UserDTO = UserDTO
+    //     // };
+    //     // SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
+    //     // if (response?.Response.Status == true)
+    //     // {
+    //     //     OnValidSubmission?.Invoke(response.Identity!, response.Token!);
+    //     // }
+    //     //   }
+    //     //   else
+    //     //   {
+    //     // UserRequest request = new UserRequest
+    //     // {
+    //     //     RequestType = UserRequestType.UPDATE,
+    //     //     UserDTO = userDTO,
+    //     //     Token = DataService.Token
+    //     // };
+    //     // UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+    //     // if (response?.Response.Status == true) UserPopupRef.Close();
+    // }
+}

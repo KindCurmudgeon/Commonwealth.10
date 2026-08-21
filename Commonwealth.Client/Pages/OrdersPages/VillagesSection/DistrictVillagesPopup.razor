@@ -1,0 +1,73 @@
+﻿@using Commonwealth.Shared.EconomicMgrs;
+@using Commonwealth.Client.Components;
+@using Commonwealth.Shared.EndpointDTOs;
+
+@namespace Commonwealth.Client.Pages
+
+@if (IsVisible)
+{
+    <ModalBase Title="@Title" OnClose="@Close">
+        <div>
+            <span>Population:</span>
+            <span>@DistrictMgr.Population</span>
+        </div>
+        <div>@EmploymentString</div>
+@*         @if (ForeignVillagesHere is null || ForeignVillagesHere?.Count == 0)
+        {
+            <div>No Foreign Villages</div>
+        }
+        else
+        {
+            foreach (VillageMgr village in ForeignVillagesHere ?? [])
+            {
+
+                string? nationName = InfoPackage.NationNamings?.NameOf(village.Identity.Owner);
+                <div>$"{@nationName}: {@village.Identity.Name.Pluralize(@village.Count)}"</div>
+            }
+        } *@
+
+    </ModalBase>
+}
+@code {
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public MgrPackage MgrPackage { get; set; } = default!;
+    private bool IsVisible { get; set; } = false;
+    private string Title { get; set; } = default!;
+    private DistrictMgr DistrictMgr { get; set; } = default!;
+    private string? EmploymentString { get; set; }
+ //   private List<VillageMgr> ForeignVillagesHere { get; set; } = default!;
+
+    public void Show(DistrictMgr districtMgr)
+    {
+        Title = $"{districtMgr.Name} Villages - this Season Projection";
+        DistrictMgr = districtMgr;
+ //       ForeignVillagesHere = MgrPackage.ForeignVillageMgrs.Here(districtMgr.Name).ToList(); 
+        if (DistrictMgr.Population is null || DistrictMgr.Population <= 0) EmploymentString = null;
+        else
+        {
+            // double pcu = 1 - Math.Round(100 * (double)(districtMgr.StaffUsed ?? 0) / (int)DistrictMgr.Population);
+            // EmploymentString = $"Unemployed: {districtMgr.Population - districtMgr.StaffUsed}  ({pcu * 100}%)";
+        }
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void ShowLastSeason(DistrictMgr districtMgr)
+    {
+        Title = $"{districtMgr.Name} Villages - Last Season";
+        DistrictMgr = districtMgr;
+        if (DistrictMgr.Population is null || DistrictMgr.Population <= 0) EmploymentString = null;
+        // else
+        // {
+        //     double pcu = 1 - Math.Round(100 * (double)(DistrictMgr.LastSeasonEconActivity?.StaffUsed ?? 0) / (int)DistrictMgr.Population);
+        //     EmploymentString = $"Unemployed: {DistrictMgr.Population - DistrictMgr.LastSeasonEconActivity?.StaffUsed}  ({pcu * 100}%)";
+        // }
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

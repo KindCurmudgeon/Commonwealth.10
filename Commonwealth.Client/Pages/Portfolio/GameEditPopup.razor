@@ -1,0 +1,219 @@
+﻿@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Client.Components
+
+@namespace Commonwealth.Client.Pages
+@inject SharedDataService DataService;
+@inject ApiService ApiService;
+
+@if (IsVisible)
+{
+    <ModalBase Title="@Title" OnClose="@Close" SubmitAsync="@Submit" Size="modal-xl">
+        <fieldset disabled="@IsEditDisabled">
+            <div class="row align-items-center">
+                <ldiv class="col-5 text-end">Game Name:</ldiv>
+                <div class="col-4">
+                    @if (IsNewGame is true)
+                    {
+                        <input type="text" @bind-value="GameDTO!.GameName" class="form-control" />
+                    }
+                    else
+                    {
+                        <div>@GameDTO!.GameName</div>
+                    }
+                </div>
+            </div>
+            <div>
+                <span>
+                    <InputCheckbox @bind-Value="GameDTO.ArchiveGame" />
+                </span>
+                <span class="ms-2">Archive Game</span>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-5 text-end">Game State:</div>
+                <div class="col-4">@GameDTO!.GameStateString()</div>
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-5 text-end">Nation Count:</div>
+                <div class="col-4">@LineupDTOs!.Count</div>
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-5 text-end">Turn Period (Days):</div>
+                @if (IsEditDisabled)
+                {
+                    <div class="col-3">@OrdersDuration</div>
+                }
+                else
+                {
+                    <div class="col-3">
+                        <input type="number" class="form-control text-end" @bind-value="OrdersDuration" />
+                </div>
+                }
+            </div>
+            <br />
+
+            <div>
+                <span class="fw-bold">Lineup:</span>
+                <span class="ms-3">  (Player / Nation Name / Home District)</span>
+            </div>
+            <hr>
+            <ol>
+                @foreach (LineupDTO dto in LineupDTOs!)
+                {
+                    <li>
+                        <span>@($"{dto.UserName} / {dto.NationName ?? "tbd"} / {dto.HomeDistrict ?? "tbd"}  - {dto.StateString()}")</span>
+                        @if (IsEditDisabled == false)
+                        {
+                            <span class="ms-3">[</span>
+                            <span class="clicktext text-danger" @onclick="(() => RemovePlayer(dto))">Remove</span>
+                            <span>]</span>
+                            @if (GameDTO.GameState == GameState.Activated)
+                            {
+                                <span class="ms-2">[</span>
+                                <span class="clicktext text-primary ms-1" @onclick="(() => ReassignClick(dto))">Reassign</span>
+                                <span>]</span>
+                            }
+                        }
+                    </li>
+                }
+            </ol>
+            @if (IsEditDisabled is false)
+            {
+                <span>
+                    <input type="text" @bind-value="PlayerId" />
+                </span>
+                <span class="clicktext ms-3" onclick="@AddPlayer">Add Player Nation</span>
+            }
+
+            <hr style="height:4px;color:black; opacity:100">
+
+        </fieldset>
+    </ModalBase>
+}
+
+@code {
+    [Parameter] public EventCallback<bool?> OnCreated { get; set; }
+
+    private bool IsVisible = false;
+    private GameDTO? GameDTO { get; set; }
+    private List<LineupDTO>? LineupDTOs { get; set; }
+    private bool IsNewGame { get; set; }
+    private string Title { get; set; } = default!;
+    private bool IsEditDisabled { get; set; }
+    private int OrdersDuration { get; set; }
+    private string? PlayerId { get; set; }
+
+    public async Task Show(string? gameName, bool? isEditable = null)
+    {
+        IsNewGame = gameName == null;
+        IsEditDisabled = !(isEditable ?? false);
+        if (IsNewGame)
+        {
+            string creatorName = DataService.UserIdentity!.UserName;
+            GameDTO = GameDTOFactory.Create(creatorName);
+            LineupDTOs = new List<LineupDTO>() {LineupDTOFactory.Create(creatorName)};
+            GameDTO.GameName = Utilities.GetRandomGameName();
+        }
+        else
+        {
+            await GetGameDTO(gameName);
+        }
+
+        if (GameDTO is not null)
+        {
+            if (IsEditDisabled) Title = $"Game: {GameDTO.GameName ?? "TBD"}";
+            else Title = IsNewGame ? "Create New Game" : $"Edit Game: {GameDTO.GameName}";
+            OrdersDuration = GameDTO.OrdersPeriod?.Days ?? 7;
+            IsVisible = true;
+            StateHasChanged();
+        }
+    }
+    async Task Submit()
+    {
+        if (GameDTO?.GameName is null) return;
+        GameDTO!.OrdersPeriod = new TimeSpan(OrdersDuration, 0, 0, 0);
+        GamemasterRequest request = new()
+        {
+            RequestType = IsNewGame ? GM_RequestType.Create : GM_RequestType.Update,
+            GameDTO = GameDTO,
+            LineupDTOs = LineupDTOs,
+            Token = DataService.Token
+        };
+        GamemasterResponse? response = await ApiService.SendRequest<GamemasterRequest, GamemasterResponse>(Endpoints.Gamemaster, request);
+        if (response is null || response.Response.Status is false) return;
+        Close();
+        await OnCreated.InvokeAsync(true);
+    }
+
+    void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+    // void ReassignClick(LineupDTO dto)
+    // {
+    //     ReassignCode = dto.Identity.NationCode;
+    //     AddPlayerClick();
+    // }
+    async Task AddPlayer()
+    {
+        if (String.IsNullOrEmpty(PlayerId)) return;
+        string? confirmedId = await ConfirmUser(PlayerId);
+        if (confirmedId is null) return;
+        LineupDTO dto = LineupDTOFactory.Create(confirmedId);
+        PlayerId = null;
+        LineupDTOs!.Add(dto);
+    }
+
+    async Task<string?> ConfirmUser(string userName)
+    {
+        UserRequest request = new UserRequest()
+        {
+            RequestType = UserRequestType.CONFIRM,
+            UserName = userName,
+            Token = DataService.Token
+        };
+        UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+        if (response?.Response.Status is null || response.Response.Status is false) return null;
+        return response.UserName;
+    }
+    async Task ReassignClick(LineupDTO dto)
+    {
+        if (String.IsNullOrEmpty(PlayerId)) return;
+        if (dto.UserName.Equals(PlayerId, StringComparison.OrdinalIgnoreCase)) return;
+        string? confirmedId = await ConfirmUser(PlayerId);
+        if (confirmedId is null) return;
+        dto.OrdersState = OrdersState.Replaced;
+        dto.NewUser = confirmedId;
+        PlayerId = null;
+    }
+    void RemovePlayer(LineupDTO dto)
+    {
+        if (dto.LineupState == LineupState.Added)
+        {
+            LineupDTOs!.RemoveAll(l => l.Id == dto.Id);
+        }
+        else
+        {
+    //        dto.LineupState = LineupState.ToBeRemoved;
+            dto.OrdersState = OrdersState.Remove;
+        }
+    }
+    async Task<bool> GetGameDTO(string? gameName)
+    {
+        GamemasterRequest request = new()
+        {
+            RequestType = GM_RequestType.Get,
+            GameName = gameName,
+            Token = DataService.Token
+        };
+        GamemasterResponse? response = await
+            ApiService.SendRequest<GamemasterRequest, GamemasterResponse>(Endpoints.Gamemaster, request);
+        if (response?.Response.Status is false) return false;
+        GameDTO = response?.GameDTO;
+        LineupDTOs = response?.LineupDTOs ?? [];
+        return true;
+    }
+}

@@ -1,0 +1,70 @@
+﻿@using Commonwealth.Client.Components
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.EndpointDTOs
+
+@namespace Commonwealth.Client.Pages
+
+@if (IsVisible)
+{
+    <ModalBase Title="@Title" OnClose="@Close"  Size="Modal-lg">
+@*         <label for="Tax" class="ps-2 pe-2 bold">Tax Rate (%):</label>
+        <InputNumber id="Tax" @bind-Value="TaxRate" class="col-1 right-align" min="0" max="50" step="5" /> 
+        <EconActivityTable Activity="Activity" InfoPackage="InfoPackage" Title="Economic Activity" />*@
+        <br />
+        @if (DistrictMgr?.FoodMetrics?.FoodStatus == FoodStatus.RATIONING)
+        {
+            <div><b>Food Rationing is in Effect!</b></div>
+        }
+        @if (DistrictMgr?.FoodMetrics?.FoodStatus == FoodStatus.FAMINE)
+        {
+            <div><b>FAMINE!!!</b></div>
+        }
+
+    </ModalBase>
+}
+@code {
+    //   [Parameter] public Action<DistrictOrder>? Submit { get; set; }
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    private bool IsVisible { get; set; } = false;
+    private string Title { get; set; } = default!;
+    private DistrictMgr DistrictMgr { get; set; } = default!;
+    private EconActivity? Activity { get; set; }
+    //   private DistrictOrder Order { get; set; } = default!;
+    private int TaxRate { get; set; }
+    private string EmploymentString { get; set; } = default!;
+
+
+    public void Show(DistrictMgr districtMgr)
+    {
+        Title = $"{districtMgr.Name} Goods - this Season Projection";
+        DistrictMgr = districtMgr;
+        Activity = districtMgr;
+        //      Order = districtMgr.Order?.DeepCopy() ?? new DistrictOrder(districtMgr.Name);
+        //       TaxRate = (int)(Order?.TaxRate * 100 ?? 0);
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void ShowLastSeason(DistrictMgr districtMgr)
+    {
+        Title = $"{districtMgr.Name} Goods - Last Projection";
+        DistrictMgr = districtMgr;
+     //   Activity = districtMgr.LastSeasonEconActivity ?? null;
+        //      Order = districtMgr.Order?.DeepCopy() ?? new DistrictOrder(districtMgr.Name);
+        //       TaxRate = (int)(Order?.TaxRate * 100 ?? 0);
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+  //   public void OnSubmit()
+  //   {
+  // //      Order!.TaxRate = (double)TaxRate / 100;
+  // //      Submit?.Invoke(Order!);
+  //       IsVisible = false;
+  //       StateHasChanged();
+  //   }
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,53 @@
+﻿@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EndpointDTOs
+@inject SharedDataService DataService;
+@inject NavigationManager NavMgr;
+
+@namespace Commonwealth.Client.Components
+
+@if (IsVisible)
+{
+    <ModalBase @ref="AlertPopupRef" Title="@Title" BGcolor="@BackGround" OnClose="OnClose">
+        @foreach (string message in Messages ?? [])
+        {
+            <div>@message</div>
+        }
+    </ModalBase>
+}
+
+@code
+{
+    private ModalBase AlertPopupRef = new();
+    private string? Title { get; set; }
+    private List<string>? Messages { get; set; }
+    private string? BackGround { get; set; }
+    private bool IsVisible = false;
+    private Timer? AutoCloseTimer {get;set;}
+    public void Show(ResponseBase response, int? autoClose=0)
+    {
+        Title = response.Response.Status ? "Notice" : "Alert";
+        BackGround = response.Response.Status ? "greenyellow" : "lightpink";
+        Messages = response.Response.Messages;
+        IsVisible = true;
+        AutoCloseTimer?.Dispose();
+        if (autoClose is not null && autoClose > 0)
+        {
+            AutoCloseTimer = new Timer(_ =>
+            {
+                OnClose();
+            },null,((int)autoClose*1000),Timeout.Infinite);
+        }
+        StateHasChanged();
+
+    }
+    public void OnClose()
+    {
+        IsVisible = false;
+        StateHasChanged();
+        // string? nav = DataService.NavigateToAfterAlert;
+        // DataService.NavigateToAfterAlert = null;
+        // if (nav is not null) NavMgr.NavigateTo(nav);
+    }
+    public void Dispose() { AutoCloseTimer?.Dispose(); }
+
+}

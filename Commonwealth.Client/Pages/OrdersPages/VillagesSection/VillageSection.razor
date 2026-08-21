@@ -1,0 +1,180 @@
+﻿@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Client.Components
+
+@namespace Commonwealth.Client.Pages
+@inject SharedDataService DataService;
+
+@if (IsVisible)
+{
+    <div class="tabletitle">Villages</div>
+    <table class="table table-responsive align-middle">
+        <TableHeader HeadingClass="tablevillage-header"
+                     FirstHeading="<div>Districts</div>" Headings="InfoPackage.VillageNames" />
+        <tbody>
+            @{
+                int rowCount = 0;
+            }
+                @foreach (DistrictMgr mgr in MgrPackage.DistrictMgrs)
+            {
+                rowCount++;
+                List<VillageMgr> villagesHere = MgrPackage.VillageMgrs.Here(mgr.Name).ToList();
+                <VillageRow DistrictMgr="mgr" 
+                             ShowAdjust="ShowAdjust"
+                             DistrictLeftClick="DistrictLeftClick"
+                             DistrictRightClick="DistrictRightClick"
+                             InfoPackage="InfoPackage"
+                             MgrPackage="MgrPackage"
+                             VillagesHere="villagesHere"/>
+            }
+            @foreach (DistrictMgr mgr in MgrPackage.ExpansionDistrictMgrs)
+            {
+                rowCount++;
+                List<VillageMgr> villagesHere = MgrPackage.VillageMgrs.Here(mgr.Name).ToList();
+                <VillageRow DistrictMgr="mgr"
+                            ShowAdjust="ShowAdjust"
+                            RemoveExpansionDistrict="RemoveExpansion"
+                            InfoPackage="InfoPackage"
+                            MgrPackage="MgrPackage"
+                            VillagesHere="villagesHere" />
+            }
+
+            @if (rowCount > 1)
+            {
+                <tr class="tablevillage-total">
+                    <th scope="row">Totals:</th>
+                    @foreach (string columnName in InfoPackage?.VillageNames ?? [])
+                    {
+                        VillageMgr? result = VillageCensus.Find(r => r.Identity.Name == columnName);
+                        VillageOrder? orders = result?.Order;
+                        CellData? cellData = result?.SummaryCell();
+                        <td class="text-center">
+                            @if (cellData is null)
+                            {
+                                <div>-</div>
+                            }
+                            else
+                            {
+                                <div>@cellData!.Contents</div>
+                                <div>@cellData!.Activity</div>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (InfoPackage?.ExpansionTargets?.Count > 0)
+    {
+        <button class="btn btnsave" onclick="@ShowExpansion">Expand Districts</button>
+    }
+
+    <SelectStringPopup @ref="ExpansionPopup" Submit="ExpansionSubmitCallBack" />
+    <VillagePopup @ref="@VillagePopup" InfoPackage="InfoPackage" Submit="VillageSubmitCallBack" />
+    <DistrictVillagesPopup @ref="DistrictVillagesPopupRef" InfoPackage="InfoPackage" MgrPackage="@MgrPackage" />
+
+}
+@code {
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public MgrPackage MgrPackage { get; set; } = default!;
+    [Parameter, EditorRequired] public Action RefreshOrders { get; set; } = default!;
+    // public List<VillageMgr> VillageMgrs { get; set; } = default!;
+    // public List<DistrictMgr> DistrictMgrs { get; set; } = default!;
+    // public NationMgr NationMgr { get; set; } = default!;
+
+    private DistrictVillagesPopup DistrictVillagesPopupRef = new();
+    private VillagePopup VillagePopup = new();
+    private SelectStringPopup ExpansionPopup = new();
+    private List<string> ExpansionTargets { get; set; } = default!;
+
+    private List<VillageMgr> VillageCensus { get; set; } = default!;
+    private DistrictMgr Totals { get; set; } = default!;
+    private bool IsVisible = false;
+
+    protected override void OnParametersSet()
+    {
+        // NationMgr = InfoPackage.NationMgr;
+        // VillageMgrs = NationMgr.VillageMgrs;
+        // DistrictMgrs = NationMgr.DistrictMgrs;
+        ExpansionTargets = InfoPackage.ExpansionTargets ?? [];
+        Totals = DistrictMgrFactory.CreateExpansionDistrict("Totals");
+        TakeVillageCensus();
+        IsVisible = true;
+    }
+
+
+    private void ShowExpansion() => ExpansionPopup.Show(InfoPackage?.ExpansionTargets, "Select Expansion District");
+    private void ExpansionSubmitCallBack(string newDistrict)
+    {
+        if (newDistrict is null) return;
+        DistrictMgr result = DistrictMgrFactory.CreateExpansionDistrict(newDistrict);
+        MgrPackage.ExpansionDistrictMgrs.Add(result);
+        InfoPackage.UpdateExpansionTargets(MgrPackage.ExpansionDistrictMgrs);
+        ExpansionPopup.Close();
+        RefreshOrders.Invoke();
+    }
+    private void RemoveExpansion(DistrictMgr mgr)
+    {
+        if (mgr.Owner == MgrPackage.NationMgr.NationCode) return;
+        MgrPackage.VillageMgrs.RemoveAll(vm => vm.Identity.District == mgr.Name);
+        MgrPackage.TradeMgrs.RemoveAll(tm => tm.Order.DistrictName == mgr.Name);
+        InfoPackage.UpdateExpansionTargets(MgrPackage.ExpansionDistrictMgrs);
+        RefreshOrders.Invoke();
+        InfoPackage.ExpansionTargets?.Add(mgr.Name);
+    }
+    private void DistrictLeftClick(DistrictMgr mgr)
+    {
+        DataService.ShowReport(mgr.CreateVillageReport("Projection"));
+    }
+    private void DistrictRightClick(DistrictMgr mgr)
+    {
+        DataService.ShowReport(mgr.LastSeasonVillageReport);
+    }
+
+    public void ShowAdjust(VillageMgr villageMgr)
+    {
+        VillagePopup.Show(villageMgr);
+    }
+
+    // public void ShowDistrict(DistrictMgr mgr)
+    // {
+    //     string title = $"{mgr.Name} - {InfoPackage?.GameDate?.ToString()}";
+    //     DataService.ShowReport(mgr.Report);
+    //     // DistrictPopup.Show(title, mgr);
+    // }
+    // public void DistrictSubmitCallBack(DistrictOrder order)
+    // {
+    //     DistrictMgr? match = DistrictMgrs?.Find(d => d.Name == order.Name);
+    //     match?.ChangeOrder(order);
+    //     DistrictGoodsPopupRef.Close();
+    //     InfoPackage?.OrdersChanged?.Invoke(true);
+    // }
+    public void VillageSubmitCallBack(VillageMgr villageMgr)
+    {
+        villageMgr.HasChanged = true;
+        VillageMgr? match = MgrPackage.VillageMgrs.Find(v => villageMgr.Identity.Equals(v.Identity));
+        if (match is null) { MgrPackage.VillageMgrs.Add(villageMgr); }
+        else { match = villageMgr; }
+        VillagePopup.Close();
+        TakeVillageCensus();
+        RefreshOrders.Invoke();
+    }
+    public void TakeVillageCensus()
+    {
+        VillageCensus = [];
+        foreach (VillageMgr villageMgr in MgrPackage.VillageMgrs)
+        {
+            VillageMgr? existing = VillageCensus.Find(d => d.Identity!.Name == villageMgr.Identity.Name);
+            if (existing == null)
+            {
+                existing = new VillageMgr(new VillageOrder(villageMgr.Identity));
+                VillageCensus.Add(existing);
+            }
+            existing.Count += villageMgr.Count;
+            existing.Active += villageMgr.Active;
+            existing.Order.Activate += villageMgr.Order.Activate;
+            existing.Order.Build += villageMgr.Order.Build;
+        }
+    }
+}

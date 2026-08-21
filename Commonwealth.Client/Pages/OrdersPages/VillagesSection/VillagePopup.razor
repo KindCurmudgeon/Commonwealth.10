@@ -1,0 +1,148 @@
+﻿
+
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Shared.EconomicMgrs
+@using Commonwealth.Shared.Common
+@using Commonwealth.Client.Components
+
+@namespace Commonwealth.Client.Pages
+
+@if (IsVisible)
+{
+    <ModalBase Title="@Title" OnClose="Close" Submit="@OnSubmit">
+        <div class="fs-5">
+            <span class="fw-bold">Summary: </span>
+            <span>@VillageMgr!.Summary()</span>
+            <span class="text-danger fw-bold">@VillageMgr!.Activity()</span>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-4 text-end">Build:</div>
+            <input class="col-2" type="number" min="0" @oninput="BuildChanged" value="@Order!.Build" />
+        </div>
+
+        @if (VillageMgr!.Count > VillageMgr!.Active)
+        {
+            <br />
+            <div class="row">
+                <div class="col-4 text-end">Activate:</div>
+                <input class="col-2" type="number" max="@(VillageMgr.Count - VillageMgr.Active)" min="0" @oninput="ActivateChanged"
+                       value="@Order!.Activate" />
+            </div>
+        }
+        @if (VillageMgr.Active > 0)
+        {
+            <br />
+            <div class="row">
+                <div class="col-4 text-end">Deactivate:</div>
+                <input class="col-2" type="number" max="@VillageMgr.Active" min="0" @oninput="DeactivateChanged"
+                       value="@Order!.Deactivate" />
+            </div>
+        }
+        <br />
+
+        <br />
+        <div class="fw-bold">This Season:</div>
+        <div>
+            <span class="ms-2">Activation Costs:</span>
+            <span>@ActivationCosts</span>
+        </div>
+        <div>
+            <span class="ms-2">Construction Costs:</span>
+            <span>@ConstructionCosts</span>
+        </div>
+        <div>
+            <span class="ms-2">Operation Costs:</span>
+            <span>@OperationCosts</span>
+        </div>
+        <div>
+            <span class="ms-2">Production:</span>
+            <span>@Production</span>
+        </div>
+
+    </ModalBase>
+}
+
+@code
+{
+    [Parameter] public Action<VillageMgr>? Submit { get; set; } = default!;
+    [Parameter, EditorRequired] public InfoPackage InfoPackage { get; set; } = default!;
+
+    public VillageMgr VillageMgr { get; set; } = default!;
+    private VillageOrder Order { get; set; } = default!;
+
+
+    private string Title { get; set; } = default!;
+    private string ActivationCosts { get; set; } = default!;
+    private string ConstructionCosts { get; set; } = default!;
+    private string OperationCosts { get; set; } = default!;
+    private string Production { get; set; } = default!;
+
+
+    private bool IsVisible = false;
+
+    public void Show(VillageMgr villageMgr)
+    {
+        VillageMgr = villageMgr;
+        Order = villageMgr.Order;
+        Title = $"Adjust {villageMgr.Identity.District}: {villageMgr.Identity.Name}";
+        UpdateData();
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private void UpdateData()
+    {
+        VillageParm? villageParm = InfoPackage.EconParms.FindVillageParm(VillageMgr?.Identity.Name);
+        int netActive = VillageMgr!.NetActive;
+        ActivationCosts = villageParm?.Activation?.MultiplyBy(Order?.Activate).AssetString() ?? "none";
+        ConstructionCosts = villageParm?.Construction?.MultiplyBy(Order?.Build).AssetString() ?? "none";
+        OperationCosts = villageParm?.Operation?.MultiplyBy(netActive).AssetString() ?? "none";
+        Production = villageParm?.Production?.MultiplyBy(netActive).ToString() ?? "none";
+    }
+
+    private void BuildChanged(ChangeEventArgs e)
+    {
+        if (e.Value is string value && int.TryParse(value, out int result))
+        {
+            Order!.Build = result;
+            Order!.Activate = VillageMgr!.Count - VillageMgr!.Active;
+            Order.Deactivate = 0;
+            UpdateData();
+            StateHasChanged();
+        }
+    }
+    private void ActivateChanged(ChangeEventArgs e)
+    {
+        if (e.Value is string value && int.TryParse(value, out int result))
+        {
+            Order!.Activate = result;
+            Order.Deactivate = 0;
+            Order.Build = 0;
+            UpdateData();
+            StateHasChanged();
+        }
+    }
+    private void DeactivateChanged(ChangeEventArgs e)
+    {
+        if (e.Value is string value && int.TryParse(value, out int result))
+        {
+            Order!.Deactivate = result;
+            Order.Activate = 0;
+            Order.Build = 0;
+            UpdateData();
+            StateHasChanged();
+        }
+    }
+    private void OnSubmit()
+    {
+        VillageMgr!.HasChanged = true;
+        Submit?.Invoke(VillageMgr);
+        Close();
+    }
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

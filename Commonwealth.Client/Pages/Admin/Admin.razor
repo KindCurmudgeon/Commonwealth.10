@@ -1,0 +1,216 @@
+﻿@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EndpointDTOs
+@using System.Text.Json
+
+@attribute [Route(PageLink.Admin)];
+
+@inject SharedDataService DataService
+@inject ApiService ApiService
+@inject NavigationManager NavMgr
+
+<h3>Admin</h3>
+<button class="btn btnsubmit float-end" @onclick="Exit">Exit</button>
+<div class="clicktext" @onclick="(()=> SetAction(Actions.GetGames))">Get Games</div>
+<br />
+<button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.User))">List Users</button>
+<button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.Game))">List Games</button>
+<button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.Parm))">List Parms</button>
+<button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.AllFiles))">List All Files</button>
+<br />
+<br />
+<div>
+    <button class="btn-secondary" @onclick="(() => SetAction(Actions.UpdateParms))">Update Parms</button>
+    <InputFile OnChange="HandleFileSelected" accept=".json" />
+</div>
+<br />
+
+<div><b>@($"Action: {Action ?? "null"};   Arg1: {Arg1 ?? "null"};  Arg2: {Arg2 ?? "null"}")</b></div>
+<ul>
+    @foreach (string item in Items ?? [])
+    {
+        <li>
+
+            @switch (Action)
+            {
+                case Actions.GetList:
+                    <span>@item</span>
+                    <span class="ps-3 smallfont text-success clickchar" @onclick="(() => SetAction(Actions.ViewFile, item))">View</span>
+                    <span class="ps-3 smallfont text-danger clickchar" @onclick="(() => SetAction(Actions.RemoveFile, item))">Remove File</span>
+                    switch (Arg1)
+                    {
+                        case FileTypes.User:
+                            <span class="ps-3 smallfont text-black clickchar" @onclick="(() => SetAction(Actions.GetUserGames, item))">View Games</span>
+                            <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.MakeAdmin, item))">Make Admin</span>
+                            <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.MakeDev, item))">Make Dev</span>
+                            break;
+                        case FileTypes.Game:
+                            <span class="ps-3 smallfont text-black clickchar" @onclick="(() => SetAction(Actions.GetGameUsers, item))">View Users</span>
+                            <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.RemoveGameFromUser, item))">Remove Game</span>
+                            break;
+                    }
+                    break;
+                case Actions.GetUserGames:
+                    List<string> parsed = ParseGame(item);
+                    <span>@parsed[0]</span>
+                    @if (parsed.Count == 1)
+                    {
+                      <span>(GameMaster)</span>
+                    }
+                    <span class="ps-3 smallfont text-danger clickchar" @onclick="(() => SetAction(Actions.RemoveGameFromUser, Arg1, item))">Remove Game</span>
+                    break;
+                case Actions.GetGameUsers:
+                    //                 <span class="ps-3 smallfont text-danger clickchar" @onclick="(() => SetAction(Actions.RemoveUser, Arg1, item))">Remove File</span>
+                    break;
+                case Actions.GetGames:
+                    <span>@item</span>
+                    <span class="p-sm-3 text-danger clickchar" @onclick="(()=>SetAction(Actions.RemoveGame,item))">Remove</span>
+                    break;
+            }
+        </li>
+    }
+</ul>
+<div>
+    <span>Error:</span>
+    <span>@ErrorMsg</span>
+</div>
+<div>
+    <span>Status:</span>
+    <span>@StatusMessage</span>
+</div>
+<div>
+    <div>@($"JsonContent: {ContentTitle}")</div>
+    <pre>@JsonContent</pre>
+</div>
+@if (Items?.Count == 0)
+{
+    <div>none</div>
+}
+
+
+@code {
+    List<string>? Items;
+    string? Action = null;
+    string? Arg1;
+    string? Arg2;
+    const string Remove = "Rmv";
+    string? ContentTitle;
+
+    private async Task SetAction(string action, string? arg1 = null, string? arg2 = null)
+    {
+        AdminRequest request = new()
+        {
+            Action = action,
+            Arg1 = arg1,
+            Arg2 = arg2,
+            Token = DataService.Token
+        };
+        AdminResponse? response = await ApiService.SendRequest<AdminRequest, AdminResponse>(Endpoints.Admin, request);
+        if (response?.Response.Status is true)
+        {
+            Action = response.Action;
+            Items = response.Items;
+            Arg1 = response.Arg1;
+            Arg2 = response.Arg2;
+            if (Action == Actions.ViewFile)
+            {
+                ContentTitle = Arg1;
+                if (response.JsonString is not null)
+                {
+                    JsonDocument parsedJson = JsonDocument.Parse(response.JsonString);
+                    string formatted = JsonSerializer.Serialize(parsedJson,
+                        new JsonSerializerOptions { WriteIndented = true });
+                    JsonContent = formatted;
+                }
+                else JsonContent = "NULL STRING!!!";
+            }
+            else
+            {
+                ContentTitle = null; JsonContent = null;
+            }
+            StateHasChanged();
+        }
+    }
+    List<string> ParseGame(string item)
+    {
+        return item.Split(",").ToList();
+    }
+
+    private void Exit()
+    {
+        NavMgr.NavigateTo(PageLink.Portfolio);
+    }
+    //====================================================
+    private string StatusMessage = string.Empty;
+    private string? JsonContent;
+    private string ErrorMsg = string.Empty;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            IBrowserFile file = e.File;
+
+            // Validate extension
+            if (!file.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                StatusMessage = "1. Only .json files are allowed.";
+                return;
+            }
+
+            // Optional: Limit file size (e.g., 1 MB)
+            const long maxFileSize = 1 * 1024 * 1024;
+            if (file.Size > maxFileSize)
+            {
+                StatusMessage = "2. File is too large. Max size is 1 MB.";
+                return;
+            }
+
+            // Read file content into string
+            using var stream = file.OpenReadStream(maxFileSize);
+            using var reader = new StreamReader(stream);
+            string jsonContent = await reader.ReadToEndAsync();
+            JsonContent = jsonContent;
+            //      using JsonDocument jsonDoc = JsonDocument.Parse(jsonContent);
+            //    StatusMessage = "3 "+jsonDoc.RootElement.ToString();
+
+            // // Optional: Validate JSON format before sending
+            // try
+            // {
+            //     using var doc = JsonDocument.Parse(jsonContent);
+            // }
+            // catch
+            // {
+            //     StatusMessage = "Invalid JSON format.";
+            //     return;
+            // }
+            string[] fileNameParts = file.Name.Split('.');
+            if (fileNameParts.Length < 3)
+            {
+                StatusMessage = "Bad File Name";
+                return;
+            }
+
+            string fileType = fileNameParts[1];
+            StatusMessage = fileType;
+            if (ParmFileTypes.AcceptableTypes.Contains(fileType) is false) { StatusMessage = "unallowed file type"; return; }
+
+            // Send raw JSON to API
+            ParmUploadRequest request = new ParmUploadRequest()
+            {
+                Type = fileType,
+                Payload = jsonContent
+            };
+            ParmUploadResponse? response = await ApiService.SendRequest<ParmUploadRequest, ParmUploadResponse>(Endpoints.Admin + Sub.UpdateParms, request);
+            //  HttpResponseMessage response = await Http.PostAsync("https://your-api.com/api/upload-json-raw", content);
+
+        }
+        catch (Exception ex)
+        {
+            ErrorMsg = $"Error: {ex.Message}";
+        }
+    }
+    public void GetGames()
+    {
+        
+    }
+}

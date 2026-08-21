@@ -1,23 +1,24 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Commonwealth.Shared.Common;
 
 namespace Commonwealth.Shared.EconomicMgrs;
 
-public partial class DistrictMgr : DistrictInfo, IEconActivity
+public class DistrictMgr : DistrictInfo, IEconActivity
 {
-    public bool HasChanged { get; set; } = false;
+ //   public bool HasChanged { get; set; } = false;
     public required string Name { get; set; }
     public Report? LastSeasonGoodsReport { get; set; }
     public Report? LastSeasonVillageReport { get; set; }
     //  public DistrictOrder Order { get; private set; }
     public List<string> Adjustments { get; set; } = [];
 
-    [JsonConstructor] public DistrictMgr() { }
-    public static DistrictMgr CreateExpansion(string name)
-    {
-        return new DistrictMgr() { Name = name };
-    }
+[JsonConstructor] public DistrictMgr(){}
+    [SetsRequiredMembers] public DistrictMgr(string name, List<Asset>? goods, int staffAvailable) 
+    :  base(goods, staffAvailable)
+
+     { Name = name; }
     public void Reset()
     {
         ResetEconActivity(StaffAvailable);
@@ -56,7 +57,7 @@ public partial class DistrictMgr : DistrictInfo, IEconActivity
         return report;
     }
 }
-public class DistrictInfo : EconActivity
+public partial class DistrictInfo : EconActivity
 {
     public int? Owner { get; set; }
     public int? Population { get; set; }
@@ -66,9 +67,9 @@ public class DistrictInfo : EconActivity
     public int ForeignVillageCount { get; set; }
     public Report? LastSeasonReport { get; set; }
 
-    [JsonConstructor] public DistrictInfo() : base() { }
-
-    public DistrictInfo(List<Asset>? goods, int staffAvailable) : base(goods, staffAvailable) { }
+    [JsonConstructor] public DistrictInfo(){}
+    [SetsRequiredMembers] public DistrictInfo(List<Asset>? goods, int staffAvailable) 
+                        : base(goods, staffAvailable) { }
 
 }
 public class FoodMetrics
@@ -92,7 +93,7 @@ public enum FoodStatus
 }
 public partial class EconomicMgr
 {
-    static void HandleFoodConsumption(DistrictMgr mgr)
+    public static void HandleFoodConsumption(DistrictMgr mgr)
     {
         List<Asset>? foodConsumed = mgr.FoodMetrics?.AllocatedFoodConsumed ?? [];
         mgr.ConsumeGoods(nameof(EconActivity.Food), foodConsumed);

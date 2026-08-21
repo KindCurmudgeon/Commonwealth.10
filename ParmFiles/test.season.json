@@ -1,0 +1,20 @@
+{
+    "ParmFileInfo": {
+        "RootName": "test",
+        "Version": "0",
+        "Type":"season"
+    },
+    "GameCalendar": {
+        "Years": {
+            "Min": 300,
+            "Max": 1300
+        },  
+        "SeasonNames": ["Summer","Winter"]
+    },
+    "MinVillagesNeededForDistrictOwnership": 2,
+    "ImmigrationFactor": 2.0,
+    "PopulationStat": {
+        "Min": 3000,
+        "Max": 9000
+    }
+}

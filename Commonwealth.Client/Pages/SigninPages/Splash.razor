@@ -1,0 +1,117 @@
+﻿@page "/"
+@using Commonwealth.Client.Services
+@using Commonwealth.Shared.EndpointDTOs
+@using Commonwealth.Client.Components
+
+@inject NavigationManager NavMgr;
+@inject ApiService ApiService;
+@inject SharedDataService DataService;
+@namespace Commonwealth.Client.Pages
+
+<style>
+    body {
+        background-color: aliceblue
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+
+            <label class="col-form-label">Username:</label>
+            <div>
+                <input type="text" @bind-value="signinParameters!.UserName" class="form-control" />
+            </div>
+
+            <label class="col-form-label">Password:</label>
+            <div>
+                <input type="password" @bind-value="@signinParameters.Password" class="form-control" />
+            </div>
+            <div class="">
+                <button class="btn btn-primary mt-3" onclick="@SigninSubmitAsync">Submit</button>
+            </div>
+            <div class="">
+                <div class="clicktext mt-3" onclick="@RegisterClicked">Create New Account</div>
+            </div>
+        </div>
+
+        <div class="col-6 d-flex justify-content-center">
+            <img src="SplashWelcome.png" alt="welcome" class="image-fluid mb-4 mx-auto d-block" style="max-width: 100%; height:auto" />
+        </div>
+    </div>
+
+    <FormEntryErrorMessages ErrorMessages="Errors" />
+    <UserPopup @ref="UserPopupRef" OnSubmit="RegisterSubmit" />
+</div>
+
+@code {
+    //  private void NewAccount() { NavMgr.NavigateTo(PageLink.User); }
+    private SigninParameters? signinParameters { get; set; }
+
+    private bool isFastLogin = true;
+    private List<string>? Errors { get; set; }
+    private UserPopup UserPopupRef = new();
+
+
+    protected override void OnInitialized()
+    {
+        signinParameters = new() { UserName = string.Empty, Password = string.Empty };
+        if (isFastLogin)
+        {
+            signinParameters.UserName = "MRG";
+            signinParameters.Password = "123";
+        }
+    }
+
+    async Task SigninSubmitAsync()
+    {
+        if (IsSubmissionReady() is false) return;
+        SigninRequest request = new() {
+            RequestType = SigninRequestType.SIGNIN, 
+            SigninParameters = signinParameters,
+        };
+        SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
+        if (response is null) return;
+        Signin(response.Identity, response.Token);
+    }
+    bool IsSubmissionReady()
+    {
+        Errors = [];
+        Errors.CheckStringEntry(signinParameters?.UserName, "User Name", 20, 3);
+        Errors.CheckStringEntry(signinParameters?.Password, "Password", 20, 3);
+        return (Errors.Count == 0);
+    }
+    void RegisterClicked()
+    {
+        UserDTO dto = new() { };
+        UserPopupRef?.Show(dto);
+    }
+    async Task RegisterSubmit(UserDTO dto)
+    {
+        SigninRequest request = new() { RequestType = SigninRequestType.REGISTER, UserDTO = dto };
+        SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
+        if (response is null || response.Response.Status == false) return;
+        Signin(response.Identity, response.Token);
+    }
+    void Signin(UserIdentity? userIdentity, string? Token)
+    {
+        DataService.SetToken(Token);
+        DataService.SetPlayerIdentity(userIdentity);
+        if (DataService.IsSuccessfulSignin())
+        {
+             NavMgr.NavigateTo(PageLink.Portfolio);
+        }
+    }
+    // SelectStringPopup TestSelect = new();
+    // string? TestString;
+    // void ModalTest()
+    // {
+    //     TestSelect.Show(mylist);
+    // }
+    // void GotSelectedItem(string item)
+    // {
+    //     TestString = item;
+    //     TestSelect.Close();
+    // }
+
+    // List<string> mylist = new List<string>() { "asedf", "werre", "zxcv" };
+}

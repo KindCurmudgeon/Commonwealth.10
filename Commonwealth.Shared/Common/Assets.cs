@@ -110,7 +110,7 @@ public static class AssetExtenstions
     }
     public static bool IsSufficient(this List<Asset> source, List<Asset>? proposedConsume)
     {
-        foreach(Asset consumeAsset in proposedConsume ?? [])
+        foreach (Asset consumeAsset in proposedConsume ?? [])
         {
             Asset? sourceAsset = source.Find(t => t.Name == consumeAsset.Name);
             if (consumeAsset.Amount > (sourceAsset?.Amount ?? 0)) return false;
@@ -184,7 +184,7 @@ public static class AssetExtenstions
     }
 
 
-public static List<Asset> GetNegative(this List<Asset> source)
+    public static List<Asset> GetNegative(this List<Asset> source)
     {
         List<Asset> negated = [];
         foreach (Asset asset in source) negated.Add(new Asset(asset.Name, -asset.Amount));
@@ -208,7 +208,7 @@ public static List<Asset> GetNegative(this List<Asset> source)
             stringBuilder.Append(element);
         }
         if (stringBuilder.Length > 0) stringBuilder.Length -= 2; // Remove the last comma and space
-        return (stringBuilder.Length == 0) ? "(none)": stringBuilder.ToString();
+        return (stringBuilder.Length == 0) ? "(none)" : stringBuilder.ToString();
     }
 
 }

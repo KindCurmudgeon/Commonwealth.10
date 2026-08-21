@@ -1,0 +1,21 @@
+﻿
+
+@namespace Commonwealth.Client.Components
+@using Commonwealth.Shared.Common
+
+<div class="text-center">@TableData.Title</div>
+<table class="table table-responsive align-middle">
+    <TableHeader HeadingClass="tablegoods-header" FirstHeading="@TableData.FirstHeading" Headings="@TableData.ColumnHeadings" />
+    <tbody>
+        @foreach (RowData row in TableData.RowDatas ?? [])
+        {
+            <ReportTableRow RowHeader="@row.Header" RowValues="@row.Items" />
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter, EditorRequired] public ReportTableData TableData { get; set; }
+
+
+}

@@ -174,11 +174,3 @@ public interface IEconActivity
 {
      public void Reset();
 }
-public interface IMgr<T>
-{
-     T? Order { get; }
-     void ChangeOrder(T order);
-     bool HasChanged { get; set; }
-     List<string> Adjustments { get; set; }
-
-}

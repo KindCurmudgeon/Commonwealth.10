@@ -20,23 +20,7 @@ public class NationResponse : ResponseBase
     public List<string>? AvailableHomes { get; set; }
     public bool? IsGameActivated { get; set; }
 }
-
-
-//public partial class NationNamingDTO
-//{
-//    public required NationIdentity Identity { get; set; }
-//    public required NationNaming Naming { get; set; }
-//    [JsonConstructor] public NationNamingDTO() { }
-//    [SetsRequiredMembers]
-//    public NationNamingDTO(NationIdentity identity, NationNaming naming)
-//    {
-//        Identity = identity;
-//        Naming = naming;
-//    }
-//}
-
-
-public partial class NationIdentity
+public class NationIdentity
 {
     public required string GameName { get; set; }
     public required int NationCode { get; set; }
@@ -54,14 +38,14 @@ public partial class NationIdentity
     }
 
 }
-public partial class NationNaming
+public class NationNaming
 {
-    //   [JsonInclude] public string? HomeDistrict { get; private set; }
-    [JsonInclude] public int NationCode { get; set; }
-    [JsonInclude] public string? Name { get; set; }
-    [JsonInclude] public string? Possessive { get; set; }
-    [JsonInclude] public string? LeaderTitle { get; set; }
-    [JsonInclude] public string? Government { get; set; }
+    public int NationCode { get; set; }
+    public string? Name { get; set; }
+    public string? Possessive { get; set; }
+    public string? LeaderTitle { get; set; }
+    public string? Government { get; set; }
+    public bool IsNamed() => string.IsNullOrEmpty(Name) is false;
     public string? FormalLeader
     {
         get
@@ -70,14 +54,14 @@ public partial class NationNaming
             return $"{LeaderTitle ?? "Leader"} of {Government ?? "Nation"} of {Name ?? "tbd"}";
         }
     }
-    public string? FormalNation {
+    public string? FormalNation
+    {
         get
         {
             if (Name is null) return null;
             return $"{Government ?? "Nation"} of {Name ?? "tbd"}";
         }
     }
-    [JsonConstructor] public NationNaming() { }
     public NationNaming DeepCopy()
     {
         return new NationNaming()

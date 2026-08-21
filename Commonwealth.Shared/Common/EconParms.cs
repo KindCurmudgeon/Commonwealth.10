@@ -51,6 +51,19 @@ public partial class VillageParm
     //     return Expenses?.Find(e=>e.Type == type)?.Goods;
     // }
 }
+
+public static class EconParmExtensions
+{
+    public static VillageParm? FindVillageParm(this EconParms econParms, string? villageName)
+    {
+        if (villageName is null) return null;
+        return econParms.VillageParms.Find(p => p.Name == villageName);
+    }
+    public static string? GetGoodType(this EconParms econParms, Asset asset)
+    {
+        return econParms.GoodParms.Find(p => p.Name == asset.Name)?.Type;
+    }
+}
 public enum EXPENSE { NONE, CONSTRUCTION, ACTIVATION, OPERATION }
 public enum VillageClass { NONE, PRODUCTION, TRADING, STORAGE }
 public enum VillageConstraint { NONE, SEACOAST, ISLAND }

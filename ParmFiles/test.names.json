@@ -1,0 +1,62 @@
+{
+    "ParmFileInfo": {
+        "RootName": "test",
+        "Version": "0",
+        "Type": "names"
+    },
+    "LeaderTitles": [
+        "Regent",
+        "Sovereign",
+        "Overlord",
+        "Chancellor",
+        "Monarch",
+        "Governor",
+        "First Minister",
+        "Speaker",
+        "Herald",
+        "King",
+        "Queen",
+        "Prince",
+        "Princess",
+        "Duke",
+        "Duchess"
+    ],
+    "NationNames": [
+        {
+            "Name": "Alpha",
+            "Possessive": "Alphanian"
+        },
+        {
+            "Name": "Beta",
+            "Possessive": "Betanian"
+        },
+        {
+            "Name": "Gamma",
+            "Possessive": "Gammanian"
+        },
+        {
+            "Name": "Delta",
+            "Possessive": "Deltanian"
+        },
+        {
+            "Name": "Epsilon",
+            "Possessive": "Epsilonian"
+        },
+        {
+            "Name": "Phi",
+            "Possessive": "Phinensian"
+        }
+    ],
+    "Governments": [
+        "Republic",
+        "Empire",
+        "Kingdom",
+        "Duchy",
+        "Sultanate",
+        "Principality",
+        "Federation",
+        "Confederation",
+        "Union",
+        "Commonwealth"
+    ]
+}

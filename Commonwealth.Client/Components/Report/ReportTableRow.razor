@@ -1,0 +1,15 @@
+﻿
+@namespace Commonwealth.Client.Components
+
+<tr class="RowClass">
+    <th>@RowHeader</th>
+    @foreach(string item in RowValues)
+    {
+        <td class="text-center">@item</td>
+    }
+</tr>
+@code {
+    [Parameter, EditorRequired] public string RowHeader { get; set; }
+    [Parameter, EditorRequired] public List<string> RowValues { get; set; }
+    [Parameter] public string? RowClass { get; set; }
+}

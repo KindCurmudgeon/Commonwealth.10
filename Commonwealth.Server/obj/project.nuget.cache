@@ -1,8 +1,25 @@
 {
   "version": 2,
-  "dgSpecHash": "eshdPRMtfFU=",
+  "dgSpecHash": "XW7Gqtl89Ks=",
   "success": true,
   "projectFilePath": "/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Server/Commonwealth.Server.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/michaelgrimes/.nuget/packages/azure.core/1.55.0/azure.core.1.55.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/azure.storage.blobs/12.29.1/azure.storage.blobs.12.29.1.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/azure.storage.common/12.28.0/azure.storage.common.12.28.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.bcl.asyncinterfaces/10.0.3/microsoft.bcl.asyncinterfaces.10.0.3.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.bcl.cryptography/10.0.2/microsoft.bcl.cryptography.10.0.2.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.identity.client/4.83.1/microsoft.identity.client.4.83.1.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.identity.client.extensions.msal/4.83.1/microsoft.identity.client.extensions.msal.4.83.1.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.identitymodel.abstractions/8.22.0/microsoft.identitymodel.abstractions.8.22.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.identitymodel.jsonwebtokens/8.22.0/microsoft.identitymodel.jsonwebtokens.8.22.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.identitymodel.logging/8.22.0/microsoft.identitymodel.logging.8.22.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/microsoft.identitymodel.tokens/8.22.0/microsoft.identitymodel.tokens.8.22.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/system.clientmodel/1.11.0/system.clientmodel.1.11.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/system.identitymodel.tokens.jwt/8.22.0/system.identitymodel.tokens.jwt.8.22.0.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/system.io.hashing/10.0.3/system.io.hashing.10.0.3.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/system.memory.data/10.0.3/system.memory.data.10.0.3.nupkg.sha512",
+    "/Users/michaelgrimes/.nuget/packages/system.security.cryptography.protecteddata/4.5.0/system.security.cryptography.protecteddata.4.5.0.nupkg.sha512"
+  ],
   "logs": []
 }
