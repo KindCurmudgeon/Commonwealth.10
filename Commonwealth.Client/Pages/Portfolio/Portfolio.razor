@@ -2,6 +2,7 @@
 @using Commonwealth.Client.Components;
 @using Commonwealth.Shared.Common
 @using Commonwealth.Shared.EndpointDTOs
+@using IdentityProvider.EndpointDTOs
 @using Microsoft.AspNetCore.Components;
 
 @attribute [Route(PageLink.Portfolio)];
@@ -13,7 +14,7 @@
 
 
 <h4 class="fw-bold"><u>Your Portfolio of Games</u>:</h4>
-@if (Response is null)
+@if (IsVisible is false)
 {
     <div>Loading ...</div>
 }
@@ -151,16 +152,18 @@ else
     <hr style="height:4px;color:black; opacity:100">
     <div class="clicktext my-1" @onclick="CreateGame">Create a New Game</div>
     <hr style="height:4px;color:black; opacity:100">
-    <div class="clicktext my-1" @onclick="EditAccount">Edit Account</div>
+    @* <div class="clicktext my-1" @onclick="EditAccount">Edit Account</div> *@
     <NationEditPopup @ref="NationEditRef" />
     <GameEditPopup @ref="GameEditPopupRef" OnCreated="RefreshAsync" />
-    <UserPopup @ref="UserPopupRef" OnSubmit="OnUserSubmit" />
+    @* <UserPopup @ref="UserPopupRef" OnSubmit="OnUserSubmit" /> *@
     <ConfirmPopup @ref=ConfirmPopupRef CallbackAsync="ConfirmCallback" TextTrue="Remove" TextFalse="Cancel"></ConfirmPopup>
 }
 @code
 {
-    public UserResponse? Response { get; set; }
-    public required List<GameSummaryDTO> Summaries { get; set; }
+   // public PlayerResponse? Response { get; set; }
+   bool IsVisible = false;
+    private List<GameSummaryDTO> Summaries { get; set; } = default!;
+    public PlayerDTO PlayerDTO {get;set;} = default!;
 
     private NationEditPopup NationEditRef = new();
     private GameEditPopup GameEditPopupRef = new();
@@ -175,12 +178,17 @@ else
 
     private async Task RefreshAsync(bool? forceStateChange = null)
     {
-        UserRequest request = new() { RequestType = UserRequestType.GET_PORTFOLIO, Token = DataService.Token };
-        UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+        PlayerRequest request = new() 
+        {
+             RequestType = PlayerRequestType.GetPortfolio, 
+             Token = DataService.Token 
+        };
+        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.User, request);
         if (response is not null && response.Response.Status is true)
         {
-            Response = response;
-            Summaries = response.GameSummaries ?? [];
+            IsVisible = true;
+            Summaries = response.GameSummaries ?? []; 
+            PlayerDTO = response.PlayerDTO!;
             if (forceStateChange is true) StateHasChanged();
         }
     }
@@ -292,38 +300,4 @@ else
             await RefreshAsync(true);
         }
     }
-    private void AdminFunctions() => NavMgr.NavigateTo(PageLink.Admin);
-
-
-    private async Task EditAccount()
-    {
-        UserDTO? dto = await GetUserDTO(DataService?.UserIdentity?.UserName);
-        UserPopupRef?.Show(dto);
-    }
-    private async Task<UserDTO?> GetUserDTO(string? userName)
-    {
-        if (ApiService is null || userName is null) return null;
-
-        UserRequest request = new()
-        {
-            RequestType = UserRequestType.GETUSERDTO,
-            UserName = userName,
-            Token = DataService?.Token
-        };
-        UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
-        if (response is null || response.Response.Status is false) return null;
-        return response.UserDTO;
-    }
-    private async Task OnUserSubmit(UserDTO userDTO)
-    {
-        UserRequest request = new() { RequestType = UserRequestType.UPDATE, UserDTO = userDTO, Token = DataService.Token };
-        UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
-        if (response is null) return;
-        if (response.Response.Status is false)
-        {
-            UserPopupRef.UpdateUserDTO(response.UserDTO);
-        }
-        else UserPopupRef.Close();
-    }
-
 }

@@ -2,6 +2,8 @@ using Commonwealth.Server.Data;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
+using Identity.Client.Service;
+using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Endpoints;
 
@@ -11,32 +13,32 @@ public static partial class GamemasterEndpoints
     {
         app.MapPost("/", async (
             GamemasterRequest request,
-            BlobService blobService) =>
+            BlobService blobService, IdentityService identityService) =>
         {
             GamemasterResponse response = new();
             try
             {
                 ValidateRequest();
-                User user = await Authorization.ValidateUserAsync(request, blobService);
+                PlayerDTO requestor = Authorization.ExtractProfileDTOfromToken(request.Token).CreatePlayerDTO();
                 switch (request.RequestType)
                 {
                     case GM_RequestType.Create:
-                        await CreateAsync(request.GameDTO!, request.LineupDTOs, user, blobService, response);
+                        await CreateAsync(request.GameDTO!, request.LineupDTOs, requestor, blobService, identityService, response);
                         break;
                     case GM_RequestType.Update:
-                        await UpdateAsync(request.GameDTO!, request.LineupDTOs, user, blobService, response);
+                        await UpdateAsync(request.GameDTO!, request.LineupDTOs, requestor, blobService, identityService, response);
                         break;
                     case GM_RequestType.Activate:
-                        await ActivateAsync(request.GameName!, user, blobService, response);
+                        await ActivateAsync(request.GameName!, requestor, blobService, response);
                         break;
                     case GM_RequestType.SeasonUpdate:
-                        await SeasonUpdateAsync(request.GameName!, user, request.UseHistory, blobService, response);
+                        await SeasonUpdateAsync(request.GameName!, requestor, request.UseHistory, blobService, response);
                         break;
                     case GM_RequestType.Get:
-                        await GetGameResponseAsync(request.GameName!, user, blobService, response);
+                        await GetGameResponseAsync(request.GameName!, requestor, blobService, identityService, response);
                         break;
                     case GM_RequestType.Remove:
-                        await RemoveGameAsync(request.GameName!, user, blobService, response);
+                        await RemoveGameAsync(request.GameName!, requestor, blobService, response);
                         break;
                 }
             }

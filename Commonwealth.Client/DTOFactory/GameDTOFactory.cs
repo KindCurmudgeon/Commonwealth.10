@@ -3,9 +3,9 @@ using Commonwealth.Shared.EndpointDTOs;
 
 public static class GameDTOFactory
 {
-     public static GameDTO Create(string creator)
-     {
-                  return new GameDTO()
+    public static GameDTO Create(PlayerDTO creator)
+    {
+        return new GameDTO()
         {
             GameName = null,
             GameState = GameState.None,
@@ -15,5 +15,5 @@ public static class GameDTOFactory
             Gamemasters = [],
             IsActivated = false
         };
-     }
+    }
 }

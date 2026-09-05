@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Commonwealth.Server.Data;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
+using Identity.Client.Service;
 
 
 namespace Commonwealth.Server.Endpoints;
@@ -10,23 +11,28 @@ namespace Commonwealth.Server.Endpoints;
 public static partial class GamemasterEndpoints
 {
 
-    public static async Task GetGameResponseAsync(string gameName, User requestor, BlobService blobService, GamemasterResponse response)
+    public static async Task GetGameResponseAsync(string gameName, PlayerDTO requestor, 
+            BlobService blobService, IdentityService identityService, GamemasterResponse response)
     {
         Game game = await Game.RetrieveAsync(gameName, blobService);
         List<Nation> nations = await game.GatherNationsAsync(blobService);
         game.ConfirmUserIsAllowed(requestor, nations);
-    //    GameParms gameParms = await GameParms.RetrieveAsync(game.Name, blobService);
-        response.GameDTO = await game.CreateGameDTOAsync(blobService);
+        //    GameParms gameParms = await GameParms.RetrieveAsync(game.Name, blobService);
+        response.GameDTO = await game.CreateGameDTOAsync(identityService);
         response.LineupDTOs = await CreateLineupDTOAsync();
         response.IsGamemaster = game.IsGamemaster(requestor);
-        if (response.IsGamemaster is true) response.Friends = requestor.Friends;
+        if (response.IsGamemaster is true)
+        {
+            Player player = await Player.RetrieveAsync(requestor.Id, blobService);
+            response.Friends = player.Friends;
+        }
 
         async Task<List<LineupDTO>> CreateLineupDTOAsync()
         {
             List<LineupDTO> dtos = [];
             foreach (Nation nation in nations)
             {
-                User player = await User.RetrieveAsync(nation.UserName, blobService);
+                PlayerDTO? player = null;  // FIX LAter
                 LineupDTO dto = nation.CreateLineupDTO(player!);
                 dtos.Add(dto);
             }

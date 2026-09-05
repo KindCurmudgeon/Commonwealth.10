@@ -12,7 +12,7 @@
 <button class="btn btnsubmit float-end" @onclick="Exit">Exit</button>
 <div class="clicktext" @onclick="(()=> SetAction(Actions.GetGames))">Get Games</div>
 <br />
-<button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.User))">List Users</button>
+<button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.Player))">List Users</button>
 <button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.Game))">List Games</button>
 <button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.Parm))">List Parms</button>
 <button class="btn-secondary" @onclick="(() => SetAction(Actions.GetList, FileTypes.AllFiles))">List All Files</button>
@@ -38,7 +38,7 @@
                     <span class="ps-3 smallfont text-danger clickchar" @onclick="(() => SetAction(Actions.RemoveFile, item))">Remove File</span>
                     switch (Arg1)
                     {
-                        case FileTypes.User:
+                        case FileTypes.Player:
                             <span class="ps-3 smallfont text-black clickchar" @onclick="(() => SetAction(Actions.GetUserGames, item))">View Games</span>
                             <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.MakeAdmin, item))">Make Admin</span>
                             <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.MakeDev, item))">Make Dev</span>

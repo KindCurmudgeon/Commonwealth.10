@@ -1,12 +1,12 @@
+/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/bin/Debug/net10.0/Commonwealth.Shared.deps.json
+/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/bin/Debug/net10.0/Commonwealth.Shared.dll
+/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/bin/Debug/net10.0/Commonwealth.Shared.pdb
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.GeneratedMSBuildEditorConfig.editorconfig
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.AssemblyInfoInputs.cache
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.AssemblyInfo.cs
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.csproj.CoreCompileInputs.cache
-/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/bin/Debug/net10.0/Commonwealth.Shared.deps.json
-/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/bin/Debug/net10.0/Commonwealth.Shared.dll
-/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/bin/Debug/net10.0/Commonwealth.Shared.pdb
+/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.sourcelink.json
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.dll
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/refint/Commonwealth.Shared.dll
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.pdb
 /Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/ref/Commonwealth.Shared.dll
-/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/obj/Debug/net10.0/Commonwealth.Shared.sourcelink.json

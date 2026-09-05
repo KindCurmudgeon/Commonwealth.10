@@ -6,19 +6,20 @@ using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.Common;
 using Commonwealth.Shared.EconomicMgrs;
 using Commonwealth.Shared.EndpointDTOs;
+using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Data;
 
 public partial class Game
 {
-    public static Game Create(GameDTO dto, User creator, EconParms econParms, GeographyFile geogParmsFile, InitParms initParms)
+    public static Game Create(GameDTO dto, PlayerDTO creator, EconParms econParms, GeographyFile geogParmsFile, InitParms initParms)
     {
         Game game = new Game()
         {
             Id = Guid.NewGuid(),
             Name = Util.TitleCase(dto.GameName),
             GameState = GameState.Created,
-            Creator = creator.UserName,
+            Creator = creator,
             CreationDate = DateTime.UtcNow,
             Gamemasters = [],
             OrdersPeriod = dto.OrdersPeriod ?? new TimeSpan(7, 0, 0, 0),
@@ -220,20 +221,20 @@ public partial class Game
         }
         return nations;
     }
-    public bool IsGamemaster(User user)
+    public bool IsGamemaster(PlayerDTO playerDTO)
     {
-        if (user.IsAdministrator) return true;
-        if (Creator == user.UserName) return true;
-        string? found = Gamemasters.Find(g => g == user.UserName);
-        return found is not null;
+        // if (user.IsAdministrator) return true;
+    if (Creator.Id == playerDTO.Id) return true;
+       return Gamemasters.Exists(g => g == playerDTO.Id);
     }
-    public void ConfirmUserIsAllowed(User user, List<Nation> nations)
+    public void ConfirmUserIsAllowed(PlayerDTO user, List<Nation> nations)
     {
-        if (user.IsAdministrator) return;
-        if (IsGamemaster(user)) return;
+        // if (user.IsAdministrator) return;
+        // if (IsGamemaster(user)) return;
         foreach (Nation nation in nations)
         {
-            if (string.Equals(nation.UserName, user.UserName, StringComparison.OrdinalIgnoreCase)) return;
+            if (nation.playerId == user.Id) return;
+            //   if (string.Equals(nation.UserName, user.UserName, StringComparison.OrdinalIgnoreCase)) return;
         }
         throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, user.UserName);
     }
@@ -283,23 +284,23 @@ public partial class Game
         {
             try
             {
-                User player = await descriptors.RetrieveIfNotFoundAsync<User>(User.BlobPath(nation.UserName), blobService);
+                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(nation.playerId), blobService);
                 player.RemoveAllGames(game.Name);
             }
             catch { }
         }
-        foreach (string userName in game.Gamemasters)
+        foreach (Guid userId in game.Gamemasters)
         {
             try
             {
-                User player = await descriptors.RetrieveIfNotFoundAsync<User>(User.BlobPath(userName), blobService);
+                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(userId), blobService);
                 player.RemoveAllGames(game.Name);
             }
             catch { }
         }
         try
         {
-            User creator = await descriptors.RetrieveIfNotFoundAsync<User>(User.BlobPath(game.Creator!), blobService);
+            Player creator = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(game.Creator.Id), blobService);
             creator.RemoveAllGames(game.Name);
         }
         catch { }

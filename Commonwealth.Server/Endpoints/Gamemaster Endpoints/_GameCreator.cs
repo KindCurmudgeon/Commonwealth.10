@@ -5,18 +5,22 @@ using Commonwealth.Server.Parameters;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.Common;
 using Commonwealth.Shared.EndpointDTOs;
+using Identity.Client.Service;
+using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Endpoints;
+
 public static partial class GamemasterEndpoints
 {
-    public static async Task CreateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, User user,
-                            BlobService blobService, ResponseBase response)
+    public static async Task CreateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, PlayerDTO creator,
+                            BlobService blobService, IdentityService identityService, ResponseBase response)
     {
         bool confirm = Util.IsLegalWindowsFilename(gameDTO.GameName);
         if (confirm is false) throw new AppException(ExceptionType.Endpoint, EndpointFailType.Invalid, "Illegal GameName");
         string? gameName = Util.TitleCase(gameDTO.GameName);
         if (await Game.GameExists(gameName, blobService)) gameName = await FindUnique(gameName, blobService);
-        if (gameName is null) {
+        if (gameName is null)
+        {
             throw new AppException(ExceptionType.Endpoint, EndpointFailType.NameExists, gameName);
         }
 
@@ -29,7 +33,7 @@ public static partial class GamemasterEndpoints
 
         GeographyFile geogParmsFile = await GeographyFile.RetrieveAsync(gameDTO.GeogFileInfo, blobService);
 
-        Game game = Game.Create(gameDTO, user, econParms, geogParmsFile, initParms);
+        Game game = Game.Create(gameDTO, creator, econParms, geogParmsFile, initParms);
 
         // TestGame testGame = new TestGame(game);
         //             string test = JsonSerializer.Serialize(testGame);
@@ -40,13 +44,14 @@ public static partial class GamemasterEndpoints
         //             {
         //               string msg = ex.Message;   
         //             }
-        user.NationIdentities.Add(new NationIdentity(game.Name, -1)); // -1 => Creator
+        Player creatorPlayer = await Player.RetrieveAsync(creator.Id, blobService);
+        creatorPlayer.NationIdentities.Add(new NationIdentity(game.Name, -1)); // -1 => Creator
         List<BlobDescriptor> descriptors = [];
         descriptors.Add(game.BlobDescriptor());
         //   descriptors.Add(gameParms.BlobDescriptor());
-        descriptors.Add(user.BlobDescriptor());
+        descriptors.Add(creatorPlayer.BlobDescriptor());
 
-        await HandleAnyAddedNationsAsync(game, lineupDTOs, descriptors, blobService, response);
+        await HandleAnyAddedNationsAsync(game, lineupDTOs, descriptors, blobService, identityService,response);
         bool result = await blobService.SaveGroupAsync(descriptors);
         if (result is true) response.AddMessage($"Game '{game.Name}' created!");
         else response.AddError($"Trouble creating {game.Name}!");

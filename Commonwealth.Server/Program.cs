@@ -4,11 +4,13 @@ using Commonwealth.Server.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string? X = builder.Configuration["AZURE_CLIENT_ID"];
 // Add Blob Service
 var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
 {
     ManagedIdentityClientId = builder.Configuration["AZURE_CLIENT_ID"]
 });
+
 builder.AddBlobService(credential);
 
 builder.AuthInitialize();

@@ -57,10 +57,11 @@ public partial class Nation : IBlobObject
         Naming.LeaderTitle = newNaming.LeaderTitle ?? Util.PickRandomFromList(leaderTitles);
         Naming.Government = newNaming.Government ?? Util.PickRandomFromList(governments);
     }
-    public bool IsUserAllowed(User user)
+    public bool IsUserAllowed(Guid testId)
     {
-        if (user.IsAdministrator) return true;
-        if (string.Equals(UserName, user.UserName, StringComparison.OrdinalIgnoreCase)) return true;
+        //   if (user.IsAdministrator) return true;
+        //if (string.Equals(UserName, user.UserName, StringComparison.OrdinalIgnoreCase)) return true;
+        if (testId == playerId) return true;
         return false;
     }
     public List<Asset> FoodGoodsProratedPerVillage(int foodPerVillage, List<string> foodTypes)

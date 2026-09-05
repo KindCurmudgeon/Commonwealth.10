@@ -7,14 +7,15 @@ public static class BlobNaming
     public const string GameParmsSuffix = "-parms";
     public const string NationSuffix = "-nation-";
 
- //   public const string StatusPrefix = "-orders-";
- //   public const string SeasonSuffix = "-season";
+    //   public const string StatusPrefix = "-orders-";
+    //   public const string SeasonSuffix = "-season";
     public const string HistorySuffix = "-history-";
 }
 
 public static class Folders
 {
-    public static string Parms { get; set; } = "Parms";
-    public static string Games { get; set; } = "Games";
-    public static string Users {get;set;} = "Users";
+    public const string Parms = "Parms";
+    public const string Games = "Games";
+    public const string Players = "Players";
+    public const string UserIdentities = "UsersIdentities";
 }

@@ -7,7 +7,7 @@ namespace Commonwealth.Client.Services;
 
 public class SharedDataService
 {
-    public UserIdentity? UserIdentity { get; private set; } = null;
+    public PlayerDTO? UserDTO { get; private set; } = null;
     public string? Token { get; private set; } = null;
     public NationIdentity? NationIdentity { get; set; }
     //  public Guid? GameId { get; set; }
@@ -15,13 +15,13 @@ public class SharedDataService
     private MainLayout? _mainLayout;
     private ApiService? _apiService;
 
-    public void SetPlayerIdentity(UserIdentity? identity)
+    public void SetUserDTO(PlayerDTO? dto)
     {
-        UserIdentity = identity;
+        UserDTO = dto;
     }
     public bool IsSuccessfulSignin()
     {
-        if (UserIdentity is null || Token is null) return false;
+        if (UserDTO is null || Token is null) return false;
         return true;
     }
     public void SetToken(string? token)
@@ -49,6 +49,13 @@ public class SharedDataService
         {
             _mainLayout?.ShowAlert(response);
         }
+    }
+    public void ShowErrorAlert(string message)
+    {
+        ResponseBase responseBase = new();
+        responseBase.Response.Messages.Add(message);
+        responseBase.Response.Status = false;
+        _mainLayout?.ShowAlert(responseBase);
     }
     public string? NavigateToAfterAlert { get; set; }
 

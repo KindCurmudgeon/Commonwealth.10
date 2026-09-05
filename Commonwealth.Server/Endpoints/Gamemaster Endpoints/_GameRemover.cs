@@ -7,11 +7,11 @@ namespace Commonwealth.Server.Endpoints;
 
 public static partial class GamemasterEndpoints
 {
-    public static async Task RemoveGameAsync(string gameName, User requestor, BlobService blobService, ResponseBase response)
+    public static async Task RemoveGameAsync(string gameName, PlayerDTO requestor, BlobService blobService, ResponseBase response)
     {
 
         Game game = await Game.RetrieveAsync(gameName, blobService);
-        if (game.Creator != requestor.UserName && !requestor.IsAdministrator)
+        if (game.Creator.Id != requestor.Id)
             throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
         await Game.Remove(game, blobService);
         response.AddMessage($"Game '{gameName}' removed!");

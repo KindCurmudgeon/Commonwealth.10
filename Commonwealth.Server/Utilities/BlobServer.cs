@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Azure;
 using Azure.Core;
 using Azure.Storage.Blobs;
@@ -49,29 +48,31 @@ public class BlobService
     }
     public async Task<T> RetrieveAsync<T>(string pathName) where T : IBlobObject
     {
+        BlobClient blobClient = ContainerClient.GetBlobClient(pathName);
         try
         {
-            BlobClient blobClient = ContainerClient.GetBlobClient(pathName);
-
-            string jsonContent;
-            using (MemoryStream stream = new())
-            {
-                await blobClient.DownloadToAsync(stream);
-                stream.Position = 0; // Reset stream position to the beginning
-                using (StreamReader reader = new(stream))
-                {
-                    jsonContent = await reader.ReadToEndAsync();
-                }
-            }
+            BlobDownloadResult rawResult = await blobClient.DownloadContentAsync();
+            string jsonContent = rawResult.Content.ToString();
             T? result = JsonSerializer.Deserialize<T>(jsonContent);
-            ValidateFileContents(result);
             return result!;
         }
-        catch (RequestFailedException ex)
+        catch (RequestFailedException ex) when (ex.Status == 404)
         {
-            Console.WriteLine(ex.Message);
             throw new AppException(ExceptionType.Blob, BlobFailType.NotFound, pathName);
         }
+        // string jsonContent;
+        // using (MemoryStream stream = new())
+        // {
+        //     await blobClient.DownloadToAsync(stream);
+        //     stream.Position = 0; // Reset stream position to the beginning
+        //     using (StreamReader reader = new(stream))
+        //     {
+        //         jsonContent = await reader.ReadToEndAsync();
+        //     }
+        // }
+        // T? result = JsonSerializer.Deserialize<T>(jsonContent);
+        // ValidateFileContents(result);
+        // return result!;
         catch (JsonException ex)
         {
             throw new AppException(ExceptionType.Blob, BlobFailType.JSON, ex);
@@ -80,11 +81,11 @@ public class BlobService
         {
             throw new AppException(ExceptionType.Blob, BlobFailType.Unexpected, ex);
         }
-        void ValidateFileContents(IBlobObject? result)
-        {
-            if (result is null) throw new AppException(ExceptionType.Blob, BlobFailType.JSON, (string?)null);
-            result.Validate();
-        }
+        // void ValidateFileContents(IBlobObject? result)
+        // {
+        //     if (result is null) throw new AppException(ExceptionType.Blob, BlobFailType.JSON, (string?)null);
+        //     result.Validate();
+        // }
     }
     public async Task<bool> SaveGroupAsync(List<BlobDescriptor> descriptors)
     {

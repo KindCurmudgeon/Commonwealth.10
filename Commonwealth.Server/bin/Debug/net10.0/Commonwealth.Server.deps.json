@@ -10,6 +10,7 @@
         "dependencies": {
           "Azure.Storage.Blobs": "12.29.1",
           "Commonwealth.Shared": "1.0.0",
+          "IdentityProvider.Shared": "1.0.0",
           "System.IdentityModel.Tokens.Jwt": "8.22.0"
         },
         "runtime": {
@@ -198,6 +199,14 @@
             "fileVersion": "1.0.0.0"
           }
         }
+      },
+      "IdentityProvider.Shared/1.0.0": {
+        "runtime": {
+          "IdentityProvider.Shared.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -320,6 +329,11 @@
       "hashPath": "system.security.cryptography.protecteddata.4.5.0.nupkg.sha512"
     },
     "Commonwealth.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "IdentityProvider.Shared/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

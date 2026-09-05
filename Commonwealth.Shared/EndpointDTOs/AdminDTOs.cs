@@ -30,7 +30,7 @@ public class ParmUploadResponse : ResponseBase
 public static class Actions
 {
     public const string UpdateParms = "updateParms";
-    
+
     public const string GetList = "getList";
     public const string ViewFile = "viewFile";
     public const string RemoveFile = "removeFile";
@@ -48,9 +48,8 @@ public static class Actions
 public static class FileTypes
 {
     public const string Game = "Game";
-    public const string User = "User";
+    public const string Player = "Player";
     public const string Parm = "Parm";
-    public const string UserGames = "userGames";
     public const string AllFiles = "AllFiles";
 }
 public static class ParmFileType

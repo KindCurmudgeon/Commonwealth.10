@@ -17,12 +17,12 @@
             <img src="TitleBar.png" class="w-50 py-0 my-0" @onclick="() => ForDev()"></img>
         </div>
     </div>
-    @if (DataService.UserIdentity is not null)
+    @if (DataService.UserDTO is not null)
     {
         <div class="row px-2 py-0 my-0" style="background-color:black">
             <div class="col text-start">
                 <span class="text-warning">User ID:</span>
-                <span class="text-info"><b>@DataService.UserIdentity.UserName</b></span>
+                <span class="text-info"><b>@DataService.UserDTO.UserName</b></span>
             </div>
             <div class="col text-center">
                 <div class="text-center text-warning clicktext" @onclick="Reshow">Show Last Alert</div>
@@ -65,61 +65,61 @@
 
     private void Logout()
     {
-        DataService.SetPlayerIdentity(null);
+        DataService.SetUserDTO(null);
         DataService.SetToken(null);
         NavMgr.NavigateTo(PageLink.Splash);
     }
     // private async Task EditAccount()
     // {
-    //     UserDTO? dto = await GetUserDTO(DataService?.UserIdentity?.UserName);
-    //     UserPopupRef?.Show(dto);
+    // UserDTO? dto = await GetUserDTO(DataService?.UserIdentity?.UserName);
+    // UserPopupRef?.Show(dto);
     // }
     // private async Task<UserDTO?> GetUserDTO(string? userName)
     // {
-    //     if (ApiService is null || userName is null) return null;
+    // if (ApiService is null || userName is null) return null;
 
-    //     UserRequest request = new()
-    //     {
-    //         RequestType = UserRequestType.GETUSERDTO,
-    //         UserName = userName,
-    //         Token = DataService?.Token
-    //     };
-    //     UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
-    //     if (response is null || response.Response.Status is false) return null;
-    //     return response.UserDTO;
+    // UserRequest request = new()
+    // {
+    // RequestType = UserRequestType.GETUSERDTO,
+    // UserName = userName,
+    // Token = DataService?.Token
+    // };
+    // UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+    // if (response is null || response.Response.Status is false) return null;
+    // return response.UserDTO;
     // }
     private void ForDev()
     {
-        if (DataService.UserIdentity?.IsDeveloper is true)
+        @* if (DataService.UserDTO?.IsDeveloper is true)
         {
             NavMgr.NavigateTo(PageLink.Admin);
-        }
+        } *@
     }
     // private async Task UserAccountSubmit(UserDTO userDTO)
     // {
-    //     //     if (IsSubmissionReady() is false) return;
-    //     //    if (IsNewUser)
-    //     //   {
-    //     // SigninRequest request = new SigninRequest
-    //     // {
-    //     //     RequestType = SigninRequestType.REGISTER,
-    //     //     UserDTO = UserDTO
-    //     // };
-    //     // SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
-    //     // if (response?.Response.Status == true)
-    //     // {
-    //     //     OnValidSubmission?.Invoke(response.Identity!, response.Token!);
-    //     // }
-    //     //   }
-    //     //   else
-    //     //   {
-    //     // UserRequest request = new UserRequest
-    //     // {
-    //     //     RequestType = UserRequestType.UPDATE,
-    //     //     UserDTO = userDTO,
-    //     //     Token = DataService.Token
-    //     // };
-    //     // UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
-    //     // if (response?.Response.Status == true) UserPopupRef.Close();
+    // // if (IsSubmissionReady() is false) return;
+    // // if (IsNewUser)
+    // // {
+    // // SigninRequest request = new SigninRequest
+    // // {
+    // // RequestType = SigninRequestType.REGISTER,
+    // // UserDTO = UserDTO
+    // // };
+    // // SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
+    // // if (response?.Response.Status == true)
+    // // {
+    // // OnValidSubmission?.Invoke(response.Identity!, response.Token!);
+    // // }
+    // // }
+    // // else
+    // // {
+    // // UserRequest request = new UserRequest
+    // // {
+    // // RequestType = UserRequestType.UPDATE,
+    // // UserDTO = userDTO,
+    // // Token = DataService.Token
+    // // };
+    // // UserResponse? response = await ApiService.SendRequest<UserRequest, UserResponse>(Endpoints.User, request);
+    // // if (response?.Response.Status == true) UserPopupRef.Close();
     // }
 }

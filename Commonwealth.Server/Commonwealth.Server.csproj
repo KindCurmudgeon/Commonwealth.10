@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Commonwealth.Shared\Commonwealth.Shared.csproj" />
+    <ProjectReference Include="..\IdentityProvider.Shared\IdentityProvider.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Shared.Common;
 namespace Commonwealth.Server.Utilities;
 
@@ -274,7 +275,11 @@ public static partial class Util
         }
         return points[last].Y;
     }
-
+    public static Guid StringToGuid(string? id)
+     {
+          if (!Guid.TryParse(id, out Guid guid)) throw new AppException(ExceptionType.Endpoint, EndpointFailType.Invalid, "User ID");
+          return guid;
+     }
 }
 public class Stat
 {
@@ -287,4 +292,5 @@ public class Stat
         Min = min;
         Max = max;
     }
+
 }

@@ -6,9 +6,9 @@ namespace Commonwealth.Server.Endpoints;
 
 public partial class UserEndpoints
 {
-    public static async Task ValidateAccount(UserRequest request, BlobService blobService, UserResponse response)
-    {
-        User user = await Authorization.ValidateUserAsync(request, blobService);
-        response.UserDTO = user.CreateDTO();
-    }
+    // public static async Task ValidateAccount(UserRequest request, BlobService blobService, UserResponse response)
+    // {
+    //     Data.UserIdentity user = await Authorization.AuthenticateUser(request, blobService);
+    //     response.UserDTO = user.CreateDTO();
+    // }
 }

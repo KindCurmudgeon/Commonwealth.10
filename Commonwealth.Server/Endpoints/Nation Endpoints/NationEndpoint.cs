@@ -2,6 +2,7 @@ using Commonwealth.Server.Data;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
+using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Endpoints;
 
@@ -17,17 +18,17 @@ public static partial class NationEndpoints
             try
             {
                 ValidateRequest();
-                User requestor = await Authorization.ValidateUserAsync(request, blobService);
-                Nation nation = await Nation.RetrieveAsync(request.Identity!, blobService);
-                if (nation.IsUserAllowed(requestor) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
+                ProfileDTO profile = Authorization.ExtractProfileDTOfromToken(request.Token);
+                Nation nation = await Nation.RetrieveAsync(request.Identity, blobService);
+                if (nation.IsUserAllowed(profile.UserId) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, profile.UserName);
                 switch (request.RequestType)
                 {
                     case NationRequestType.Get:
-                        Game game = await Game.RetrieveAsync(nation.Identity.GameName, blobService);
-                        //    GameParms gameParms = await GameParms.RetrieveAsync(nation.Identity.GameName, blobService);
-                        User player = (requestor.UserName == nation.UserName) ? requestor : await User.RetrieveAsync(nation.UserName, blobService);
-                        await ProcessGet(nation, game, blobService, response);
-                        break;
+                    // Game game = await Game.RetrieveAsync(nation.Identity.GameName, blobService);
+                    // //    GameParms gameParms = await GameParms.RetrieveAsync(nation.Identity.GameName, blobService);
+                    // Data.UserIdentity player = (requestor.UserName == nation.UserName) ? requestor : await Data.UserIdentity.RetrieveAsync(nation.UserName, blobService);
+                    // await ProcessGet(nation, game, blobService, response);
+                    // break;
                     case NationRequestType.Update:
                     case NationRequestType.AcceptReject:
                         await ProcessUpdate(nation, request, blobService, response);

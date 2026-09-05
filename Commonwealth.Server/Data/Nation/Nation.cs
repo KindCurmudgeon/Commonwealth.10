@@ -8,9 +8,10 @@ namespace Commonwealth.Server.Data;
 
 public partial class Nation : IBlobObject
 {
-  public Guid Id {get;set;}
+  public Guid Id { get; set; }
   public required NationIdentity Identity { get; set; }
-  public required string UserName { get; set; }
+  //  public required string UserName { get; set; }
+  public Guid playerId { get; set; }
   public required NationNaming Naming { get; set; }
   public string? HomeDistrict { get; set; }
   public LineupState LineupState { get; set; }
@@ -28,16 +29,17 @@ public partial class Nation : IBlobObject
 
   [JsonConstructor] public Nation() { }
 
-    [SetsRequiredMembers]
-    public Nation(Game game, int nationCode, string userName)
-    {
-      Id = Guid.NewGuid();
-        Identity = new NationIdentity(game.Name, nationCode);
-        UserName = userName;
-        SeasonCount = -1;
-        Naming = new NationNaming() { NationCode = nationCode };
-        LineupState = LineupState.Invited;
-    }
+  [SetsRequiredMembers]
+  public Nation(Game game, int nationCode, Guid playerId)
+  {
+    Id = Guid.NewGuid();
+    Identity = new NationIdentity(game.Name, nationCode);
+    this.playerId = playerId;
+    //    UserName = userName;
+    SeasonCount = -1;
+    Naming = new NationNaming() { NationCode = nationCode };
+    LineupState = LineupState.Invited;
+  }
 
 }
 

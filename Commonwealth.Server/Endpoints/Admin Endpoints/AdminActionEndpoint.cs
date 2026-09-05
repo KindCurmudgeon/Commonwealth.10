@@ -4,6 +4,7 @@ using Commonwealth.Server.Data;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
+using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Endpoints;
 
@@ -18,9 +19,9 @@ public static class AdminActionEndpoint
             AdminResponse response = new() { Action = request.Action };
             try
             {
-                User requester = await Authorization.ValidateUserAsync(request, blobService);
-                if (requester.IsDeveloper is not true)
-                    throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requester.UserName);
+                ProfileDTO profile = Authorization.ExtractProfileDTOfromToken(request.Token);
+                // if (requester.IsDeveloper is not true)
+                //     throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requester.UserName);
                 response.Items = [];
                 response.Action = request.Action;
                 response.Arg1 = request.Arg1;
@@ -33,8 +34,8 @@ public static class AdminActionEndpoint
                     case Actions.GetUserGames: await GetUserGames(request.Arg1); break;
                     case Actions.GetGameUsers: await GetGameUsers(request.Arg1); break;
                     case Actions.RemoveGameFromUser: await RemoveGameFromUser(request.Arg1); break;
-                    case Actions.MakeAdmin: await MakeAdmin(request.Arg1); break;
-                    case Actions.MakeDev: await MakeDev(request.Arg1); break;
+                    // case Actions.MakeAdmin: await MakeAdmin(request.Arg1); break;
+                    // case Actions.MakeDev: await MakeDev(request.Arg1); break;
                     case Actions.GetGames: await GetGames(); break;
                     case Actions.RemoveGame: await RemoveGame(request.Arg1); break;
                 }
@@ -48,7 +49,7 @@ public static class AdminActionEndpoint
                 string? prefix = null;
                 switch (listType)
                 {
-                    case FileTypes.User: prefix = User.AllUsersPrefix(); break;
+                    case FileTypes.Player: prefix = Player.AllUsersPrefix(); break;
                     case FileTypes.Game: prefix = Game.AllGamesBlobPrefix(); break;
                     case FileTypes.Parm: prefix = ParmsBlobPath(); break;
                     case FileTypes.AllFiles: prefix = ""; break;
@@ -68,8 +69,8 @@ public static class AdminActionEndpoint
             async Task GetUserGames(string? userFileName)
             {
                 if (userFileName is null) return;
-                User user = await blobService.RetrieveAsync<User>(userFileName);
-                foreach (NationIdentity identity in user.NationIdentities)
+                Player player = await blobService.RetrieveAsync<Player>(userFileName);
+                foreach (NationIdentity identity in player.NationIdentities)
                 {
                     response.Items.Add($"{CreateIdentityString(identity)}");
                 }
@@ -91,11 +92,11 @@ public static class AdminActionEndpoint
             async Task RemoveGameFromUser(string? userFileName)
             {
                 if (userFileName is null) return;
-                User user = await blobService.RetrieveAsync<User>(userFileName);
+                Player player = await blobService.RetrieveAsync<Player>(userFileName);
                 string[] parsed = request.Arg2!.Split(",").ToArray();
                 string gameName = parsed[0];
-                user.NationIdentities.RemoveAll(i => i.GameName == gameName);
-                await user.SaveAsync(blobService);
+                player.NationIdentities.RemoveAll(i => i.GameName == gameName);
+                await player.SaveAsync(blobService);
             }
             async Task<bool> RemoveFile(string? fileName)
             {
@@ -172,23 +173,23 @@ public static class AdminActionEndpoint
             //     }
             //     return true;
             // }
-            async Task<bool> MakeAdmin(string? fileName)
-            {
-                if (fileName is null) return false;
-                User user = await blobService.RetrieveAsync<User>(fileName);
-                user.IsAdministrator = true;
-                await user.SaveAsync(blobService);
-                return true;
-            }
-            async Task<bool> MakeDev(string? fileName)
-            {
-                if (fileName is null) return false;
-                User user = await blobService.RetrieveAsync<User>(fileName);
-                user.IsAdministrator = true;
-                user.IsDeveloper = true;
-                await user.SaveAsync(blobService);
-                return true;
-            }
+            // async Task<bool> MakeAdmin(string? fileName)
+            // {
+            //     if (fileName is null) return false;
+            //     Data.UserIdentity user = await blobService.RetrieveAsync<Data.UserIdentity>(fileName);
+            //     user.IsAdministrator = true;
+            //     await user.SaveAsync(blobService);
+            //     return true;
+            // }
+            // async Task<bool> MakeDev(string? fileName)
+            // {
+            //     if (fileName is null) return false;
+            //     Data.UserIdentity user = await blobService.RetrieveAsync<Data.UserIdentity>(fileName);
+            //     user.IsAdministrator = true;
+            //     user.IsDeveloper = true;
+            //     await user.SaveAsync(blobService);
+            //     return true;
+            // }
             async Task GetGames()
             {
                 string prefix = Game.AllGamesBlobPrefix();

@@ -6,8 +6,8 @@ public static class EndpointGroups
 {
   public static void MapEndpoints(this IEndpointRouteBuilder app)
   {
-    var signinGroup = app.MapGroup(Commonwealth.Shared.EndpointDTOs.Endpoints.Signin);
-    signinGroup.SigninEndpoint();
+    // var signinGroup = app.MapGroup(Commonwealth.Shared.EndpointDTOs.Endpoints.Signin);
+    // signinGroup.SigninEndpoint();
 
     var userGroup = app.MapGroup(Shared.EndpointDTOs.Endpoints.User);
     userGroup.UserEndpoint();

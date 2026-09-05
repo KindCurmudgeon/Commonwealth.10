@@ -59,7 +59,7 @@
 @code {
         bool IsVisible = false;
     private NationNaming? Naming { get; set; }
-    private NationIdentity? Identity { get; set; }
+    private NationIdentity Identity { get; set; } = default!;
     private string? HomeDistrict { get; set; }
     private List<string>? AvailableHomes { get; set; }
     private bool? IsGameActivated { get; set; }
@@ -79,7 +79,7 @@
         if (response?.Response.Status is true)
         {
             Naming = response.Naming;
-            Identity = response.Identity;
+            Identity = response.Identity!;
             AvailableHomes = response.AvailableHomes;
             HomeDistrict = response.HomeDistrict ?? "Random";
             IsGameActivated = response.IsGameActivated;

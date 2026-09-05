@@ -6,7 +6,7 @@ namespace Commonwealth.Shared.EndpointDTOs;
 public class NationRequest : RequestBase
 {
     public NationRequestType RequestType { get; set; }
-    public NationIdentity? Identity { get; set; }
+    public required NationIdentity Identity { get; set; }
     public NationNaming? Naming { get; set; }
     public string? HomeDistrict { get; set; }
     public bool? IsAccepted { get; set; }

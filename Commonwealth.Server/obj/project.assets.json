@@ -277,6 +277,16 @@
         "runtime": {
           "bin/placeholder/Commonwealth.Shared.dll": {}
         }
+      },
+      "IdentityProvider.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/IdentityProvider.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/IdentityProvider.Shared.dll": {}
+        }
       }
     }
   },
@@ -709,12 +719,18 @@
       "type": "project",
       "path": "../Commonwealth.Shared/Commonwealth.Shared.csproj",
       "msbuildProject": "../Commonwealth.Shared/Commonwealth.Shared.csproj"
+    },
+    "IdentityProvider.Shared/1.0.0": {
+      "type": "project",
+      "path": "../IdentityProvider.Shared/IdentityProvider.Shared.csproj",
+      "msbuildProject": "../IdentityProvider.Shared/IdentityProvider.Shared.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
       "Azure.Storage.Blobs >= 12.29.1",
       "Commonwealth.Shared >= 1.0.0",
+      "IdentityProvider.Shared >= 1.0.0",
       "System.IdentityModel.Tokens.Jwt >= 8.22.0"
     ]
   },
@@ -746,6 +762,9 @@
           "projectReferences": {
             "/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/Commonwealth.Shared.csproj": {
               "projectPath": "/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/Commonwealth.Shared/Commonwealth.Shared.csproj"
+            },
+            "/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/IdentityProvider.Shared/IdentityProvider.Shared.csproj": {
+              "projectPath": "/Users/michaelgrimes/Library/CloudStorage/Dropbox/Software Projects/Commonwealth.10/IdentityProvider.Shared/IdentityProvider.Shared.csproj"
             }
           }
         }

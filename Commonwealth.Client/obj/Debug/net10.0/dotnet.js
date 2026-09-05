@@ -5,7 +5,7 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
   "mainAssemblyName": "Commonwealth.Client",
   "applicationEnvironment": "Development",
   "resources": {
-    "hash": "sha256-tk9DE0N8CMzyoomO2z0N1E6WFdN/DorBJdsj6k4dbJg=",
+    "hash": "sha256-dSJRMQh0c2LFr8GoNucRQTnYnrvpWfDWKirNk8OFHF0=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.puryxhmhq9.js"
@@ -96,20 +96,20 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Microsoft.Extensions.Configuration.wasm",
-        "name": "Microsoft.Extensions.Configuration.qjwtydrbeh.wasm",
-        "hash": "sha256-+o/D7fr2KXPZyZmjiCQLWPHVEh/oiumh8cIcUUlXN4U=",
+        "name": "Microsoft.Extensions.Configuration.k3gsyevy27.wasm",
+        "hash": "sha256-gAo2vNKc6IguqLYysEBH6sm0iSchu3oGbYQ3Aq5PtSM=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Configuration.Abstractions.wasm",
-        "name": "Microsoft.Extensions.Configuration.Abstractions.iqery9nry2.wasm",
-        "hash": "sha256-Wtkv6KZJ6c4+tzKrdRIJ2f3EhIakYPDfAn2Rj04zHR0=",
+        "name": "Microsoft.Extensions.Configuration.Abstractions.gydskqrdmp.wasm",
+        "hash": "sha256-qGEjY6VT2kt4ucUDReYxSt/AZBfFiBd5i7rkwP8WEFE=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Configuration.Binder.wasm",
-        "name": "Microsoft.Extensions.Configuration.Binder.7ebfchnp6m.wasm",
-        "hash": "sha256-bwcA9NPW/7dv3k+Mr4N+gcZdNUYUtuUj3+O8YHwkbMc=",
+        "name": "Microsoft.Extensions.Configuration.Binder.jagglvwcdi.wasm",
+        "hash": "sha256-hTi+lsmFyO+ohu81RCsWT31+ymlbM74tJEDpvEuN/qE=",
         "cache": "force-cache"
       },
       {
@@ -126,26 +126,26 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Microsoft.Extensions.DependencyInjection.wasm",
-        "name": "Microsoft.Extensions.DependencyInjection.0lh9y2h2sj.wasm",
-        "hash": "sha256-RPtn6pkmjQgSJvC2r9Gf9YPVYplQr2s1x/1CuqngAo0=",
+        "name": "Microsoft.Extensions.DependencyInjection.dpa1450tku.wasm",
+        "hash": "sha256-jxt6IZ6EWYrltHD5SctKq9exI4IgXFWN8HHCGTGXWBA=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.DependencyInjection.Abstractions.wasm",
-        "name": "Microsoft.Extensions.DependencyInjection.Abstractions.r4njuum1at.wasm",
-        "hash": "sha256-27EFRDR3xbRa0nWlwVoIj7DmFf0h6tMjjYcNWEjPkNM=",
+        "name": "Microsoft.Extensions.DependencyInjection.Abstractions.woum050g24.wasm",
+        "hash": "sha256-IIfEv8464evpIZhWH9CEVKytwJjFayCOQNxwFMSzewg=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Diagnostics.wasm",
-        "name": "Microsoft.Extensions.Diagnostics.e4xkfi1ghr.wasm",
-        "hash": "sha256-UhSR/+KrqvW8cRihNiuuZKZub5H7Bi6Uu5hn74ct0ok=",
+        "name": "Microsoft.Extensions.Diagnostics.1jey3rxiy8.wasm",
+        "hash": "sha256-DT14V4vi9XUlFVFm3GmOzlxHBod9icve1tfVRr/16Dc=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Diagnostics.Abstractions.wasm",
-        "name": "Microsoft.Extensions.Diagnostics.Abstractions.k7gpa90haf.wasm",
-        "hash": "sha256-UGy6L0YpW2Jk6nCcbqyaTZ10KREZolKUCPnZP73JBSc=",
+        "name": "Microsoft.Extensions.Diagnostics.Abstractions.fkr8no9xuy.wasm",
+        "hash": "sha256-cRs5WmY9zg24WDKu0SNxfrTJSAWbn8nvTV4rqWaMxnw=",
         "cache": "force-cache"
       },
       {
@@ -167,33 +167,39 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
         "cache": "force-cache"
       },
       {
+        "virtualPath": "Microsoft.Extensions.Http.wasm",
+        "name": "Microsoft.Extensions.Http.gyli1m98dc.wasm",
+        "hash": "sha256-qIi3+3+I6j0NG9kzMXy8a48KzzOe6/hqQAflkyvQHsU=",
+        "cache": "force-cache"
+      },
+      {
         "virtualPath": "Microsoft.Extensions.Logging.wasm",
-        "name": "Microsoft.Extensions.Logging.sceabnebwe.wasm",
-        "hash": "sha256-1FHSWAgdUAeGtFFXIYqElWp8gy2mikQNMtTN8+/oo30=",
+        "name": "Microsoft.Extensions.Logging.op9zaw9pvp.wasm",
+        "hash": "sha256-FEpTWBY+QUqwgBqB9uvDQO9eSFjq9S3rPQIaxVCVnaw=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Logging.Abstractions.wasm",
-        "name": "Microsoft.Extensions.Logging.Abstractions.ef2lrhidbn.wasm",
-        "hash": "sha256-ij5nuTCdqyB4gAlMGyLXxnmohZYnn3SC233Zqd40tYU=",
+        "name": "Microsoft.Extensions.Logging.Abstractions.8weyptjtvc.wasm",
+        "hash": "sha256-6DzIf0hf+dxG6YyvkhCKRQplQmzo7XWuHH9ngbrlnDU=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Options.wasm",
-        "name": "Microsoft.Extensions.Options.llivjk1whj.wasm",
-        "hash": "sha256-6ULG5niYM+MHArol/TOSkMbfxTc7D5jKcorcHt/RPo0=",
+        "name": "Microsoft.Extensions.Options.ldnbby568o.wasm",
+        "hash": "sha256-5zFrr6qDicK+jGfTglhuenZJfjcPRePRnMy7C6bhCZ0=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Options.ConfigurationExtensions.wasm",
-        "name": "Microsoft.Extensions.Options.ConfigurationExtensions.cbvevgdsho.wasm",
-        "hash": "sha256-+No81T5HXezhQaZ4c1145qD3lvRa4r9Q3FWXw6ZfgAg=",
+        "name": "Microsoft.Extensions.Options.ConfigurationExtensions.oic5e9iprm.wasm",
+        "hash": "sha256-oMBQFO2V/s0C8K6axybP94kUSUYD9fXaYKkooTHJQ4o=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Microsoft.Extensions.Primitives.wasm",
-        "name": "Microsoft.Extensions.Primitives.ndur9bx6x9.wasm",
-        "hash": "sha256-ixdbQi4Qj2Bd8xbpEM/764LZNO1roqKfS/hVzZiePNc=",
+        "name": "Microsoft.Extensions.Primitives.xoe0uq16op.wasm",
+        "hash": "sha256-n58JBASBWj2pbdb/VpoMiGC1xh+6OcVDccrku7x55Bg=",
         "cache": "force-cache"
       },
       {
@@ -1236,8 +1242,14 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Commonwealth.Shared.wasm",
-        "name": "Commonwealth.Shared.ietbyqx8q8.wasm",
-        "hash": "sha256-ZnwuLTKOoxGATcE+KCtKH8HSfd8mhNW7/4Ul8YlsgV8=",
+        "name": "Commonwealth.Shared.6v1706ctap.wasm",
+        "hash": "sha256-Mt0k1yR9bnYo1bWKqEuY9c1GEBBl++Wg+T9sR35u9TU=",
+        "cache": "force-cache"
+      },
+      {
+        "virtualPath": "IdentityProvider.Shared.wasm",
+        "name": "IdentityProvider.Shared.t2zljilks9.wasm",
+        "hash": "sha256-1W8fYz6TPjcywYdq+qf6dd+g0E8ZfSk+HXXrajoZmvk=",
         "cache": "force-cache"
       },
       {
@@ -1248,22 +1260,28 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Commonwealth.Client.wasm",
-        "name": "Commonwealth.Client.qaprskdpiz.wasm",
-        "hash": "sha256-0jTMiVdjVfZDUgAvdOdScAx5JEmeUbc4CjJZRuUNVU0=",
+        "name": "Commonwealth.Client.pfi2jhclrh.wasm",
+        "hash": "sha256-1aAMnHw4Trw0+YgM/iaLdURr0asTod/6GY8GVSS2GI8=",
         "cache": "force-cache"
       }
     ],
     "pdb": [
       {
         "virtualPath": "Commonwealth.Shared.pdb",
-        "name": "Commonwealth.Shared.trqofbh9bz.pdb",
-        "hash": "sha256-iWhO+wx9Q2ZW/ksREhvQn6eTIG83RBeosMnxwfUOS3s=",
+        "name": "Commonwealth.Shared.deeiohp6xv.pdb",
+        "hash": "sha256-m9qbNM8pDn6RqUDeYomdZiSuNQDN4dJJoVOVCLdEz30=",
+        "cache": "force-cache"
+      },
+      {
+        "virtualPath": "IdentityProvider.Shared.pdb",
+        "name": "IdentityProvider.Shared.fylxa9myg9.pdb",
+        "hash": "sha256-Z9vbhPVvoJtsAZTTz1bc0WVfE4J6x58SqmFm7p5UngE=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Commonwealth.Client.pdb",
-        "name": "Commonwealth.Client.bml7fg046u.pdb",
-        "hash": "sha256-MxgHwYd0H2BOjg5WdOtFnT0VKcXKjicFBarlsgGcHi8=",
+        "name": "Commonwealth.Client.1prhnvyo8l.pdb",
+        "hash": "sha256-dRk2X1KO5X97v7ck0EnQ++mT8cFnOhr2E6TiaDi/ICE=",
         "cache": "force-cache"
       }
     ],

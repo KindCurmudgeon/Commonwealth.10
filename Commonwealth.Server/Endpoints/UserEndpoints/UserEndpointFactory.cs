@@ -3,26 +3,26 @@ using Commonwealth.Shared.EndpointDTOs;
 
 public static class UserEndpointFactory
 {
-     public static UserDTO CreateDTO(this User user)
+     // public static UserDTO CreateDTO(this Commonwealth.Server.Data.UserIdentity user)
+     // {
+     //      return new UserDTO()
+     //      {
+     //           UserName = user.UserName,
+     //           Password = string.Empty,
+     //           Email = user.Email ?? string.Empty,
+     //           FamilyName = user.FamilyName ?? string.Empty,
+     //           GivenName = user.GivenName ?? string.Empty,
+     //           Friends = user.Friends
+     //      };
+     // }
+     public static GameSummaryDTO CreateGameSummaryDTO(this Game game, Nation? nation, int waitingCount, Player player)
      {
-          return new UserDTO()
-          {
-               UserName = user.UserName,
-               Password = string.Empty,
-               Email = user.Email ?? string.Empty,
-               FamilyName = user.FamilyName ?? string.Empty,
-               GivenName = user.GivenName ?? string.Empty,
-               Friends = user.Friends
-          };
-     }
-     public static GameSummaryDTO CreateGameSummaryDTO(this Game game, Nation? nation, int waitingCount, User user)
-     {
-          bool isCreator = game.Creator == user.UserName;
+          bool isCreator = game.Creator.Id == player.Id;
           return new GameSummaryDTO()
           {
                GameName = game.Name,
                IsCreator = isCreator,
-               IsGamemaster = isCreator || game.Gamemasters.Contains(user.UserName),
+               IsGamemaster = isCreator || game.Gamemasters.Contains(player.Id),
                GameState = game.GameState,
                IsDevelopmentGame = game.IsDevelopmentGame,
                WaitingCount = waitingCount,

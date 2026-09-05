@@ -12,16 +12,16 @@ public static partial class OrdersEndpoints
     {
         app.MapPost("/", async (
             OrdersRequest request,
-            BlobService blobService, 
+            BlobService blobService,
             ILogger<Program> logger) =>
         {
             OrdersResponse response = new();
             try
             {
                 ValidateRequest();
-                User requestor = await Authorization.ValidateUserAsync(request, blobService);
+                PlayerDTO requestor = Authorization.ExtractProfileDTOfromToken(request.Token).CreatePlayerDTO();
                 Nation nation = await Nation.RetrieveAsync(request.Identity!, blobService);
-                if (nation.IsUserAllowed(requestor) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
+                if (nation.IsUserAllowed(requestor.Id) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
                 //           User player = (requestor.UserName == nation.UserName) ? requestor :  await User.RetrieveAsync(nation.UserName, blobService);
 
 
@@ -36,8 +36,8 @@ public static partial class OrdersEndpoints
                         await UpdateOrdersAsync(request, nation, blobService, response);
                         break;
                     default:
-                        logger.LogInformation("Unknown Orders Request Type from {username}",requestor.UserName);
-                    break;
+                        logger.LogInformation("Unknown Orders Request Type from {username}", requestor.UserName);
+                        break;
                 }
             }
             catch (Exception ex) { response.HandleException(ex); }

@@ -28,14 +28,14 @@ public class GameDTO
     public string? GameName { get; set; }
     public TimeSpan? OrdersPeriod { get; set; }
     public GameState GameState { get; set; }
-    public string? Creator { get; set; }
+    public required PlayerDTO Creator { get; set; }
     public ParmFileInfo? GeogFileInfo { get; set; }
     public ParmFileInfo? EconFileInfo { get; set; }
     public ParmFileInfo? InitFileInfo { get; set; }
     public bool ArchiveGame { get; set; }
 
     public DateTime? CreationDateTime { get; set; }
-    public List<UserIdentity>? Gamemasters { get; set; }
+    public List<PlayerDTO>? Gamemasters { get; set; }
     public bool? IsActivated { get; set; }
     public string? GameStateString()
     {
@@ -69,8 +69,8 @@ public class GameDTO
 
 public class LineupDTO
 {
-    public Guid Id { get; set; }
-    public required string UserName { get; set; }
+    public Guid LineupId { get; set; } 
+    public required PlayerDTO Player { get; set; }
     public NationIdentity? Identity { get; set; }
     public LineupState LineupState { get; set; }
     public OrdersState OrdersState { get; set; }
@@ -88,7 +88,7 @@ public class LineupDTO
                 case LineupState.Invited: return "Invited";
                 case LineupState.Accepted: return "Accepted";
                 case LineupState.Regrets: return "Regrets";
-             //   case LineupState.Changed: return $"Reassigned: {NewUser}";
+                //   case LineupState.Changed: return $"Reassigned: {NewUser}";
                 default: return null;
             }
         }
@@ -111,4 +111,11 @@ public enum GameState
 public enum LineupState
 {
     NotFound = 0, Added = 10, Invited = 30, Accepted = 40, Regrets = -10
+}
+public class PlayerDTO
+{
+     public Guid Id { get; set; }
+     public required string UserName { get; set; }
+
+     [JsonConstructor, SetsRequiredMembers] public PlayerDTO(Guid id, string userName) { Id = id; UserName = userName; }
 }

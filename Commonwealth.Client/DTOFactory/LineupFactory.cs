@@ -2,12 +2,12 @@ using Commonwealth.Shared.EndpointDTOs;
 
 public static class LineupDTOFactory
 {
-     public static LineupDTO Create(string userName)
+     public static LineupDTO Create(PlayerDTO dto)
      {
           return new LineupDTO()
           {
-               Id = Guid.NewGuid(),
-               UserName = userName,
+               LineupId = Guid.NewGuid(),
+               Player = dto,
                LineupState = LineupState.Added
           };
      }

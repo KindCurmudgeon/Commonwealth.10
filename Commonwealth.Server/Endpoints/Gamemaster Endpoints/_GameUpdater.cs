@@ -2,21 +2,24 @@ using Commonwealth.Server.Data;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
+using Identity.Client.Service;
+using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Endpoints;
 
 public static partial class GamemasterEndpoints
 {
-    public static async Task UpdateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, User requestor, BlobService blobService, ResponseBase response)
+    public static async Task UpdateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, PlayerDTO requestor, BlobService blobService,
+        IdentityService identityService, ResponseBase response)
     {
-        if (lineupDTOs is null) return;
+        //   if (lineupDTOs is null) return;
         Game game = await Game.RetrieveAsync(gameDTO.GameName!, blobService);
-   //     GameParms gameParms = await GameParms.RetrieveAsync(game.Name, blobService);
+        //     GameParms gameParms = await GameParms.RetrieveAsync(game.Name, blobService);
         if (game!.IsGamemaster(requestor) == false)
             throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
         List<BlobDescriptor> descriptors = [];
         if (await ProcessGameUpdates() is true) descriptors.Add(game.BlobDescriptor());
-        await HandleAnyAddedNationsAsync(game, lineupDTOs, descriptors, blobService, response);
+        await HandleAnyAddedNationsAsync(game, lineupDTOs, descriptors, blobService, identityService, response);
         await HandleAnyRemovedNationsAsync(game, lineupDTOs, descriptors, blobService, response);
         await HandlePlayerChanges(game, lineupDTOs, descriptors, blobService);
         bool result = await blobService.SaveGroupAsync(descriptors);
