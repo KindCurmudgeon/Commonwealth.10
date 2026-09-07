@@ -17,12 +17,12 @@
             <img src="TitleBar.png" class="w-50 py-0 my-0" @onclick="() => ForDev()"></img>
         </div>
     </div>
-    @if (DataService.UserDTO is not null)
+    @if (DataService.PlayerName is not null)
     {
         <div class="row px-2 py-0 my-0" style="background-color:black">
             <div class="col text-start">
                 <span class="text-warning">User ID:</span>
-                <span class="text-info"><b>@DataService.UserDTO.UserName</b></span>
+                <span class="text-info"><b>@DataService.PlayerName</b></span>
             </div>
             <div class="col text-center">
                 <div class="text-center text-warning clicktext" @onclick="Reshow">Show Last Alert</div>
@@ -65,7 +65,7 @@
 
     private void Logout()
     {
-        DataService.SetUserDTO(null);
+        DataService.SetPlayerName(null);
         DataService.SetToken(null);
         NavMgr.NavigateTo(PageLink.Splash);
     }

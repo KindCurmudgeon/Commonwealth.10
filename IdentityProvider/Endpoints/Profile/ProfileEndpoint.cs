@@ -15,19 +15,10 @@ public static partial class ProfileEndpoints
                ProfileResponse response = new();
                try
                {
-                    UserManager userManager = await UserManager.Open(blobService);
                     if (request.UserName is not null)
                     {
-                         UserProfile? profile = await userManager.GetProfileByUserName(request.UserName);
-                         if (profile is not null)
-                         {
-                              response.ProfileDTO = ProfileFactory.CreateProfileDTO(profile);
-                         }
-                    }
-                    else if (request.UserId is not null)
-                    {
-                         UserProfile userProfile = await userManager.GetProfileById((Guid)request.UserId);
-                         response.ProfileDTO = ProfileFactory.CreateProfileDTO(userProfile);
+                         UserProfile? profile = await UserProfile.RetrieveAsync(request.UserName, blobService);
+                         response.ProfileDTO = profile?.CreateProfileDTO();
                     }
                }
                catch { response.ProfileDTO = null; }

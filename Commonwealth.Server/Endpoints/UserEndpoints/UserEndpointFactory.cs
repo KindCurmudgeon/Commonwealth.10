@@ -17,12 +17,12 @@ public static class UserEndpointFactory
      // }
      public static GameSummaryDTO CreateGameSummaryDTO(this Game game, Nation? nation, int waitingCount, Player player)
      {
-          bool isCreator = game.Creator.Id == player.Id;
+          bool isCreator = game.CreatorName == player.UserName;
           return new GameSummaryDTO()
           {
                GameName = game.Name,
                IsCreator = isCreator,
-               IsGamemaster = isCreator || game.Gamemasters.Contains(player.Id),
+               IsGamemaster = isCreator || game.Gamemasters.Contains(player.UserName),
                GameState = game.GameState,
                IsDevelopmentGame = game.IsDevelopmentGame,
                WaitingCount = waitingCount,

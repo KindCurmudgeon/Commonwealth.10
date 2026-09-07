@@ -6,7 +6,7 @@ namespace Commonwealth.Server.Data;
 
 public partial class Player
 {
-    public Guid Id { get; set; }
+    public required string UserName {get;set;}
     public List<NationIdentity> NationIdentities { get; set; } = [];
     public List<string> Friends { get; set; } = [];
     [JsonConstructor] public Player() { }

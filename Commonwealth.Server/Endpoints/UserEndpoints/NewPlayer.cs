@@ -12,7 +12,7 @@ public static partial class UserEndpoints
      {
           Player player = new Player()
           {
-              Id = profile.UserId,
+              UserName = profile.UserName
           };
           await player.SaveAsync(blobService);
      }

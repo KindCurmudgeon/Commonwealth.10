@@ -50,6 +50,8 @@ public static class Token
             new Claim(JwtRegisteredClaimNames.Email, profile.Email ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.FamilyName, profile.FamilyName ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.GivenName, profile.GivenName ?? string.Empty),
+            new Claim("admin", "false"),
+            new Claim("developer", "false")
 
         };
         if (profile.IsAdministrator) claims.Add(new Claim(ClaimTypes.Role,"Admin"));

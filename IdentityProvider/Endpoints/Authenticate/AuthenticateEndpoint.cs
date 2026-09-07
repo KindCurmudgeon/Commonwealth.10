@@ -1,9 +1,10 @@
+using System.Diagnostics;
 using IdentityProvider.EndpointDTOs;
 using Utilities;
 
 namespace IdentityProvider.Endpoints;
 
-public static partial class SigninEndpoints
+public static partial class AuthEndPoints
 {
     public static void AuthenticateEndpoint(this IEndpointRouteBuilder app)
     {
@@ -22,13 +23,16 @@ public static partial class SigninEndpoints
                         await GetToken(request.AuthProfileDTO!, blobService, config, response);
                         break;
                     case AuthenticateRequestType.REGISTER:
-                        await Register(request.AuthProfileDTO!, blobService, response);
+                        await Register(request.AuthProfileDTO!, blobService, config, response);
                         break;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return Results.Ok(response);
+            }
             return Results.Ok(response);
-
             void Validate()
             {
                 AuthProfileDTO? dto = request.AuthProfileDTO;

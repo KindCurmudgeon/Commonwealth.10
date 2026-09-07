@@ -53,30 +53,18 @@ public static partial class GamemasterEndpoints
         // }
         foreach (LineupDTO lineupDTO in lineupDTOs?.Where(r => r.LineupState == LineupState.Added) ?? [])
         {
-            List<string> notFound = [];
-            ProfileRequest request = new() { UserName = lineupDTO.Player.UserName };
-            PlayerDTO? playerDTO = await CommonEndpoint.GetPlayerDTOAsync(request, IdentityService);
-            if (playerDTO is null)
-            {
-                notFound.Add(lineupDTO.Player.UserName);
-                continue;
-            }
 
-            try
+            int code = FindUnusedNationCode();
+            Nation nation = new Nation(game, code, lineupDTO.PlayerName);
+            if (lineupDTO.HomeDistrict is not null) nation.HomeDistrict = lineupDTO.HomeDistrict;
+            Player player = await descriptors.AddIfNotDuplicateAsync<Player>(Player.BlobPath(lineupDTO.PlayerName), blobService);
+            player?.NationIdentities.Add(nation.Identity);
+            descriptors.Add(nation.BlobDescriptor());
+            if (game.GameState == GameState.Activated)
             {
-                int code = FindUnusedNationCode();
-                Nation nation = new Nation(game, code, playerDTO!.Id);
-                if (lineupDTO.HomeDistrict is not null) nation.HomeDistrict = lineupDTO.HomeDistrict;
-                Player player = await descriptors.AddIfNotDuplicateAsync<Player>(Player.BlobPath(lineupDTO.Player.Id), blobService);
-                player?.NationIdentities.Add(nation.Identity);
-                descriptors.Add(nation.BlobDescriptor());
-                if (game.GameState == GameState.Activated)
-                {
-                    game.WorldNews?.AddTextEntry($"Nation '{nation.Naming?.Name}' mangaged by '{player?.Id}' has joined the game.");
-                    descriptors.AddIfNotDuplicate(game.BlobDescriptor());
-                }
+                game.WorldNews?.AddTextEntry($"Nation '{nation.Naming?.Name}' mangaged by '{nation.PlayerName}' has joined the game.");
+                descriptors.AddIfNotDuplicate(game.BlobDescriptor());
             }
-            catch { response.AddError(Message.NotFound(playerDTO!.UserName, "Player")); continue; }
         }
 
         async Task<List<int>> GatherActiveCodes()
@@ -111,7 +99,7 @@ public static partial class GamemasterEndpoints
             //    GameRole gameRole = new GameRole(game.Name, GameRoleType.Nation, identity.NationCode);
             if (game.GameState == GameState.Created)
             {
-                Player user = await descriptors.AddIfNotDuplicateAsync<Player>(Player.BlobPath(lineupDTO.Player.Id), blobService);
+                Player user = await descriptors.AddIfNotDuplicateAsync<Player>(Player.BlobPath(lineupDTO.PlayerName), blobService);
                 user?.NationIdentities.RemoveAll(g => g.IsSameAs(identity));
                 descriptors.Add(Nation.BlobDescriptorRemove(identity));
                 response.AddMessage($"Nation '{identity.GameName}:{identity.NationCode}' removed.");

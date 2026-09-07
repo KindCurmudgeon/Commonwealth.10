@@ -5,12 +5,11 @@ using Utilities;
 
 namespace IdentityProvider.Endpoints;
 
-public static partial class SigninEndpoints
+public static partial class AuthEndPoints
 {
-    public static async Task GetToken(AuthProfileDTO profileDTO, BlobService blobService, IConfiguration config, AuthenticateResponse response)
+    public static async Task GetToken(AuthProfileDTO authProfile, BlobService blobService, IConfiguration config, AuthenticateResponse response)
     {
-        UserManager userManager = await UserManager.Open(blobService);
-        UserProfile userProfile = await userManager.GetValidatedProfile(profileDTO.UserName, profileDTO.Password);
-        response.Token = Token.GenerateJwtToken(userProfile, config);
+        UserProfile? profile = await UserProfile.RetrieveAsync(authProfile.UserName, blobService);
+        response.Token = Token.GenerateJwtToken(profile, config);
     }
 }

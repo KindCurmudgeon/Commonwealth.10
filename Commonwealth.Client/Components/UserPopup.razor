@@ -85,11 +85,11 @@
     private List<string>? Errors { get; set; }
 
     private bool IsVisible = false;
-    private ProfileDTO ProfileDTO { get; set; } = default!;
+    private AuthProfileDTO ProfileDTO { get; set; } = default!;
     private string? Password { get; set; }
     private string NewFriend { get; set; } = string.Empty;
 
-    public void Show(ProfileDTO? dto)
+    public void Show(AuthProfileDTO? dto)
     {
         if (dto is null) return;
         ProfileDTO = dto;
@@ -112,6 +112,7 @@
 
     private async Task HandleSubmit()
     {
+        if (IsSubmissionReady() is false) return;
         NewFriend = string.Empty;
         AuthProfileDTO authProfileDTO = new(){
             UserName = ProfileDTO!.UserName,
@@ -171,7 +172,7 @@
         IsVisible = false;
         StateHasChanged();
     }
-    public void UpdateUserDTO(ProfileDTO? dto)
+    public void UpdateUserDTO(AuthProfileDTO? dto)
     {
         if (dto is null) return;
         ProfileDTO = dto;

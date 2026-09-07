@@ -17,8 +17,8 @@ public partial class Game : IBlobObject
   public ParmFileInfo? InitFileInfo { get; set; }
   public ParmFileInfo? EconFileInfo { get; set; }
   public GameState GameState { get; set; }
-  public required PlayerDTO Creator { get; set; }
-  public List<Guid> Gamemasters { get; set; } = [];
+  public required string CreatorName { get; set; }
+  public List<string> Gamemasters { get; set; } = [];
   public DateTime? CreationDate { get; set; }
   public DateTime? ActivationDate { get; set; }
   public DateTime? OrdersDueDate { get; set; }

@@ -46,7 +46,7 @@
     </div>
 
     <FormEntryErrorMessages ErrorMessages="Errors" />
-    @* <UserPopup @ref="UserPopupRef" OnSubmit="RegisterSubmit" /> *@
+    <UserPopup @ref="UserPopupRef" OnSubmit="RegisterSubmit" />
 </div>
 
 @code {
@@ -82,6 +82,7 @@
         if (response?.Response.Status is true)
         {
             DataService?.SetToken(token);
+            DataService?.SetPlayerName(response.PlayerName!);
             NavMgr.NavigateTo(PageLink.Portfolio);
         }
     }
@@ -106,18 +107,34 @@
     }
     void RegisterClicked()
     {
-        ProfileDTO dto = new() { UserName = string.Empty };
+        AuthProfileDTO dto = new() { UserName = string.Empty, Password=string.Empty };
         UserPopupRef?.Show(dto);
     }
-    @* async Task RegisterSubmit(UserDTO dto)
+    async Task RegisterSubmit(AuthProfileDTO dto)
     {
-        SigninRequest request = new() { RequestType = SigninRequestType.REGISTER, UserDTO = dto };
+        string? token = await IdentityService.RegisterNewUser(dto);
+        if (token is null)
+        {
+            DataService.ShowErrorAlert("Trouble Registering.");
+            return;
+        }
+        UserPopupRef.Close();
+        PlayerRequest request = new () {
+            RequestType = PlayerRequestType.NewPlayer,
+            Token = token
+        };
+        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.User, request);
+         if (response?.Response.Status is true) {   DataService?.SetToken(token);
+            DataService?.SetPlayerName(dto.UserName);
+            NavMgr.NavigateTo(PageLink.Portfolio);
+            }
+        @* SigninRequest request = new() { RequestType = SigninRequestType.REGISTER, UserDTO = dto };
         SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
         if (response is null || response.Response.Status == false) return;
 
-        Signin(response.UserDTO, response.Token);
-    } *@
-    void Signin(PlayerDTO? userIdentity, string? Token)
+        Signin(response.UserDTO, response.Token); *@
+    }
+    @* void Signin(PlayerDTO? userIdentity, string? Token)
     {
         DataService.SetToken(Token);
         DataService.SetUserDTO(userIdentity);
@@ -125,7 +142,7 @@
         {
             NavMgr.NavigateTo(PageLink.Portfolio);
         }
-    }
+    } *@
     // SelectStringPopup TestSelect = new();
     // string? TestString;
     // void ModalTest()

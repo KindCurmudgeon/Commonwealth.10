@@ -6,19 +6,13 @@ using Utilities;
 
 namespace Data;
 
-public partial class UserProfile : IBlobObject
+public partial class UserProfile : ProfileDTO, IBlobObject
 {
     public Guid Id { get; set; }
-    public required string UserName { get; set; }
     public DateTime CreationTime { get; set; }
     public required byte[] Salt { get; set; }
     public required string HashedPassword { get; set; }
-    public string? Email { get; set; }
-    public string? GivenName { get; set; }
-    public string? FamilyName { get; set; }
-    public bool IsAdministrator { get; set; }
-    public bool IsDeveloper { get; set; }
-    //  public List<string> Friends { get; set; } = [];
+
     [JsonConstructor] public UserProfile() { }
 
     [SetsRequiredMembers]

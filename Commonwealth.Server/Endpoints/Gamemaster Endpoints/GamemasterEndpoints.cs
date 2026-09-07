@@ -19,26 +19,27 @@ public static partial class GamemasterEndpoints
             try
             {
                 ValidateRequest();
-                PlayerDTO requestor = Authorization.ExtractProfileDTOfromToken(request.Token).CreatePlayerDTO();
+                ProfileDTO requestor = Authorization.ExtractProfileDTOfromToken(request.Token);
+
                 switch (request.RequestType)
                 {
                     case GM_RequestType.Create:
-                        await CreateAsync(request.GameDTO!, request.LineupDTOs, requestor, blobService, identityService, response);
+                        await CreateAsync(request.GameDTO!, request.LineupDTOs, requestor.UserName, blobService, identityService, response);
                         break;
                     case GM_RequestType.Update:
-                        await UpdateAsync(request.GameDTO!, request.LineupDTOs, requestor, blobService, identityService, response);
+                        await UpdateAsync(request.GameDTO!, request.LineupDTOs, requestor.UserName, blobService, identityService, response);
                         break;
                     case GM_RequestType.Activate:
-                        await ActivateAsync(request.GameName!, requestor, blobService, response);
+                        await ActivateAsync(request.GameName!, requestor.UserName, blobService, response);
                         break;
                     case GM_RequestType.SeasonUpdate:
-                        await SeasonUpdateAsync(request.GameName!, requestor, request.UseHistory, blobService, response);
+                        await SeasonUpdateAsync(request.GameName!, requestor.UserName, request.UseHistory, blobService, response);
                         break;
                     case GM_RequestType.Get:
-                        await GetGameResponseAsync(request.GameName!, requestor, blobService, identityService, response);
+                        await GetGameResponseAsync(request.GameName!, requestor.UserName, blobService, identityService, response);
                         break;
                     case GM_RequestType.Remove:
-                        await RemoveGameAsync(request.GameName!, requestor, blobService, response);
+                        await RemoveGameAsync(request.GameName!, requestor.UserName, blobService, response);
                         break;
                 }
             }

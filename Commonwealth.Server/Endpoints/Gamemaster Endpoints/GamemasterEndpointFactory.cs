@@ -17,42 +17,42 @@ public static class GameEndpointFactory
             GeogFileInfo = game.GeogFileInfo,
             OrdersPeriod = game.OrdersPeriod,
             GameState = game.GameState,
-            Creator = game.Creator,
-            Gamemasters = await GetGamemasterDTOs(),
+            Creator = game.CreatorName,
+            Gamemasters = game.Gamemasters,
             CreationDateTime = DateTime.UtcNow
         };
 
-        async Task<List<PlayerDTO>?> GetGamemasterDTOs()
-        {
-            List<Guid> notFound = [];
-            List<PlayerDTO> playerDTOs = [];
-            foreach (Guid guid in game.Gamemasters)
-            {
-                ProfileRequest request = new() { UserId = guid };
-                PlayerDTO? playerDTO = await CommonEndpoint.GetPlayerDTOAsync(request, identityService);
-                if (playerDTO is null) { notFound.Add(guid); continue; }
-                playerDTOs.Add(playerDTO);
-            }
-            return playerDTOs;
+        // async Task<List<str>?> GetGamemasterDTOs()
+        // {
+        //     List<string> notFound = [];
+        //     List<PlayerDTO> playerDTOs = [];
+        //     foreach (string playerName in game.Gamemasters)
+        //     {
+        //         ProfileRequest request = new() { UserName = playerName };
+        //         PlayerDTO? playerDTO = await CommonEndpoint.GetPlayerDTOAsync(request, identityService);
+        //         if (playerDTO is null) { notFound.Add(playerName); continue; }
+        //         playerDTOs.Add(playerDTO);
+        //     }
+        //     return playerDTOs;
 
-        }
+        // }
     }
 
-    public static LineupDTO CreateLineupDTO(this Nation nation, PlayerDTO player)
+    public static LineupDTO CreateLineupDTO(this Nation nation, string player)
     {
         return new LineupDTO()
         {
             Identity = nation.Identity,
-            Player = player,
+            PlayerName = player,
             NationName = nation.Naming?.Name,
             HomeDistrict = nation.HomeDistrict,
             LineupState = nation.LineupState,
             OrdersState = nation.OrdersState
         };
     }
-    public static PlayerDTO CreatePlayerDTO(this ProfileDTO profile)
-    {
-        return new PlayerDTO(profile.UserId, profile.UserName);
-    }
+    // public static PlayerDTO CreatePlayerDTO(this ProfileDTO profile)
+    // {
+    //     return new PlayerDTO(profile.UserId, profile.UserName);
+    // }
 
 }

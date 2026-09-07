@@ -9,14 +9,14 @@ namespace Commonwealth.Server.Endpoints;
 
 public static partial class GamemasterEndpoints
 {
-    public static async Task UpdateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, PlayerDTO requestor, BlobService blobService,
+    public static async Task UpdateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, string requestor, BlobService blobService,
         IdentityService identityService, ResponseBase response)
     {
         //   if (lineupDTOs is null) return;
         Game game = await Game.RetrieveAsync(gameDTO.GameName!, blobService);
         //     GameParms gameParms = await GameParms.RetrieveAsync(game.Name, blobService);
         if (game!.IsGamemaster(requestor) == false)
-            throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
+            throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor);
         List<BlobDescriptor> descriptors = [];
         if (await ProcessGameUpdates() is true) descriptors.Add(game.BlobDescriptor());
         await HandleAnyAddedNationsAsync(game, lineupDTOs, descriptors, blobService, identityService, response);

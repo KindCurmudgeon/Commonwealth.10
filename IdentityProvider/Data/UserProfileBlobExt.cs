@@ -5,23 +5,27 @@ namespace Data;
 public partial class UserProfile
 {
 
-     public static string FullFileName(string id) { return id + BlobNaming.Json; }
+     public static string FullFileName(string userName) { return userName + BlobNaming.Json; }
      //   public string BlobPath() { return BlobService.CreateBlobPath(Folders.IDP, null, FullFileName()); }
-     public static string BlobPath(Guid id) { return BlobService.CreateBlobPath(Folders.IDP, null, FullFileName(id.ToString())); }
-     public BlobDescriptor BlobDescriptor() { return new BlobDescriptor(BlobPath(Id), this); }
+     public static string BlobPath(string userName) { return BlobService.CreateBlobPath(Folders.Users, null, FullFileName(userName)); }
+     public BlobDescriptor BlobDescriptor() { return new BlobDescriptor(BlobPath(UserName), this); }
 
+     public async Task<bool> UserExists(string userName, BlobService blobService)
+     {
+          return await blobService.IsExisting(BlobPath(userName));
+     }
      public Task SaveAsync(BlobService blobService)
      {
-          BlobDescriptor descriptor = new(BlobPath(Id), this);
+          BlobDescriptor descriptor = new(BlobPath(UserName), this);
           return blobService.SaveAsync(descriptor);
      }
-     public static async Task<UserProfile> RetrieveAsync(Guid id, BlobService blobService)
+     public static async Task<UserProfile> RetrieveAsync(string userName, BlobService blobService)
      {
-          return await blobService.RetrieveAsync<UserProfile>(BlobPath(id));
+          return await blobService.RetrieveAsync<UserProfile>(BlobPath(userName));
      }
-     public static async Task RemoveAsync(Guid id, BlobService blobService)
+     public static async Task RemoveAsync(string userName, BlobService blobService)
      {
-          await blobService.RemoveJsonAsync(BlobPath(id));
+          await blobService.RemoveJsonAsync(BlobPath(userName));
      }
      public void Validate() { }
 }

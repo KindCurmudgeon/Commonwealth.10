@@ -12,14 +12,14 @@ namespace Commonwealth.Server.Data;
 
 public partial class Game
 {
-    public static Game Create(GameDTO dto, PlayerDTO creator, EconParms econParms, GeographyFile geogParmsFile, InitParms initParms)
+    public static Game Create(GameDTO dto, string creatorName, EconParms econParms, GeographyFile geogParmsFile, InitParms initParms)
     {
         Game game = new Game()
         {
             Id = Guid.NewGuid(),
             Name = Util.TitleCase(dto.GameName),
             GameState = GameState.Created,
-            Creator = creator,
+            CreatorName = creatorName,
             CreationDate = DateTime.UtcNow,
             Gamemasters = [],
             OrdersPeriod = dto.OrdersPeriod ?? new TimeSpan(7, 0, 0, 0),
@@ -128,7 +128,7 @@ public partial class Game
         }
         void CreateGameNews()
         {
-            game.GameNews?.AddTextEntry($"Game '{game.Name}' created by '{game.Creator}'");
+            game.GameNews?.AddTextEntry($"Game '{game.Name}' created by '{game.CreatorName}'");
             game.GameNews?.AddTextEntry($"Created: {game.CreationDate: yyyy.MM.dd HH:mm} GMT.");
         }
     }
@@ -221,22 +221,22 @@ public partial class Game
         }
         return nations;
     }
-    public bool IsGamemaster(PlayerDTO playerDTO)
+    public bool IsGamemaster(string playerName)
     {
         // if (user.IsAdministrator) return true;
-    if (Creator.Id == playerDTO.Id) return true;
-       return Gamemasters.Exists(g => g == playerDTO.Id);
+        if (CreatorName == playerName) return true;
+        return Gamemasters.Exists(g => g == playerName);
     }
-    public void ConfirmUserIsAllowed(PlayerDTO user, List<Nation> nations)
+    public void ConfirmUserIsAllowed(string playerName, List<Nation> nations)
     {
         // if (user.IsAdministrator) return;
         // if (IsGamemaster(user)) return;
         foreach (Nation nation in nations)
         {
-            if (nation.playerId == user.Id) return;
+            if (nation.PlayerName == playerName) return;
             //   if (string.Equals(nation.UserName, user.UserName, StringComparison.OrdinalIgnoreCase)) return;
         }
-        throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, user.UserName);
+        throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, playerName);
     }
     public int GetWaitingCount(List<Nation> nations)
     {
@@ -284,23 +284,23 @@ public partial class Game
         {
             try
             {
-                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(nation.playerId), blobService);
+                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(nation.PlayerName), blobService);
                 player.RemoveAllGames(game.Name);
             }
             catch { }
         }
-        foreach (Guid userId in game.Gamemasters)
+        foreach (string playerName in game.Gamemasters)
         {
             try
             {
-                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(userId), blobService);
+                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(playerName), blobService);
                 player.RemoveAllGames(game.Name);
             }
             catch { }
         }
         try
         {
-            Player creator = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(game.Creator.Id), blobService);
+            Player creator = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(game.CreatorName), blobService);
             creator.RemoveAllGames(game.Name);
         }
         catch { }

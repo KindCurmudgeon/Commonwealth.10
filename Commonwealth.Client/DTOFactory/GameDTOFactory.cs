@@ -3,7 +3,7 @@ using Commonwealth.Shared.EndpointDTOs;
 
 public static class GameDTOFactory
 {
-    public static GameDTO Create(PlayerDTO creator)
+    public static GameDTO Create(string creator)
     {
         return new GameDTO()
         {

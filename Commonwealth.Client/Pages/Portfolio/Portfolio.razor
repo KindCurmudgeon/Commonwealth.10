@@ -163,7 +163,6 @@ else
    // public PlayerResponse? Response { get; set; }
    bool IsVisible = false;
     private List<GameSummaryDTO> Summaries { get; set; } = default!;
-    public PlayerDTO PlayerDTO {get;set;} = default!;
 
     private NationEditPopup NationEditRef = new();
     private GameEditPopup GameEditPopupRef = new();
@@ -188,7 +187,6 @@ else
         {
             IsVisible = true;
             Summaries = response.GameSummaries ?? []; 
-            PlayerDTO = response.PlayerDTO!;
             if (forceStateChange is true) StateHasChanged();
         }
     }

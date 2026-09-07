@@ -13,7 +13,7 @@ namespace Utilities;
 
 public class BlobService
 {
-    private static string BlobContainerName = "IdentityFiles";
+    private static string BlobContainerName = "identities";
     public required BlobContainerClient ContainerClient { get; set; }
     [SetsRequiredMembers]
     public BlobService(BlobServiceClient blobServiceClient)

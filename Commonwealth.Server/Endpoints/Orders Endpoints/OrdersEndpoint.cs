@@ -3,6 +3,7 @@ using Commonwealth.Server.Data;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
+using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Endpoints;
 
@@ -19,9 +20,9 @@ public static partial class OrdersEndpoints
             try
             {
                 ValidateRequest();
-                PlayerDTO requestor = Authorization.ExtractProfileDTOfromToken(request.Token).CreatePlayerDTO();
+                ProfileDTO requestor = Authorization.ExtractProfileDTOfromToken(request.Token);
                 Nation nation = await Nation.RetrieveAsync(request.Identity!, blobService);
-                if (nation.IsUserAllowed(requestor.Id) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
+                if (nation.IsUserAllowed(requestor.UserName) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
                 //           User player = (requestor.UserName == nation.UserName) ? requestor :  await User.RetrieveAsync(nation.UserName, blobService);
 
 

@@ -63,7 +63,7 @@
                 @foreach (LineupDTO dto in LineupDTOs!)
                 {
                     <li>
-                        <span>@($"{dto.Player.UserName} / {dto.NationName ?? "tbd"} / {dto.HomeDistrict ?? "tbd"}  - {dto.StateString()}")</span>
+                        <span>@($"{dto.PlayerName} / {dto.NationName ?? "tbd"} / {dto.HomeDistrict ?? "tbd"}  - {dto.StateString()}")</span>
                         @if (IsEditDisabled == false)
                         {
                             <span class="ms-3">[</span>
@@ -82,7 +82,7 @@
             @if (IsEditDisabled is false)
             {
                 <span>
-                    <input type="text" @bind-value="PlayerUserName" />
+                    <input type="text" @bind-value="NewPlayerName" />
                 </span>
                 <span class="clicktext ms-3" onclick="@AddPlayer">Add Player Nation</span>
             }
@@ -103,7 +103,7 @@
     private string Title { get; set; } = default!;
     private bool IsEditDisabled { get; set; }
     private int OrdersDuration { get; set; }
-    private string? PlayerUserName { get; set; }
+    private string? NewPlayerName { get; set; }
 
     public async Task Show(string? gameName, bool? isEditable = null)
     {
@@ -111,9 +111,8 @@
         IsEditDisabled = !(isEditable ?? false);
         if (IsNewGame)
         {
-            PlayerDTO userDTO = DataService.UserDTO!;
-            GameDTO = GameDTOFactory.Create(userDTO);
-            LineupDTOs = new List<LineupDTO>() { LineupDTOFactory.Create(userDTO) };
+            GameDTO = GameDTOFactory.Create(DataService.PlayerName!);
+            LineupDTOs = new List<LineupDTO>() { LineupDTOFactory.Create(DataService.PlayerName!) };
             GameDTO.GameName = Utilities.GetRandomGameName();
         }
         else
@@ -160,10 +159,9 @@ request);
     // }
     async Task AddPlayer()
     {
-        if (String.IsNullOrEmpty(PlayerUserName)) return;
-        PlayerDTO playerDTO = new PlayerDTO(Guid.Empty, PlayerUserName);
-        LineupDTO dto = LineupDTOFactory.Create(playerDTO);
-        PlayerUserName = null;
+        if (String.IsNullOrEmpty(NewPlayerName)) return;
+        LineupDTO dto = LineupDTOFactory.Create(NewPlayerName);
+        NewPlayerName = null;
         LineupDTOs!.Add(dto);
     }
 

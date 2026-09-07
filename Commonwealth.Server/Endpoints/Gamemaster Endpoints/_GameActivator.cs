@@ -13,7 +13,7 @@ public static partial class GamemasterEndpoints
 {
     public static async Task ActivateAsync(
         string gameName,
-        PlayerDTO requestor,
+        string requestor,
         BlobService blobService,
         ResponseBase response
     )

@@ -43,4 +43,24 @@ public class IdentityService
             return null;
         }
     }
+
+    public async Task<string?> RegisterNewUser(AuthProfileDTO authProfileDTO)
+    {
+        AuthenticateRequest request = new()
+        {
+            RequestType = AuthenticateRequestType.REGISTER,
+            AuthProfileDTO = authProfileDTO
+        };
+        try
+        {
+            HttpResponseMessage message = await Client.PostAsJsonAsync(IdentityEndpoint.Authenticate, request, options);
+            AuthenticateResponse? response = await message.Content.ReadFromJsonAsync<AuthenticateResponse>();
+            return response?.Token;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error occurred while Registering: {ex.Message}");
+            return null;
+        }
+    }
 }

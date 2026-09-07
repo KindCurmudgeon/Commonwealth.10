@@ -3,11 +3,12 @@ using Commonwealth.Shared.EndpointDTOs;
 using Commonwealth.Client.Layout;
 using Commonwealth.Shared.Common;
 
+
 namespace Commonwealth.Client.Services;
 
 public class SharedDataService
 {
-    public PlayerDTO? UserDTO { get; private set; } = null;
+    public string? PlayerName { get; private set; } = null;
     public string? Token { get; private set; } = null;
     public NationIdentity? NationIdentity { get; set; }
     //  public Guid? GameId { get; set; }
@@ -15,15 +16,15 @@ public class SharedDataService
     private MainLayout? _mainLayout;
     private ApiService? _apiService;
 
-    public void SetUserDTO(PlayerDTO? dto)
+    public void SetPlayerName(string? name)
     {
-        UserDTO = dto;
+        PlayerName = name;
     }
-    public bool IsSuccessfulSignin()
-    {
-        if (UserDTO is null || Token is null) return false;
-        return true;
-    }
+    // public bool IsSuccessfulSignin()
+    // {
+    //     if (PlayerProfile is null || Token is null) return false;
+    //     return true;
+    // }
     public void SetToken(string? token)
     {
         Token = token;

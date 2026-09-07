@@ -5,7 +5,7 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
   "mainAssemblyName": "Commonwealth.Client",
   "applicationEnvironment": "Development",
   "resources": {
-    "hash": "sha256-dSJRMQh0c2LFr8GoNucRQTnYnrvpWfDWKirNk8OFHF0=",
+    "hash": "sha256-LRPOoJhh/QfBoToRgozZB+xd6EwJotWRyMMGVTcbbgU=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.puryxhmhq9.js"
@@ -1242,14 +1242,14 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Commonwealth.Shared.wasm",
-        "name": "Commonwealth.Shared.6v1706ctap.wasm",
-        "hash": "sha256-Mt0k1yR9bnYo1bWKqEuY9c1GEBBl++Wg+T9sR35u9TU=",
+        "name": "Commonwealth.Shared.l0d1pncv6g.wasm",
+        "hash": "sha256-Je3acX7V2PIL/J5CUWGjSW7Z6GbkZv+xAZFvJOxAGVQ=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "IdentityProvider.Shared.wasm",
-        "name": "IdentityProvider.Shared.t2zljilks9.wasm",
-        "hash": "sha256-1W8fYz6TPjcywYdq+qf6dd+g0E8ZfSk+HXXrajoZmvk=",
+        "name": "IdentityProvider.Shared.tke96lxbj6.wasm",
+        "hash": "sha256-DbzI84I7jfgoUArR3zw8g6hIAZ4+U9K3uaIPS4HqMUw=",
         "cache": "force-cache"
       },
       {
@@ -1260,28 +1260,28 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Commonwealth.Client.wasm",
-        "name": "Commonwealth.Client.pfi2jhclrh.wasm",
-        "hash": "sha256-1aAMnHw4Trw0+YgM/iaLdURr0asTod/6GY8GVSS2GI8=",
+        "name": "Commonwealth.Client.2pg7wlv95b.wasm",
+        "hash": "sha256-uutSEmfBrSjc0hX83wH91PVsO7QaJpiQXPotMGhxU8U=",
         "cache": "force-cache"
       }
     ],
     "pdb": [
       {
         "virtualPath": "Commonwealth.Shared.pdb",
-        "name": "Commonwealth.Shared.deeiohp6xv.pdb",
-        "hash": "sha256-m9qbNM8pDn6RqUDeYomdZiSuNQDN4dJJoVOVCLdEz30=",
+        "name": "Commonwealth.Shared.5x5bierbmk.pdb",
+        "hash": "sha256-uaxjRBItg6pfUx4jCIEAtA3DLj3ipchtHVnInZwhIos=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "IdentityProvider.Shared.pdb",
-        "name": "IdentityProvider.Shared.fylxa9myg9.pdb",
-        "hash": "sha256-Z9vbhPVvoJtsAZTTz1bc0WVfE4J6x58SqmFm7p5UngE=",
+        "name": "IdentityProvider.Shared.8x937q4w08.pdb",
+        "hash": "sha256-/KPuVWvakBgNCosindr9a6MFuAC0K44eNJuSBnLH2tA=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Commonwealth.Client.pdb",
-        "name": "Commonwealth.Client.1prhnvyo8l.pdb",
-        "hash": "sha256-dRk2X1KO5X97v7ck0EnQ++mT8cFnOhr2E6TiaDi/ICE=",
+        "name": "Commonwealth.Client.mtfu9k7wut.pdb",
+        "hash": "sha256-Zms7vxTXZDXUp1s47LbzK6NQOENEaKCQUTj4hZByjVU=",
         "cache": "force-cache"
       }
     ],

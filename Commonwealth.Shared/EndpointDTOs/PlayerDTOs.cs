@@ -17,7 +17,7 @@ public enum PlayerRequestType { NONE = 0, GetPortfolio = 10, GetFriends = 20, Ad
 public class PlayerResponse : ResponseBase
 {
     public List<GameSummaryDTO>? GameSummaries { get; set; }
-    public PlayerDTO? PlayerDTO { get; set; }
+    public string? PlayerName { get; set; }
     // public string? UserName { get; set; }
 }
 

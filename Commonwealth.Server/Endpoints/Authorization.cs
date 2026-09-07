@@ -42,19 +42,23 @@ public static class Authorization
     public static ProfileDTO ExtractProfileDTOfromToken(string? token)
     {
         List<Claim> claims = ExtractClaimsFromToken(token);
-        string? id = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value.ToString();
+     //   string? id = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value.ToString();
         string? userName = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value.ToString();
+                if (userName is null) throw new AppException(ExceptionType.Auth, AuthFailType.InvalidToken, "");
         string? eMail = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value.ToString();
         string? familyName = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.FamilyName)?.Value.ToString();
         string? givenName = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.GivenName)?.Value.ToString();
-        if (id is null || userName is null) throw new AppException(ExceptionType.Auth, AuthFailType.InvalidToken, "");
+        bool? isAdmin = claims.FirstOrDefault(c => c.Type == "admin")?.Value.ToString() == "true";
+        bool? isDeveloper = claims.FirstOrDefault(c => c.Type == "developer")?.Value.ToString() == "true";
         return new ProfileDTO()
         {
-            UserId = Guid.Parse(id),
+     //       UserId = Guid.Parse(id),
             UserName = userName,
             Email = eMail,
             FamilyName = familyName,
-            GivenName = givenName
+            GivenName = givenName,
+            IsAdministrator = isAdmin ?? false,
+            IsDeveloper = isDeveloper ?? false
         };
     }
 

@@ -11,7 +11,7 @@ namespace Commonwealth.Server.Endpoints;
 public static partial class GamemasterEndpoints
 {
 
-    public static async Task GetGameResponseAsync(string gameName, PlayerDTO requestor, 
+    public static async Task GetGameResponseAsync(string gameName, string requestor, 
             BlobService blobService, IdentityService identityService, GamemasterResponse response)
     {
         Game game = await Game.RetrieveAsync(gameName, blobService);
@@ -23,7 +23,7 @@ public static partial class GamemasterEndpoints
         response.IsGamemaster = game.IsGamemaster(requestor);
         if (response.IsGamemaster is true)
         {
-            Player player = await Player.RetrieveAsync(requestor.Id, blobService);
+            Player player = await Player.RetrieveAsync(requestor, blobService);
             response.Friends = player.Friends;
         }
 
@@ -32,8 +32,7 @@ public static partial class GamemasterEndpoints
             List<LineupDTO> dtos = [];
             foreach (Nation nation in nations)
             {
-                PlayerDTO? player = null;  // FIX LAter
-                LineupDTO dto = nation.CreateLineupDTO(player!);
+                LineupDTO dto = nation.CreateLineupDTO(nation.PlayerName);
                 dtos.Add(dto);
             }
             return dtos;
