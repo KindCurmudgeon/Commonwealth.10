@@ -18,9 +18,9 @@ public static partial class NationEndpoints
             try
             {
                 ValidateRequest();
-                ProfileDTO profile = Authorization.ExtractProfileDTOfromToken(request.Token);
+                PlayerProfile profile = Authorization.ExtractPlayerProfilefromToken(request.Token);
                 Nation nation = await Nation.RetrieveAsync(request.Identity, blobService);
-                if (nation.IsUserAllowed(profile.UserName) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, profile.UserName);
+                nation.ConfirmPlayerAllowed(profile); 
                 switch (request.RequestType)
                 {
                     case NationRequestType.Get:

@@ -8,6 +8,7 @@ namespace Commonwealth.Server.Data;
 
 public partial class Nation : IBlobObject
 {
+  public int Version { get; set; } = 1;
   public Guid Id { get; set; }
   public required NationIdentity Identity { get; set; }
   //  public required string UserName { get; set; }

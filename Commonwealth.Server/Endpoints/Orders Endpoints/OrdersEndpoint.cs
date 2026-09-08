@@ -20,11 +20,9 @@ public static partial class OrdersEndpoints
             try
             {
                 ValidateRequest();
-                ProfileDTO requestor = Authorization.ExtractProfileDTOfromToken(request.Token);
+                PlayerProfile requestor = Authorization.ExtractPlayerProfilefromToken(request.Token);
                 Nation nation = await Nation.RetrieveAsync(request.Identity!, blobService);
-                if (nation.IsUserAllowed(requestor.UserName) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
-                //           User player = (requestor.UserName == nation.UserName) ? requestor :  await User.RetrieveAsync(nation.UserName, blobService);
-
+                nation.ConfirmPlayerAllowed(requestor); 
 
                 switch (request.RequestType)
                 {

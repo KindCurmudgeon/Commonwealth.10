@@ -1,25 +1,28 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using Azure.Storage.Blobs.Models;
 using IdentityProvider.EndpointDTOs;
 using Utilities;
 
 
 namespace Data;
 
-public partial class UserProfile : ProfileDTO, IBlobObject
+public partial class UserProfile : BaseProfile, IBlobObject
+
 {
+    public int Version { get; set; } = 1;
     public Guid Id { get; set; }
     public DateTime CreationTime { get; set; }
     public required byte[] Salt { get; set; }
     public required string HashedPassword { get; set; }
+    public int AuthorityLevel { get; set; }
 
     [JsonConstructor] public UserProfile() { }
 
     [SetsRequiredMembers]
-    public UserProfile(ProfileDTO profileDTO, string hashedPW, byte[] salt)
+    public UserProfile(AuthProfileDTO profileDTO, string hashedPW, byte[] salt)
     {
         UserName = profileDTO.UserName;
-        //   HashedPassword = PasswordCrypto.HashPassword(profileDTO.Password, out byte[] salt);
         HashedPassword = hashedPW;
         Salt = salt;
         Id = Guid.NewGuid();
@@ -27,8 +30,7 @@ public partial class UserProfile : ProfileDTO, IBlobObject
         Email = profileDTO.Email;
         FamilyName = profileDTO.FamilyName;
         GivenName = profileDTO.GivenName;
-        IsAdministrator = false;
-        IsDeveloper = false;
+        AuthorityLevel = 0;
     }
 
 }

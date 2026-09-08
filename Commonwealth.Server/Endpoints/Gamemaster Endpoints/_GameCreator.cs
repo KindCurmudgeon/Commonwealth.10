@@ -12,7 +12,7 @@ namespace Commonwealth.Server.Endpoints;
 
 public static partial class GamemasterEndpoints
 {
-    public static async Task CreateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, string creator,
+    public static async Task CreateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, PlayerProfile creator,
                             BlobService blobService, IdentityService identityService, ResponseBase response)
     {
         bool confirm = Util.IsLegalWindowsFilename(gameDTO.GameName);
@@ -44,7 +44,7 @@ public static partial class GamemasterEndpoints
         //             {
         //               string msg = ex.Message;   
         //             }
-        Player creatorPlayer = await Player.RetrieveAsync(creator, blobService);
+        Player creatorPlayer = await Player.RetrieveAsync(creator.UserName, blobService);
         creatorPlayer.NationIdentities.Add(new NationIdentity(game.Name, -1)); // -1 => Creator
         List<BlobDescriptor> descriptors = [];
         descriptors.Add(game.BlobDescriptor());

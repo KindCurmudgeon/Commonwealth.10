@@ -13,13 +13,13 @@ public static partial class GamemasterEndpoints
 {
     public static async Task ActivateAsync(
         string gameName,
-        string requestor,
+        PlayerProfile requestor,
         BlobService blobService,
         ResponseBase response
     )
     {
         Game game = await Game.RetrieveAsync(gameName, blobService);
-        if (game.IsGamemaster(requestor) != true) return;
+        game.ConfirmGamemasterAuthority(requestor);
 
         List<Nation> nations = await game.GatherNationsAsync(blobService);
         NamingFile namingFile = await NamingFile.RetrieveAsync("test", blobService);
@@ -34,8 +34,6 @@ public static partial class GamemasterEndpoints
         ServerEconomicMgr econUpdater = new(game, nations);
         econUpdater.DetermineResults();
         econUpdater.UpdateForNextSeason();
-        // CreateDistrictReports();  // Must Follow ActivateDistricts and ActivateNations to ensure home districts are assigned and nations are activated for accurate reports
-        // CreateNationReports();
 
         List<BlobDescriptor> descriptors = [];
         descriptors.Add(game.BlobDescriptor());

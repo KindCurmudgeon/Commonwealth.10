@@ -38,10 +38,10 @@ public static class Actions
     public const string MakeDev = "makeDev";
     public const string GetGames = "getGames";
 
-    public const string GetUserGames = "getUserGames";
-    public const string GetGameUsers = "getGameUsers";
+    public const string GetPlayerGames = "playerGames";
+    public const string GetGamePlayers = "GamePlayers";
     public const string RemoveGame = "removeGame";
-    public const string RemoveGameFromUser = "removeGameUser";
+    public const string RemoveGameFromPlayer = "removeGamePlayer";
 
 
 }

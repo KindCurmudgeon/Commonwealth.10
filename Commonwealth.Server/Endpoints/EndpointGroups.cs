@@ -9,9 +9,9 @@ public static class EndpointGroups
     // var signinGroup = app.MapGroup(Commonwealth.Shared.EndpointDTOs.Endpoints.Signin);
     // signinGroup.SigninEndpoint();
 
-    var userGroup = app.MapGroup(Shared.EndpointDTOs.Endpoints.User);
+    var userGroup = app.MapGroup(Shared.EndpointDTOs.Endpoints.Player);
     userGroup.UserEndpoint();
-  
+
     var gamemasterGroup = app.MapGroup(Shared.EndpointDTOs.Endpoints.Gamemaster);
     gamemasterGroup.GamemasterEndpoint();
 

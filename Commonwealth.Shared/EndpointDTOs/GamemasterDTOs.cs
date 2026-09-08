@@ -12,7 +12,7 @@ public class GamemasterRequest : RequestBase
     public bool? UseHistory { get; set; }
     public List<LineupDTO>? LineupDTOs { get; set; } = [];
 }
-public enum LineupAction { NONE = 0, Added = 10, ChangeUser = 99, ToBeRemoved = -99 }
+public enum LineupAction { NONE = 0, Added = 10, ChangePlayer = 99, ToBeRemoved = -99 }
 
 public enum GM_RequestType { NONE = 0, Create = 10, Get = 20, Update = 30, Activate = 40, SeasonUpdate = 50, Remove = 99 }
 public class GamemasterResponse : ResponseBase
@@ -76,7 +76,7 @@ public class LineupDTO
     public OrdersState OrdersState { get; set; }
     public string? HomeDistrict { get; set; }
     public string? NationName { get; set; }
-    public string? NewUser { get; set; }
+    public string? NewPlayer { get; set; }
 
     public string? StateString()
     {
@@ -88,7 +88,6 @@ public class LineupDTO
                 case LineupState.Invited: return "Invited";
                 case LineupState.Accepted: return "Accepted";
                 case LineupState.Regrets: return "Regrets";
-                //   case LineupState.Changed: return $"Reassigned: {NewUser}";
                 default: return null;
             }
         }
@@ -112,10 +111,3 @@ public enum LineupState
 {
     NotFound = 0, Added = 10, Invited = 30, Accepted = 40, Regrets = -10
 }
-// public class PlayerDTO
-// {
-//     public Guid Id { get; set; }
-//     public required string UserName { get; set; }
-
-//     [JsonConstructor, SetsRequiredMembers] public PlayerDTO(Guid id, string userName) { Id = id; UserName = userName; }
-// }

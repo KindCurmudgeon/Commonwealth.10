@@ -20,15 +20,15 @@ public static partial class UserEndpoints
             try
             {
                 Validate();
-                ProfileDTO profile = Authorization.ExtractProfileDTOfromToken(request.Token);
+                PlayerProfile playerProfile = Authorization.ExtractPlayerProfilefromToken(request.Token);
 
                 switch (request.RequestType)
                 {
                     case PlayerRequestType.NewPlayer:
-                        await CreateNewPlayerAsync(profile, blobService, response);
+                        await CreateNewPlayerAsync(playerProfile, blobService, response);
                         break;
                     case PlayerRequestType.GetPortfolio:
-                        Player player = await Player.RetrieveAsync(profile.UserName, blobService);
+                        Player player = await Player.RetrieveAsync(playerProfile.UserName, blobService);
                         await GetPortfolioAsync(player, blobService, response);
                         break;
                         //         case UserRequestType.UPDATE:
@@ -43,7 +43,7 @@ public static partial class UserEndpoints
                         //             await Confirm(request.UserName!, blobService, response);
                         //             break;
                 }
-                response.PlayerName = profile.UserName;
+                response.PlayerProfile = playerProfile;
             }
             catch (Exception ex) { response.HandleException(ex); }
             return Results.Ok(response);

@@ -78,11 +78,11 @@
             return;
         }
         PlayerRequest request = new PlayerRequest() { RequestType = PlayerRequestType.NewPlayer, Token = token };
-        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.User, request);
+        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.Player, request);
         if (response?.Response.Status is true)
         {
             DataService?.SetToken(token);
-            DataService?.SetPlayerName(response.PlayerName!);
+            DataService?.SetPlayerProfile(response.PlayerProfile!);
             NavMgr.NavigateTo(PageLink.Portfolio);
         }
     }
@@ -107,7 +107,7 @@
     }
     void RegisterClicked()
     {
-        AuthProfileDTO dto = new() { UserName = string.Empty, Password=string.Empty };
+        AuthProfileDTO dto = new() { UserName = string.Empty, Password = string.Empty };
         UserPopupRef?.Show(dto);
     }
     async Task RegisterSubmit(AuthProfileDTO dto)
@@ -119,15 +119,18 @@
             return;
         }
         UserPopupRef.Close();
-        PlayerRequest request = new () {
+        PlayerRequest request = new()
+        {
             RequestType = PlayerRequestType.NewPlayer,
             Token = token
         };
-        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.User, request);
-         if (response?.Response.Status is true) {   DataService?.SetToken(token);
-            DataService?.SetPlayerName(dto.UserName);
+        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.Player, request);
+        if (response?.Response.Status is true)
+        {
+            DataService?.SetToken(token);
+            DataService?.SetPlayerProfile(response.PlayerProfile);
             NavMgr.NavigateTo(PageLink.Portfolio);
-            }
+        }
         @* SigninRequest request = new() { RequestType = SigninRequestType.REGISTER, UserDTO = dto };
         SigninResponse? response = await ApiService.SendRequest<SigninRequest, SigninResponse>(Endpoints.Signin, request);
         if (response is null || response.Response.Status == false) return;

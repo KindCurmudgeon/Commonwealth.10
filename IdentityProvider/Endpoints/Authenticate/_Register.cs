@@ -10,26 +10,10 @@ public static partial class AuthEndPoints
 {
      public static async Task Register(AuthProfileDTO authProfile, BlobService blobService, IConfiguration config, AuthenticateResponse response)
      {
-          UserProfile userProfile = CreateUserProfile(authProfile);
+          string hashedPassword = PasswordCrypto.HashPassword(authProfile.Password, out byte[] salt);
+          UserProfile userProfile = new UserProfile(authProfile, hashedPassword, salt);
           await userProfile.SaveAsync(blobService);
           response.Token = Token.GenerateJwtToken(userProfile, config);
-     }
-     private static UserProfile CreateUserProfile(AuthProfileDTO profileDTO)
-     {
-          string hashedPassword = PasswordCrypto.HashPassword(profileDTO.Password, out byte[] salt);
-          return new UserProfile()
-          {
-               UserName = profileDTO.UserName,
-               HashedPassword = hashedPassword,
-               Salt = salt,
-               Id = Guid.NewGuid(),
-               CreationTime = DateTime.UtcNow,
-               Email = profileDTO.Email,
-               FamilyName = profileDTO.FamilyName,
-               GivenName = profileDTO.GivenName,
-               IsAdministrator = false,
-               IsDeveloper = false
-          };
      }
 
 }

@@ -12,14 +12,14 @@ namespace Commonwealth.Server.Data;
 
 public partial class Game
 {
-    public static Game Create(GameDTO dto, string creatorName, EconParms econParms, GeographyFile geogParmsFile, InitParms initParms)
+    public static Game Create(GameDTO dto, PlayerProfile creator, EconParms econParms, GeographyFile geogParmsFile, InitParms initParms)
     {
         Game game = new Game()
         {
             Id = Guid.NewGuid(),
             Name = Util.TitleCase(dto.GameName),
             GameState = GameState.Created,
-            CreatorName = creatorName,
+            CreatorName = creator.UserName,
             CreationDate = DateTime.UtcNow,
             Gamemasters = [],
             OrdersPeriod = dto.OrdersPeriod ?? new TimeSpan(7, 0, 0, 0),
@@ -221,22 +221,25 @@ public partial class Game
         }
         return nations;
     }
-    public bool IsGamemaster(string playerName)
+    public bool HasGamemasterAuthority(PlayerProfile player)
     {
-        // if (user.IsAdministrator) return true;
-        if (CreatorName == playerName) return true;
-        return Gamemasters.Exists(g => g == playerName);
+        if (CreatorName == player.UserName) return true;
+        if (Gamemasters.Exists(g => g == player.UserName)) return true;
+        if (player.RoleLevel >= RoleLevel.Admin) return true;
+        return false;
     }
-    public void ConfirmUserIsAllowed(string playerName, List<Nation> nations)
+    public void ConfirmGamemasterAuthority(PlayerProfile player)
     {
-        // if (user.IsAdministrator) return;
-        // if (IsGamemaster(user)) return;
+        if (HasGamemasterAuthority(player) is false)
+            throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, player.UserName);
+    }
+    public void ConfirmGameVisibilityAuthority(PlayerProfile player, List<Nation> nations)
+    {
         foreach (Nation nation in nations)
         {
-            if (nation.PlayerName == playerName) return;
-            //   if (string.Equals(nation.UserName, user.UserName, StringComparison.OrdinalIgnoreCase)) return;
+            if (nation.PlayerName == player.UserName) return;
         }
-        throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, playerName);
+        ConfirmGamemasterAuthority(player);
     }
     public int GetWaitingCount(List<Nation> nations)
     {

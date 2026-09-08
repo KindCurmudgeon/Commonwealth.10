@@ -9,6 +9,5 @@ public static class EndpointMapping
           //  app.MapGet("/", ()=>{return Results.Ok("Credentials is Operational");});
 
           app.AuthenticateEndpoint();
-          app.ProfileEndpoint();
      }
 }

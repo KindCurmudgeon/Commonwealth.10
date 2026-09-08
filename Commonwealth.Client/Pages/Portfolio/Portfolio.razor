@@ -182,7 +182,7 @@ else
              RequestType = PlayerRequestType.GetPortfolio, 
              Token = DataService.Token 
         };
-        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.User, request);
+        PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.Player, request);
         if (response is not null && response.Response.Status is true)
         {
             IsVisible = true;

@@ -1,3 +1,4 @@
+using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Parameters;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.Common;
@@ -57,12 +58,11 @@ public partial class Nation : IBlobObject
         Naming.LeaderTitle = newNaming.LeaderTitle ?? Util.PickRandomFromList(leaderTitles);
         Naming.Government = newNaming.Government ?? Util.PickRandomFromList(governments);
     }
-    public bool IsUserAllowed(string testId)
+    public void ConfirmPlayerAllowed(PlayerProfile profile)
     {
-        //   if (user.IsAdministrator) return true;
-        //if (string.Equals(UserName, user.UserName, StringComparison.OrdinalIgnoreCase)) return true;
-        if (testId == PlayerName) return true;
-        return false;
+        if (profile.UserName == PlayerName) return;
+        if (profile.RoleLevel >= RoleLevel.Admin) return;
+        throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, profile.UserName);
     }
     public List<Asset> FoodGoodsProratedPerVillage(int foodPerVillage, List<string> foodTypes)
     {

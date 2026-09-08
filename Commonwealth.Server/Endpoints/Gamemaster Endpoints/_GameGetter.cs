@@ -11,19 +11,18 @@ namespace Commonwealth.Server.Endpoints;
 public static partial class GamemasterEndpoints
 {
 
-    public static async Task GetGameResponseAsync(string gameName, string requestor, 
+    public static async Task GetGameResponseAsync(string gameName, PlayerProfile requestor,
             BlobService blobService, IdentityService identityService, GamemasterResponse response)
     {
         Game game = await Game.RetrieveAsync(gameName, blobService);
         List<Nation> nations = await game.GatherNationsAsync(blobService);
-        game.ConfirmUserIsAllowed(requestor, nations);
-        //    GameParms gameParms = await GameParms.RetrieveAsync(game.Name, blobService);
+        game.ConfirmGameVisibilityAuthority(requestor, nations);
         response.GameDTO = await game.CreateGameDTOAsync(identityService);
         response.LineupDTOs = await CreateLineupDTOAsync();
-        response.IsGamemaster = game.IsGamemaster(requestor);
+        response.IsGamemaster = game.HasGamemasterAuthority(requestor);
         if (response.IsGamemaster is true)
         {
-            Player player = await Player.RetrieveAsync(requestor, blobService);
+            Player player = await Player.RetrieveAsync(requestor.UserName, blobService);
             response.Friends = player.Friends;
         }
 

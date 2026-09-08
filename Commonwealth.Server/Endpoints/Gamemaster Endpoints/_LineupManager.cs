@@ -13,7 +13,7 @@ public static partial class GamemasterEndpoints
         if (lineupDTOs is null) return;
         foreach (LineupDTO dto in lineupDTOs.Where(r => r.OrdersState == OrdersState.Replaced))
         {
-            if (dto.NewUser is null || dto.Identity is null) continue;
+            if (dto.NewPlayer is null || dto.Identity is null) continue;
             // try
             // {
             //     Player newUser = await descriptors.RetrieveIfNotFoundAsync<Data.UserIdentity>(Data.UserIdentity.BlobPath(dto.NewUser), blobService);

@@ -39,26 +39,26 @@
                     switch (Arg1)
                     {
                         case FileTypes.Player:
-                            <span class="ps-3 smallfont text-black clickchar" @onclick="(() => SetAction(Actions.GetUserGames, item))">View Games</span>
+                            <span class="ps-3 smallfont text-black clickchar" @onclick="(() => SetAction(Actions.GetPlayerGames, item))">View Games</span>
                             <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.MakeAdmin, item))">Make Admin</span>
                             <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.MakeDev, item))">Make Dev</span>
                             break;
                         case FileTypes.Game:
-                            <span class="ps-3 smallfont text-black clickchar" @onclick="(() => SetAction(Actions.GetGameUsers, item))">View Users</span>
-                            <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.RemoveGameFromUser, item))">Remove Game</span>
+                            <span class="ps-3 smallfont text-black clickchar" @onclick="(() => SetAction(Actions.GetGamePlayers, item))">View Users</span>
+                            <span class="ps-3 smallfont text-secondary clickchar" @onclick="(() => SetAction(Actions.RemoveGameFromPlayer, item))">Remove Game</span>
                             break;
                     }
                     break;
-                case Actions.GetUserGames:
+                case Actions.GetPlayerGames:
                     List<string> parsed = ParseGame(item);
                     <span>@parsed[0]</span>
                     @if (parsed.Count == 1)
                     {
                       <span>(GameMaster)</span>
                     }
-                    <span class="ps-3 smallfont text-danger clickchar" @onclick="(() => SetAction(Actions.RemoveGameFromUser, Arg1, item))">Remove Game</span>
+                    <span class="ps-3 smallfont text-danger clickchar" @onclick="(() => SetAction(Actions.RemoveGameFromPlayer, Arg1, item))">Remove Game</span>
                     break;
-                case Actions.GetGameUsers:
+                case Actions.GetGamePlayers:
                     //                 <span class="ps-3 smallfont text-danger clickchar" @onclick="(() => SetAction(Actions.RemoveUser, Arg1, item))">Remove File</span>
                     break;
                 case Actions.GetGames:

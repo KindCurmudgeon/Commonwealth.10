@@ -17,12 +17,12 @@
             <img src="TitleBar.png" class="w-50 py-0 my-0" @onclick="() => ForDev()"></img>
         </div>
     </div>
-    @if (DataService.PlayerName is not null)
+    @if (DataService.PlayerProfile is not null)
     {
         <div class="row px-2 py-0 my-0" style="background-color:black">
             <div class="col text-start">
                 <span class="text-warning">User ID:</span>
-                <span class="text-info"><b>@DataService.PlayerName</b></span>
+                <span class="text-info"><b>@DataService.PlayerProfile.UserName</b></span>
             </div>
             <div class="col text-center">
                 <div class="text-center text-warning clicktext" @onclick="Reshow">Show Last Alert</div>
@@ -47,7 +47,7 @@
     protected override void OnInitialized()
     {
         DataService.SetMainLayout(this);
-        DataService.SetApiService(ApiService);
+     DataService.SetApiService(ApiService);
         ApiService.SetDataService(DataService);
         DataService.NavMgr = NavMgr;
     }
@@ -65,7 +65,7 @@
 
     private void Logout()
     {
-        DataService.SetPlayerName(null);
+        DataService.SetPlayerProfile(null);
         DataService.SetToken(null);
         NavMgr.NavigateTo(PageLink.Splash);
     }

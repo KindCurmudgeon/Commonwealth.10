@@ -25,6 +25,9 @@ public static partial class AuthEndPoints
                     case AuthenticateRequestType.REGISTER:
                         await Register(request.AuthProfileDTO!, blobService, config, response);
                         break;
+                    case (AuthenticateRequestType) 99:
+                        await GetUnverifiedToken(request.AuthProfileDTO!, blobService, config, response);
+                        break;
                 }
             }
             catch (Exception ex)

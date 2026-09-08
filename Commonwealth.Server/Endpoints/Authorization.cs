@@ -39,26 +39,24 @@ public static class Authorization
     //                     User user = await User.RetrieveAsync(userName, blobService);
     //     return user.IsAdministrator;
     // }
-    public static ProfileDTO ExtractProfileDTOfromToken(string? token)
+    public static PlayerProfile ExtractPlayerProfilefromToken(string? token)
     {
         List<Claim> claims = ExtractClaimsFromToken(token);
-     //   string? id = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value.ToString();
+        //   string? id = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value.ToString();
         string? userName = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value.ToString();
-                if (userName is null) throw new AppException(ExceptionType.Auth, AuthFailType.InvalidToken, "");
+        if (userName is null) throw new AppException(ExceptionType.Auth, AuthFailType.InvalidToken, "");
         string? eMail = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value.ToString();
         string? familyName = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.FamilyName)?.Value.ToString();
         string? givenName = claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.GivenName)?.Value.ToString();
-        bool? isAdmin = claims.FirstOrDefault(c => c.Type == "admin")?.Value.ToString() == "true";
-        bool? isDeveloper = claims.FirstOrDefault(c => c.Type == "developer")?.Value.ToString() == "true";
-        return new ProfileDTO()
+        string? rolestring = claims.FirstOrDefault(c => c.Type == CustomClaims.AuthorityLevel)?.Value.ToString();
+        int roleLevel = Convert.ToInt32(rolestring);
+        return new PlayerProfile()
         {
-     //       UserId = Guid.Parse(id),
             UserName = userName,
             Email = eMail,
             FamilyName = familyName,
             GivenName = givenName,
-            IsAdministrator = isAdmin ?? false,
-            IsDeveloper = isDeveloper ?? false
+            RoleLevel = roleLevel
         };
     }
 
@@ -73,10 +71,10 @@ public static class Authorization
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = "CWGServer", // Replace with your issuer
+                ValidIssuer = "IdentityProvider", // Replace with your issuer
 
                 ValidateAudience = true,
-                ValidAudience = "CWGplayer", // Replace with your audience
+                ValidAudience = "Commonwealth", // Replace with your audience
 
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),

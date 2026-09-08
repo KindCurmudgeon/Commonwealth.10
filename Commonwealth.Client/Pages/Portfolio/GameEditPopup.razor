@@ -111,8 +111,8 @@
         IsEditDisabled = !(isEditable ?? false);
         if (IsNewGame)
         {
-            GameDTO = GameDTOFactory.Create(DataService.PlayerName!);
-            LineupDTOs = new List<LineupDTO>() { LineupDTOFactory.Create(DataService.PlayerName!) };
+            GameDTO = GameDTOFactory.Create(DataService.PlayerProfile!.UserName);
+            LineupDTOs = new List<LineupDTO>() { LineupDTOFactory.Create(DataService.PlayerProfile!.UserName) };
             GameDTO.GameName = Utilities.GetRandomGameName();
         }
         else

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 
@@ -8,27 +7,16 @@ public class PlayerRequest : RequestBase
 {
     public PlayerRequestType? RequestType { get; set; }
     public List<Guid>? FriendIds { get; set; }
-    // public ProfileDTO? UserDTO { get; set; }
-    //public string? UserName { get; set; }
 }
-//public enum UserRequestType { NONE = 0, CONFIRM = 10, UPDATE = 30, GET_PORTFOLIO = 40, GETUSERDTO = 50, REMOVE = 99 }
 public enum PlayerRequestType { NONE = 0, GetPortfolio = 10, GetFriends = 20, AddFriends = 25, RemoveFriends = 29, NewPlayer = 90, RemovePlayer = 99 };
 
 public class PlayerResponse : ResponseBase
 {
     public List<GameSummaryDTO>? GameSummaries { get; set; }
-    public string? PlayerName { get; set; }
-    // public string? UserName { get; set; }
+   // public string? PlayerName { get; set; }
+    public PlayerProfile? PlayerProfile {get;set;}
 }
 
-// public class UserIdentity
-// {
-//     public required string UserName { get; set; }
-//     public required string Email { get; set; }
-//     public bool? IsAdmin { get; set; }
-//     public bool? IsDeveloper { get; set; }
-
-// }
 public class GameSummaryDTO
 {
     public string? GameName { get; set; }
@@ -50,13 +38,14 @@ public class NationSummaryDTO
     public string? HomeDistrict { get; set; }
     public OrdersState OrdersState { get; set; }
 }
+public partial class PlayerProfile
+{
+    //   public Guid UserId { get; set; }
+    public required string UserName { get; set; }
+    public string? Email { get; set; }
+    public string? GivenName { get; set; }
+    public string? FamilyName { get; set; }
+    public int? RoleLevel {get; set;}
+    [JsonConstructor] public PlayerProfile() { }
 
-// public class UserDTO
-// {
-//     public string Password { get; set; } = string.Empty;
-//     public string UserName { get; set; } = string.Empty;
-//     public string Email { get; set; } = string.Empty;
-//     public string FamilyName { get; set; } = string.Empty;
-//     public string GivenName { get; set; } = string.Empty;
-//     public List<string> Friends { get; set; } = [];
-// }
+}

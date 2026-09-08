@@ -19,7 +19,7 @@ public static class AdminActionEndpoint
             AdminResponse response = new() { Action = request.Action };
             try
             {
-                ProfileDTO profile = Authorization.ExtractProfileDTOfromToken(request.Token);
+                PlayerProfile profile = Authorization.ExtractPlayerProfilefromToken(request.Token);
                 // if (requester.IsDeveloper is not true)
                 //     throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requester.UserName);
                 response.Items = [];
@@ -31,9 +31,9 @@ public static class AdminActionEndpoint
                     case Actions.GetList: await GetList(request.Arg1); break;
                     case Actions.RemoveFile: await RemoveFile(request.Arg1); break;
                     case Actions.ViewFile: await ViewFile(request.Arg1); break;
-                    case Actions.GetUserGames: await GetUserGames(request.Arg1); break;
-                    case Actions.GetGameUsers: await GetGameUsers(request.Arg1); break;
-                    case Actions.RemoveGameFromUser: await RemoveGameFromUser(request.Arg1); break;
+                    case Actions.GetPlayerGames: await GetUserGames(request.Arg1); break;
+                    case Actions.GetGamePlayers: await GetGameUsers(request.Arg1); break;
+                    case Actions.RemoveGameFromPlayer: await RemoveGameFromUser(request.Arg1); break;
                     // case Actions.MakeAdmin: await MakeAdmin(request.Arg1); break;
                     // case Actions.MakeDev: await MakeDev(request.Arg1); break;
                     case Actions.GetGames: await GetGames(); break;

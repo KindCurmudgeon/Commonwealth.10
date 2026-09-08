@@ -10,13 +10,13 @@ public static partial class GamemasterEndpoints
 {
     public static async Task SeasonUpdateAsync(
         string gameName,
-        string requestor,
+        PlayerProfile requestor,
         bool? useHistory,
         BlobService blobService,
         ResponseBase response)
     {
         Game game = await Game.RetrieveAsync(gameName, blobService);
-        if (game.IsGamemaster(requestor) is false) throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor);
+        game.ConfirmGamemasterAuthority(requestor);
         List<Nation> nations;
         if (useHistory is true && game.GameDate?.SeasonCount >= 1)
         {

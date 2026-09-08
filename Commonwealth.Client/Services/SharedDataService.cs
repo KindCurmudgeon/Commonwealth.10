@@ -8,7 +8,7 @@ namespace Commonwealth.Client.Services;
 
 public class SharedDataService
 {
-    public string? PlayerName { get; private set; } = null;
+    public PlayerProfile? PlayerProfile { get; private set; } = null;
     public string? Token { get; private set; } = null;
     public NationIdentity? NationIdentity { get; set; }
     //  public Guid? GameId { get; set; }
@@ -16,9 +16,9 @@ public class SharedDataService
     private MainLayout? _mainLayout;
     private ApiService? _apiService;
 
-    public void SetPlayerName(string? name)
+    public void SetPlayerProfile(PlayerProfile? profile)
     {
-        PlayerName = name;
+        PlayerProfile = profile;
     }
     // public bool IsSuccessfulSignin()
     // {

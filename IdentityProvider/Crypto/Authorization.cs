@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Data;
+using IdentityProvider.EndpointDTOs;
 
 namespace Authorization;
 
@@ -34,7 +35,7 @@ public static class PasswordCrypto
 }
 public static class Token
 {
-       public static string GenerateJwtToken(UserProfile profile, IConfiguration config)
+    public static string GenerateJwtToken(UserProfile profile, IConfiguration config)
     {
         // Secret key for signing the token (use a secure key in production)
         // XX var secretKey = "your-very-secure-secret-key";
@@ -50,17 +51,14 @@ public static class Token
             new Claim(JwtRegisteredClaimNames.Email, profile.Email ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.FamilyName, profile.FamilyName ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.GivenName, profile.GivenName ?? string.Empty),
-            new Claim("admin", "false"),
-            new Claim("developer", "false")
-
+            new Claim(CustomClaims.AuthorityLevel, profile.AuthorityLevel.ToString()),
+            new Claim(CustomClaims.EmailConfirmed, (profile.EmailConfirmed ?? false).ToString())
         };
-        if (profile.IsAdministrator) claims.Add(new Claim(ClaimTypes.Role,"Admin"));
-        if (profile.IsDeveloper) claims.Add(new Claim(ClaimTypes.Role,"Developer"));
 
         // Create the token
         var tokenDescriptor = new JwtSecurityToken(
-            issuer: "CWGServer",
-            audience: "CWGplayer",
+            issuer: "IdentityProvider",
+            audience: "Commonwealth",
             claims: claims,
             expires: DateTime.UtcNow.AddHours(12),
             signingCredentials: credentials
@@ -68,5 +66,5 @@ public static class Token
 
         // Serialize the token
         return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-    } 
+    }
 }

@@ -4,6 +4,8 @@ public static class BlobNaming
 {
     public const string Json = ".json";
     public const string GameSuffix = "-game";
+    public const string GameSetupSuffix = "-setup";
+    public const string GameStatusSuffix = "-status";
     public const string GameParmsSuffix = "-parms";
     public const string NationSuffix = "-nation-";
 

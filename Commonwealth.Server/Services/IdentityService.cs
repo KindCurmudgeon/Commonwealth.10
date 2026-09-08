@@ -22,13 +22,18 @@ public class IdentityService
         };
     }
 
-    public async Task<ProfileResponse?> GetProfileDTOAsync(ProfileRequest request)
+    public async Task<string?> GetUnverifiedTokenAsync(string userName)
     {
+        AuthenticateRequest request = new ()
+        {
+            RequestType = (AuthenticateRequestType) 99,
+            AuthProfileDTO = new() {UserName = userName, Password = string.Empty}
+        };
         try
         {
-            HttpResponseMessage message = await Client.PostAsJsonAsync(IdentityEndpoint.Profile, request, options);
-            ProfileResponse? response = await message.Content.ReadFromJsonAsync<ProfileResponse>();
-            return response;
+            HttpResponseMessage message = await Client.PostAsJsonAsync(IdentityEndpoint.Authenticate, request, options);
+            AuthenticateResponse? response = await message.Content.ReadFromJsonAsync<AuthenticateResponse>();
+            return response?.Token;
         }
         catch
         {
