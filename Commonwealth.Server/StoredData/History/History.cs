@@ -5,17 +5,17 @@ using Commonwealth.Server.Utilities;
 namespace Commonwealth.Server.Data;
 
 
-public partial class History: IBlobObject
+public partial class History : IBlobObject
 {
- //   public required Season Season { get; set; }
+    //   public required Season Season { get; set; }
     public required List<Nation> Nations { get; set; }
-//    public required List<NationStatus>? NationStatuses { get; set; }
-    public required Game Game { get; set; }
-    [JsonConstructor] public History(){}
+    //    public required List<NationStatus>? NationStatuses { get; set; }
+    public required GameStatus GameStatus { get; set; }
+    [JsonConstructor] public History() { }
     [SetsRequiredMembers]
-    public History(Game game, List<Nation> nations)
+    public History(GameStatus game, List<Nation> nations)
     {
-        Game = game;
+        GameStatus = game;
         Nations = nations;
     }
     private const string HistorySuffix = "-history-";

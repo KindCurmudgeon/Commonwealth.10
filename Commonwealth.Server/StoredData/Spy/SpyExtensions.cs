@@ -4,7 +4,7 @@ namespace Commonwealth.Server.Data;
 
 public partial class Spy
 {
-     public void SeasonUpdate(SpyMgr? spyMgr, List<District> districts, Nation? nation)
+     public void SeasonUpdate(SpyMgr? spyMgr, VGame vGame, Nation? nation)
      {
           if (spyMgr is null || nation is null) return;
           if (spyMgr.Order.NewDistrict is not null)
@@ -25,7 +25,7 @@ public partial class Spy
                default:
                     break;
           }
-          CreateReport(districts);
+          CreateReport();
 
           int GetNextCodeName()
           {
@@ -33,14 +33,15 @@ public partial class Spy
                while (nation.Spies?.Find(s => s.CodeName == candidate) is not null) candidate++;
                return candidate;
           }
-     }
-     public void CreateReport(List<District> districts)
+     void CreateReport()
      {
           Report = null;
           if (Order.Status == SpyState.Active)
           {
-               District? district = districts.FindDistrict(District);
+               VDistrict? district = vGame.FindDistrict(District!);
                Report = district?.LastSeasonVillageReport;
           }
+     }          
      }
+
 }

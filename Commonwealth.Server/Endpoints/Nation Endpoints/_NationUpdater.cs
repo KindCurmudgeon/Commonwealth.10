@@ -8,7 +8,7 @@ public static partial class NationEndpoints
     public static async Task ProcessUpdate(Nation nation, NationRequest editRequest, BlobService blobService, NationResponse response)
     {
         bool isUpdated = false;
-        Game game = await Game.RetrieveAsync(nation.Identity!.GameName, blobService);
+        VGame game = await VGame.Load(nation.Identity!.GameName, blobService);
         if (game.GameState == GameState.Created)
         {
             await UpdateHomeDistrict();

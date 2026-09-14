@@ -73,7 +73,7 @@ public partial class ServerEconomicMgr
             List<Asset> netRequested = GatherMarketTradeRequests();
             foreach (Asset requestedAsset in netRequested)
             {
-                MarketData? Available = Game.MarketDatas?.Find(m => m.Name == requestedAsset.Name);
+                MarketData? Available = VGame.MarketDatas?.Find(m => m.Name == requestedAsset.Name);
                 int threshhold = (int)((Available?.Inventory ?? 0) * (EconParms.MarketParms.MaxMarketBuyPercent ?? 1));
                 if (requestedAsset.Amount < threshhold) continue;
                 double reductionFactor = (double)threshhold / requestedAsset.Amount;

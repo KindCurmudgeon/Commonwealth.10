@@ -8,43 +8,45 @@ namespace Commonwealth.Server.Endpoints;
 
 public static class InfoPackageFactory
 {
-    public static InfoPackage Create(Game game, Nation nation, List<Nation> nations, MgrPackage mgrPackage)
+    public static InfoPackage Create(
+   VGame vGame,
+        List<VDistrict> ownedDistricts,
+        List<Nation> nations,
+        int nationCode,
+        MgrPackage mgrPackage)
     {
-
-        List<District> ownedDistricts = game.Districts.OwnedBy(mgrPackage.NationMgr.Identity.NationCode);
-        List<string> ownedDistrictConnections = GatherConnections(ownedDistricts);
-        EconParms EconParms = game.EconParms;
+        EconParms econParms = vGame.EconParms;
+        List<string> connections = vGame.GatherConnections(ownedDistricts);
         return new InfoPackage()
         {
-            GameName = game.Name,
-            SeasonString = game.GameDate.ToString(),
-            EconParms = EconParms,
-            NationGoodNames = EconParms.GoodParms.Select(p => p.Name).ToList(),
-            DistrictGoodNames = EconParms.GoodParms.Where(p => p.Type != GOODTYPE.CURRENCY).Select(g => g.Name).ToList(),
-            VillageNames = EconParms.VillageParms.Select(v => v.Name).ToList(),
+            GameName = vGame.GameName,
+            SeasonString = vGame.GameDate.ToString(),
+            EconParms = econParms,
+            NationGoodNames = econParms.GoodParms.Select(p => p.Name).ToList(),
+            DistrictGoodNames = econParms.GoodParms.Where(p => p.Type != GOODTYPE.CURRENCY).Select(g => g.Name).ToList(),
+            VillageNames = econParms.VillageParms.Select(v => v.Name).ToList(),
             NationNamings = nations.Select(n => n.Naming).ToList(),
-            MarketPrices = game.MarketDatas.AssembleMarketPrices(),
-            WorldNews = game.WorldNews,
-            GameNews = game.GameNews,
-            OwnedDistrictConnections = GatherConnections(ownedDistricts),
-            SpyTargets = CreateSpyTargets(ownedDistrictConnections),
-            DistrictTradeTargets = CreateDistrictTradeTargets(mgrPackage.DistrictMgrs, ownedDistrictConnections),
-            NationTradeTargets = CreateNationTradeTargets(nations, nation.Identity.NationCode)
+            MarketPrices = vGame.MarketDatas.AssembleMarketPrices(),
+            WorldNews = vGame.WorldNews,
+            GameNews = vGame.GameNews,
+            SpyTargets = CreateSpyTargets(connections),
+            DistrictTradeTargets = CreateDistrictTradeTargets(mgrPackage.DistrictMgrs, connections),
+            NationTradeTargets = CreateNationTradeTargets(nations, nationCode)
         };
 
-        List<string> GatherConnections(List<District> ownedDistricts)
-        {
-            List<string> connections = [];
-            foreach (District district in ownedDistricts)
-            {
-                foreach (string connection in district.Connections)
-                {
-                    string? match = ownedDistricts.FindDistrict(connection)?.Name;
-                    if (match is not null) connections.AddIfNotDuplicate(connection);
-                }
-            }
-            return connections;
-        }
+        // List<string> GatherConnections(List<District> ownedDistricts)
+        // {
+        //     List<string> connections = [];
+        //     foreach (District district in ownedDistricts)
+        //     {
+        //         foreach (string connection in district.Connections)
+        //         {
+        //             string? match = ownedDistricts.FindDistrict(connection)?.Name;
+        //             if (match is not null) connections.AddIfNotDuplicate(connection);
+        //         }
+        //     }
+        //     return connections;
+        // }
 
         List<string?> CreateDistrictTradeTargets(List<DistrictMgr> ownedDistricts, List<string> ownedDistrictConnections)
         {

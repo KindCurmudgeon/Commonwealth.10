@@ -1,4 +1,5 @@
 using Commonwealth.Server.Data;
+using Commonwealth.Server.Endpoints;
 using Commonwealth.Shared.EndpointDTOs;
 
 public static class UserEndpointFactory
@@ -15,12 +16,12 @@ public static class UserEndpointFactory
      //           Friends = user.Friends
      //      };
      // }
-     public static GameSummaryDTO CreateGameSummaryDTO(this Game game, Nation? nation, int waitingCount, Player player)
+     public static GameSummaryDTO CreateGameSummaryDTO(this VGame game, Nation? nation, int waitingCount, Player player)
      {
-          bool isCreator = game.CreatorName == player.UserName;
+          bool isCreator = game.Creator == player.UserName;
           return new GameSummaryDTO()
           {
-               GameName = game.Name,
+               GameName = game.GameName,
                IsCreator = isCreator,
                IsGamemaster = isCreator || game.Gamemasters.Contains(player.UserName),
                GameState = game.GameState,

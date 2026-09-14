@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Resources;
 using System.Text;
 using Commonwealth.Server.Parameters;
@@ -8,18 +9,21 @@ using Commonwealth.Shared.EndpointDTOs;
 
 namespace Commonwealth.Server.Data;
 
-public partial class District
+public partial class DistrictStatus
 {
-
-    public void Activate(int owner)
+[SetsRequiredMembers]
+    public DistrictStatus(DistrictSetup districtSetup, int owner, InitParms initParms)
     {
+        Name = districtSetup.Name;
         Owner = owner;
+        Population = Util.GetRandomInclusive(initParms.InitialDistrictPopulationStat);
+        Goods = GoodStat.GetRandomGoodStat(initParms.InitialDistrictGoods);
     }
 
-    public void SeasonUpdate(DistrictMgr? districtMgr, 
-                List<VillageMgr> villageMgrsHere, 
-                Report? WorldNews, 
-                List<NationNaming> namings, 
+    public void SeasonUpdate(DistrictMgr? districtMgr,
+                List<VillageMgr> villageMgrsHere,
+                Report? WorldNews,
+                List<NationNaming> namings,
                 EconParms econParms)
     {
         if (districtMgr is null) return;
@@ -28,7 +32,7 @@ public partial class District
         Goods = districtMgr.Final;
         UpdateFoodMetrics(econParms);
         UpdateOwnership();
-        List<string> districtGoods = econParms.GoodParms.Where(p=>p.Type != GOODTYPE.CURRENCY).Select(g=>g.Name).ToList();
+        List<string> districtGoods = econParms.GoodParms.Where(p => p.Type != GOODTYPE.CURRENCY).Select(g => g.Name).ToList();
         LastSeasonGoodsReport = districtMgr.CreateGoodsReport("Last Season", districtGoods);
         LastSeasonVillageReport = districtMgr.CreateVillageReport("Last Season");
         LastSeasonVillageReport.AddTitledList("Foreign Villages", GatherForeignVillageHere());
@@ -36,7 +40,7 @@ public partial class District
         List<string> GatherForeignVillageHere()
         {
             List<string> foreignVillages = [];
-            List<VillageMgr> foreignVillagesHere = villageMgrsHere.Where(v=>v.Identity.Owner != districtMgr.Owner).ToList();
+            List<VillageMgr> foreignVillagesHere = villageMgrsHere.Where(v => v.Identity.Owner != districtMgr.Owner).ToList();
             foreach (VillageMgr villageMgr in foreignVillagesHere)
             {
                 foreignVillages.Add(villageMgr.Summary(namings));
@@ -204,17 +208,12 @@ public partial class District
     //     }
     // }
 
-    public bool HasFeature(Feature? feature)
-    {
-        if (feature is null || feature == Feature.NONE) return true;
-        Feature? found = Features?.Find(f => f == feature);
-        return found is not null;
-    }
-    public bool IsVillageAllowedHere(string? villageType)
-    {
-        if (villageType is null) return false;
-        return AllowedVillages?.Contains(villageType) ?? false;
-    }
+  
+    // public bool IsVillageAllowedHere(string? villageType)
+    // {
+    //     if (villageType is null) return false;
+    //     return AllowedVillages?.Contains(villageType) ?? false;
+    // }
 }
 
 

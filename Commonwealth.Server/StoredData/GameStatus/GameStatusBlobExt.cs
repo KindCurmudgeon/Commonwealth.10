@@ -5,12 +5,12 @@ namespace Commonwealth.Server.Data;
 public partial class GameStatus : IBlobObject
 {
     private static string FullFileName(string gameName) { return gameName.ToLower() + BlobNaming.GameStatusSuffix + BlobNaming.Json; }
-    private string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(Name)); }
+    private string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(GameName)); }
     public BlobDescriptor BlobDescriptor() { return new BlobDescriptor(BlobPath(), this); }
     private static string BlobPath(string gameName) { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(gameName)); }
-    public static string AllGameFilesBlobPrefix(string gameName) { return BlobService.CreateBlobPrefix(Folders.Games, null,gameName); }
+    public static string AllGameFilesBlobPrefix(string gameName) { return BlobService.CreateBlobPrefix(Folders.Games, null, gameName); }
     public static string AllGamesBlobPrefix() { return BlobService.CreateBlobPrefix(Folders.Games, null, null); }
-    public void Validate() {}
+    public void Validate() { }
 
     public Task SaveAsync(BlobService blobService)
     {
@@ -21,6 +21,18 @@ public partial class GameStatus : IBlobObject
     {
         GameStatus status = await blobService.RetrieveAsync<GameStatus>(BlobPath(gameName));
         return status;
+    }
+    public static async Task<GameStatus?> RetrieveIfExistsAsync(string gameName, BlobService blobService)
+    {
+        try
+        {
+            GameStatus gameStatus = await RetrieveAsync(gameName, blobService);
+            return gameStatus;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
 }

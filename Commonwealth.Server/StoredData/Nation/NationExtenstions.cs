@@ -11,12 +11,12 @@ public partial class Nation : IBlobObject
 {
 
 
-    public void Activate(Game game, InitParms initParms)
+    public void Activate(InitParms initParms)
     {
         GoodsAvailable = GoodStat.GetRandomGoodStat(initParms.InitialNationGoods);
         OrdersState = OrdersState.AwaitOrders;
-        District? home = game.Districts.FindDistrict(HomeDistrict);
-        Population = home?.Population ?? 0;
+        // DistrictSetup? home = gameSetup.FindDistrictSetup(HomeDistrict);
+        // Population = home?.Population ?? 0;
         // NationReport = new($"Report for {Naming.FormalNation} - {game.GameDate}");
         // NationReport.AddItem($"<b><u>Owned Districts</u></b>: {home?.Name ?? "None"}");
         // EconActivity econActivity = new EconActivity(GoodsAvailable);

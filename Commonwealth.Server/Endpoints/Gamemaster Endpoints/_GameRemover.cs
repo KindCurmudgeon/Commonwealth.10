@@ -10,10 +10,10 @@ public static partial class GamemasterEndpoints
     public static async Task RemoveGameAsync(string gameName, PlayerProfile requestor, BlobService blobService, ResponseBase response)
     {
 
-        Game game = await Game.RetrieveAsync(gameName, blobService);
-        if (game.CreatorName != requestor.UserName)
+        GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+        if (gameSetup.Creator != requestor.UserName && requestor.RoleLevel < RoleLevel.Admin)
             throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, requestor.UserName);
-        await Game.Remove(game, blobService);
+        await GameSetup.Remove(gameSetup, blobService);
         response.AddMessage($"Game '{gameName}' removed!");
     }
 }

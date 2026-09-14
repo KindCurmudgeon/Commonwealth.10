@@ -36,7 +36,7 @@ public static partial class GamemasterEndpoints
                         await SeasonUpdateAsync(request.GameName!, requestor, request.UseHistory, blobService, response);
                         break;
                     case GM_RequestType.Get:
-                        await GetGameResponseAsync(request.GameName!, requestor, blobService, identityService, response);
+                        await GetGameResponseAsync(request.GameName!, requestor, blobService, response);
                         break;
                     case GM_RequestType.Remove:
                         await RemoveGameAsync(request.GameName!, requestor, blobService, response);

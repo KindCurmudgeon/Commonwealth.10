@@ -20,15 +20,13 @@ public static partial class NationEndpoints
                 ValidateRequest();
                 PlayerProfile profile = Authorization.ExtractPlayerProfilefromToken(request.Token);
                 Nation nation = await Nation.RetrieveAsync(request.Identity, blobService);
-                nation.ConfirmPlayerAllowed(profile); 
+                nation.ConfirmPlayerAllowed(profile);
                 switch (request.RequestType)
                 {
                     case NationRequestType.Get:
-                    // Game game = await Game.RetrieveAsync(nation.Identity.GameName, blobService);
-                    // //    GameParms gameParms = await GameParms.RetrieveAsync(nation.Identity.GameName, blobService);
-                    // Data.UserIdentity player = (requestor.UserName == nation.UserName) ? requestor : await Data.UserIdentity.RetrieveAsync(nation.UserName, blobService);
-                    // await ProcessGet(nation, game, blobService, response);
-                    // break;
+                        VGame vGame = await VGame.Load(nation.Identity.GameName, blobService);
+                        await ProcessGet(nation, vGame, blobService, response);
+                        break;
                     case NationRequestType.Update:
                     case NationRequestType.AcceptReject:
                         await ProcessUpdate(nation, request, blobService, response);

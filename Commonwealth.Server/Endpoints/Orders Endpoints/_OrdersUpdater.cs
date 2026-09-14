@@ -11,8 +11,8 @@ public static partial class OrdersEndpoints
 {
     public static async Task UpdateOrdersAsync(OrdersRequest request, Nation nation, BlobService blobService, OrdersResponse response)
     {
-        Game game = await Game.RetrieveAsync(nation.Identity.GameName, blobService);
-        if (game.GameDate.IsSame(nation.SeasonCount) is false) throw new AppException(ExceptionType.Endpoint, EndpointFailType.SeasonUpdated, (string?)null);
+        VGame vGame = await VGame.Load(nation.Identity.GameName, blobService);
+        nation.ConfirmSameSeason(vGame);
         UpdateVillageOrders();
         UpdateDistrictOrders();
         UpdateSpyOrders();

@@ -12,9 +12,9 @@ public static partial class UserEndpoints
         List<GameSummaryDTO> summaries = [];
         foreach (NationIdentity identity in player.NationIdentities ?? [])
         {
-            Game game = await Game.RetrieveAsync(identity.GameName, blobService);
-            List<Nation> nations = await game.GatherNationsAsync(blobService);
-            int waitingCount = game.GetWaitingCount(nations);
+            VGame vGame = await VGame.Load(identity.GameName, blobService);
+            List<Nation> nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
+            int waitingCount = vGame.GetWaitingCount(nations);
             Nation? myNation = null;
             if (identity.NationCode < 0)
             {
@@ -24,7 +24,7 @@ public static partial class UserEndpoints
                 if (match is not null) continue;
             }
             else myNation = nations.Find(n => n.Identity.NationCode == identity.NationCode);
-            summaries.Add(game.CreateGameSummaryDTO(myNation, waitingCount, player));
+            summaries.Add(vGame.CreateGameSummaryDTO(myNation, waitingCount, player));
         }
         response.GameSummaries = summaries;
     }

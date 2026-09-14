@@ -8,7 +8,7 @@ namespace Commonwealth.Server.Endpoints;
 
 public static partial class GamemasterEndpoints
 {
-    public static async Task HandlePlayerChanges(Game game, List<LineupDTO>? lineupDTOs, List<BlobDescriptor> descriptors, BlobService blobService)
+    public static async Task HandlePlayerChanges(GameSetup gameSetup, List<LineupDTO>? lineupDTOs, List<BlobDescriptor> descriptors, BlobService blobService)
     {
         if (lineupDTOs is null) return;
         foreach (LineupDTO dto in lineupDTOs.Where(r => r.OrdersState == OrdersState.Replaced))
@@ -37,7 +37,7 @@ public static partial class GamemasterEndpoints
     }
 
     public static async Task HandleAnyAddedNationsAsync(
-        Game game,
+        GameSetup gameSetup,
         List<LineupDTO>? lineupDTOs,
         List<BlobDescriptor> descriptors,
         BlobService blobService,
@@ -45,32 +45,25 @@ public static partial class GamemasterEndpoints
         ResponseBase response)
     {
         List<int> activeCodes = await GatherActiveCodes();
-        // if (lineupDTOs?.Count==0)
-        // {
-        //     LineupDTO dto = new LineupDTO(game.Creator!, new NationIdentity(game.Name,-1));
-        //   //  dto.Naming?.SetHomeNaming("Caelnor", game.Districts);
-        //     lineupDTOs.Add(dto); 
-        // }
         foreach (LineupDTO lineupDTO in lineupDTOs?.Where(r => r.LineupState == LineupState.Added) ?? [])
         {
-
             int code = FindUnusedNationCode();
-            Nation nation = new Nation(game, code, lineupDTO.PlayerName);
+            Nation nation = new Nation(gameSetup.GameName, code, lineupDTO.PlayerName);
             if (lineupDTO.HomeDistrict is not null) nation.HomeDistrict = lineupDTO.HomeDistrict;
             Player player = await descriptors.AddIfNotDuplicateAsync<Player>(Player.BlobPath(lineupDTO.PlayerName), blobService);
             player?.NationIdentities.Add(nation.Identity);
             descriptors.Add(nation.BlobDescriptor());
-            if (game.GameState == GameState.Activated)
+            if (gameSetup.GameState == GameState.Activated)
             {
-                game.WorldNews?.AddTextEntry($"Nation '{nation.Naming?.Name}' mangaged by '{nation.PlayerName}' has joined the game.");
-                descriptors.AddIfNotDuplicate(game.BlobDescriptor());
+                //       gameSetup.WorldNews?.AddTextEntry($"Nation '{nation.Naming?.Name}' mangaged by '{nation.PlayerName}' has joined the game.");
+                descriptors.AddIfNotDuplicate(gameSetup.BlobDescriptor());
             }
         }
 
         async Task<List<int>> GatherActiveCodes()
         {
             List<int> codes = [];
-            List<Nation> existingNations = await game.GatherNationsAsync(blobService);
+            List<Nation> existingNations = await gameSetup.GatherNationsAsync(blobService);
             foreach (Nation nation in existingNations) codes.Add(nation.Identity.NationCode);
             return codes;
         }
@@ -90,14 +83,14 @@ public static partial class GamemasterEndpoints
 
 
     }
-    public static async Task HandleAnyRemovedNationsAsync(Game game, List<LineupDTO>? lineupDTOs, List<BlobDescriptor> descriptors, BlobService blobService, ResponseBase response)
+    public static async Task HandleAnyRemovedNationsAsync(GameSetup gameSetup, List<LineupDTO>? lineupDTOs, List<BlobDescriptor> descriptors, BlobService blobService, ResponseBase response)
     {
         foreach (LineupDTO lineupDTO in lineupDTOs!.Where(r => r.OrdersState == OrdersState.Remove))
         {
             if (lineupDTO.Identity is null) continue;
             NationIdentity identity = lineupDTO.Identity;
             //    GameRole gameRole = new GameRole(game.Name, GameRoleType.Nation, identity.NationCode);
-            if (game.GameState == GameState.Created)
+            if (gameSetup.GameState == GameState.Created)
             {
                 Player user = await descriptors.AddIfNotDuplicateAsync<Player>(Player.BlobPath(lineupDTO.PlayerName), blobService);
                 user?.NationIdentities.RemoveAll(g => g.IsSameAs(identity));
@@ -105,7 +98,7 @@ public static partial class GamemasterEndpoints
                 response.AddMessage($"Nation '{identity.GameName}:{identity.NationCode}' removed.");
                 return;
             }
-            if (game.GameState == GameState.Activated)
+            if (gameSetup.GameState == GameState.Activated)
             {
                 Nation nation = await descriptors.AddIfNotDuplicateAsync<Nation>(Nation.BlobPath(identity), blobService);
                 //   nation.LineupState = LineupState.ToBeRemoved;

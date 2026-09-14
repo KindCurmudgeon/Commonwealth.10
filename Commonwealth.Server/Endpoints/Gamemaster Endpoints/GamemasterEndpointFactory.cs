@@ -1,24 +1,24 @@
 using Commonwealth.Server.Data;
+using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
 using Identity.Client.Service;
-using IdentityProvider.EndpointDTOs;
 namespace Commonwealth.Server.Endpoints;
 
 public static class GameEndpointFactory
 {
-    public static async Task<GameDTO> CreateGameDTOAsync(this Game game, IdentityService identityService)
+    public static async Task<GameDTO> CreateGameDTOAsync(this GameSetup gameSetup)
     {
 
         return new GameDTO()
         {
-            GameName = game.Name,
-            EconFileInfo = game.EconFileInfo,
-            GeogFileInfo = game.GeogFileInfo,
-            OrdersPeriod = game.OrdersPeriod,
-            GameState = game.GameState,
-            Creator = game.CreatorName,
-            Gamemasters = game.Gamemasters,
+            GameName = gameSetup.GameName,
+            EconFileInfo = gameSetup.EconFileInfo,
+            GeogFileInfo = gameSetup.GeogFileInfo,
+            OrdersPeriod = gameSetup.OrdersPeriod,
+            GameState = gameSetup.GameState,
+            Creator = gameSetup.Creator,
+            Gamemasters = gameSetup.Gamemasters,
             CreationDateTime = DateTime.UtcNow
         };
 
@@ -54,5 +54,6 @@ public static class GameEndpointFactory
     // {
     //     return new PlayerDTO(profile.UserId, profile.UserName);
     // }
+
 
 }

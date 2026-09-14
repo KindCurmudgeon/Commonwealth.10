@@ -8,9 +8,6 @@ public static class BlobNaming
     public const string GameStatusSuffix = "-status";
     public const string GameParmsSuffix = "-parms";
     public const string NationSuffix = "-nation-";
-
-    //   public const string StatusPrefix = "-orders-";
-    //   public const string SeasonSuffix = "-season";
     public const string HistorySuffix = "-history-";
 }
 
@@ -20,4 +17,6 @@ public static class Folders
     public const string Games = "Games";
     public const string Players = "Players";
     public const string UserIdentities = "UsersIdentities";
+    public static string AllGamesBlobPrefix() { return BlobService.CreateBlobPrefix(Folders.Games, null, null); }
+    public static string AllPlayersPrefix() { return BlobService.CreateBlobPrefix(Folders.Players, null, null); }
 }

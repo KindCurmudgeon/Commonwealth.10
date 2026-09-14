@@ -1,5 +1,6 @@
 
 using Commonwealth.Server.Data;
+using Commonwealth.Server.Endpoints;
 using Commonwealth.Shared.Common;
 using Commonwealth.Shared.EconomicMgrs;
 
@@ -15,14 +16,14 @@ public partial class ServerEconomicMgr
         UpdateDistricts();  // Villages before Districts due to potential Owner changes
         UpdateSpies();
         UpdateNations();
-        Game.SeasonUpdate(WorldNewsItems);
+        VGame.SeasonUpdate(WorldNewsItems);
         AdvanceSeason();
 
         void UpdateMarket()
         {
-            foreach (MarketData marketData in Game.MarketDatas ?? [])
+            foreach (MarketData marketData in VGame.MarketDatas ?? [])
             {
-                marketData.SeasonUpdate(AllTradeMgrs, Game.MarketDatas ?? []);
+                marketData.SeasonUpdate(AllTradeMgrs, VGame.MarketDatas ?? []);
             }
             List<TradeMgr> marketTrades = AllTradeMgrs.Where(t => t.Order?.TradeType == TRADETYPE.MARKET).ToList();
         }
@@ -65,15 +66,15 @@ public partial class ServerEconomicMgr
                 }
 
                 Spy? spy = nation?.Spies?.Find(s => s.Id == mgr.Id);
-                spy?.SeasonUpdate(mgr, Game.Districts, nation);
+                spy?.SeasonUpdate(mgr, VGame, nation);
             }
         }
         void UpdateDistricts()
         {
-            foreach (District district in Game.Districts)
+            foreach (VDistrict district in VGame.VDistricts)
             {
                 DistrictMgr? mgr = AllDistrictMgrs.Find(d => d.Name == district.Name);
-                district.SeasonUpdate(mgr, AllVillageMgrs.Here(district.Name), Game.WorldNews, NationNamings, EconParms);
+                district.SeasonUpdate(mgr, AllVillageMgrs.Here(district.Name), VGame.WorldNews, NationNamings, EconParms);
                 //  district?.CreateReport(Game.GameDate, Nations);
             }
         }
@@ -88,7 +89,7 @@ public partial class ServerEconomicMgr
             }
         }
 
- 
+
         // void DistrictReports()
         // {
         //     // foreach (DistrictMgr mgr in AllDistrictMgrs)
@@ -142,8 +143,8 @@ public partial class ServerEconomicMgr
 
         void AdvanceSeason()
         {
-            Game.GameDate.SeasonUpdate();
-            foreach (Nation nation in Nations) nation.SeasonCount = Game.GameDate.SeasonCount;
+            VGame.GameDate.SeasonUpdate();
+            foreach (Nation nation in Nations) nation.SeasonCount = VGame.GameDate.SeasonCount;
         }
     }
 }

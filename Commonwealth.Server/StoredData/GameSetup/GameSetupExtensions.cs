@@ -1,25 +1,21 @@
-using System.Text.Json.Serialization;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Parameters;
-using Commonwealth.Server.ServerEconomics;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.Common;
-using Commonwealth.Shared.EconomicMgrs;
 using Commonwealth.Shared.EndpointDTOs;
-using IdentityProvider.EndpointDTOs;
 
 namespace Commonwealth.Server.Data;
 
-public partial class GameSetup
+public partial class GameSetup : GameAuthority
 {
     public static GameSetup Create(GameDTO dto, PlayerProfile creator, EconParms econParms, GeographyFile geogParmsFile, InitParms initParms)
     {
         GameSetup setup = new GameSetup()
         {
             Id = Guid.NewGuid(),
-            Name = Util.TitleCase(dto.GameName),
+            GameName = Util.TitleCase(dto.GameName),
             GameState = GameState.Created,
-            CreatorName = creator.UserName,
+            Creator = creator.UserName,
             CreationDate = DateTime.UtcNow,
             Gamemasters = [],
             OrdersPeriod = dto.OrdersPeriod ?? new TimeSpan(7, 0, 0, 0),
@@ -28,22 +24,21 @@ public partial class GameSetup
             GeogFileInfo = dto.GeogFileInfo ?? GeographyFile.DefaultFileInfo,
             InitFileInfo = dto.InitFileInfo,
             EconFileInfo = dto.EconFileInfo,
-         //   WorldNews = new Report("World News - Last Season"),
-          //  GameNews = new Report("Game News - Last Season")
+            //   WorldNews = new Report("World News - Last Season"),
+            //  GameNews = new Report("Game News - Last Season")
         };
-        // CreateWorldNews();
-        // CreateGameNews();
+
         AssignResources();
         IdentifyAllowedVillages();
         // InitializeMarket();
         return setup;
 
-        List<District> CreateDistricts()
+        List<DistrictSetup> CreateDistricts()
         {
-            List<District> districts = [];
+            List<DistrictSetup> districts = [];
             foreach (DistrictParm districtParm in geogParmsFile.Districts)
             {
-                District district = District.Create(districtParm, geogParmsFile.Seas, econParms, initParms);
+                DistrictSetup district = DistrictSetup.Create(districtParm, geogParmsFile.Seas, econParms, initParms);
                 districts.Add(district);
             }
             return districts;
@@ -52,17 +47,17 @@ public partial class GameSetup
         {
             foreach (Resource resource in econParms.Resources)
             {
-                List<District> elgible = setup.Districts.Where(s => s.HasFeature(resource.Constraint)).ToList();
+                List<DistrictSetup> elgible = setup.Districts.Where(s => s.HasFeature(resource.Constraint)).ToList();
                 Util.Shuffle(elgible);
                 int netDistricts = (int)((resource.Existence ?? 1.0) * elgible.Count);
                 while (netDistricts-- > 0)
                 {
-                    District district = elgible[0];
+                    DistrictSetup district = elgible[0];
                     (district.Resources ??= []).Add(resource.Name);
                     elgible.RemoveAt(0);
                 }
             }
-            foreach (District district in setup.Districts)
+            foreach (DistrictSetup district in setup.Districts)
             {
                 int shortfall = initParms.MinResourcePerDistrict - (district.Resources?.Count ?? 0);
                 while (shortfall > 0)
@@ -87,7 +82,7 @@ public partial class GameSetup
 
         void IdentifyAllowedVillages()  // SHould this go somewhere else after EconParms.VillageParms are created.
         {
-            foreach (District district in setup.Districts)
+            foreach (DistrictSetup district in setup.Districts)
             {
                 foreach (string resource in district.Resources ?? [])
                 {
@@ -126,6 +121,53 @@ public partial class GameSetup
         //     setup.GameNews?.AddTextEntry($"Game '{setup.Name}' created by '{setup.CreatorName}'");
         //     setup.GameNews?.AddTextEntry($"Created: {setup.CreationDate: yyyy.MM.dd HH:mm} GMT.");
         // }
+    }
+
+   public static async Task Remove(GameSetup gameSetup, BlobService blobService)
+    {
+        await gameSetup.RemoveGameFromPlayers(blobService);
+        await blobService.RemoveWithPrefix(Folders.Games, null, gameSetup.GameName);
+    }
+    public async Task RemoveGameFromPlayers(BlobService blobService)
+    {
+        List<BlobDescriptor> descriptors = [];
+
+        List<Nation> nations = await GatherNationsAsync(blobService);
+        List<string> playerNames = nations.Select(n => n.PlayerName).ToList();
+        playerNames.AddIfNotDuplicate(Creator);
+        foreach (string gm in Gamemasters) playerNames.AddIfNotDuplicate(gm);
+        foreach (string playerName in playerNames)
+        {
+            Player player = await Player.RetrieveAsync(playerName, blobService);
+            player.RemoveAllGames(GameName);
+            descriptors.Add(player.BlobDescriptor());
+        }
+        await blobService.SaveGroupAsync(descriptors);
+    }
+    public DistrictSetup? FindDistrict(string districtName)
+    {
+        return Districts.Find(d => d.Name == districtName);
+    }
+    public async Task<List<Nation>> GatherNationsAsync(BlobService blobService)
+    {
+        List<string> fileNames = await blobService.GetFileNamesWithPrefix(Nation.BlobPrefix(GameName));
+        List<string> fileErrors = [];
+        List<Nation> nations = [];
+        foreach (string fileName in fileNames)
+        {
+            try
+            {
+                Nation nation = await blobService.RetrieveAsync<Nation>(fileName);
+                nations.Add(nation);
+            }
+            catch { fileErrors.Add($"Error retrieving {fileName}."); }
+        }
+        if (fileErrors.Count > 0)
+        {
+            string message = $"Errors found in nation files for game '{GameName}': {string.Join("; ", fileErrors)}";
+            throw new AppException(ExceptionType.Blob, BlobFailType.FileContent, message);
+        }
+        return nations;
     }
     // public void Activate()
     // {
@@ -172,22 +214,16 @@ public partial class GameSetup
     // }
 
 
-    public District? FindDistrict(string name)
-    {
-        return Districts?.Find(d => d.Name == name);
-    }
+    // public DistrictSetup? FindDistrictSetup(string name)
+    // {
+    //     return DistrictSetups?.Find(d => d.Name == name);
+    // }
     public static async Task<bool> GameExists(string gameName, BlobService blobService)
     {
-        return await blobService.IsExisting(GameSetup.BlobPath(gameName));
+        return await blobService.IsExisting(BlobPath(gameName));
     }
 
-    public List<string> GatherAvailableHomes(List<Nation> nations)
-    {
-        List<string> available = Districts.Select(r => r.Name).ToList();
-        List<string> taken = nations.Where(l => l.HomeDistrict is not null).Select(l => l.HomeDistrict!).ToList();
-        foreach (string name in taken) available.Remove(name);
-        return available;
-    }
+
     // public async Task<List<Nation>> GatherNationsAsync(BlobService blobService)
     // {
     //     List<string> fileNames = await blobService.GetFileNamesWithPrefix(Nation.BlobPrefix(Name));
@@ -216,43 +252,8 @@ public partial class GameSetup
     //     }
     //     return nations;
     // }
-    public bool HasGamemasterAuthority(PlayerProfile player)
-    {
-        if (CreatorName == player.UserName) return true;
-        if (Gamemasters.Exists(g => g == player.UserName)) return true;
-        if (player.RoleLevel >= RoleLevel.Admin) return true;
-        return false;
-    }
-    public void ConfirmGamemasterAuthority(PlayerProfile player)
-    {
-        if (HasGamemasterAuthority(player) is false)
-            throw new AppException(ExceptionType.Auth, AuthFailType.UserNotAuthorized, player.UserName);
-    }
-    public void ConfirmGameVisibilityAuthority(PlayerProfile player, List<Nation> nations)
-    {
-        foreach (Nation nation in nations)
-        {
-            if (nation.PlayerName == player.UserName) return;
-        }
-        ConfirmGamemasterAuthority(player);
-    }
-    public int GetWaitingCount(List<Nation> nations)
-    {
-        //  if (nations.Count == 0) return null;
-        int count = 0;
-        foreach (Nation nation in nations)
-        {
-            if (GameState == GameState.Created)
-            {
-                if (nation.LineupState != LineupState.Accepted) count++;
-            }
-            if (GameState == GameState.Activated)
-            {
-                if (nation.OrdersState != OrdersState.OrdersSubmitted) count++;
-            }
-        }
-        return count;
-    }
+
+
 
     // public void AddFoodStatusNews(FoodStatus status)
     // {
@@ -268,45 +269,45 @@ public partial class GameSetup
     //     string statusString = $"{Util.GetEnumString<FoodStatus>(status)} in {string.Join(", ", districts)}";
     //     WorldNews?.AddTextEntry(statusString);
     // }
-    public static async Task Remove(string gameName, BlobService blobService)
-    {
-        Game game = await Game.RetrieveAsync(gameName, blobService);
-        await Remove(game, blobService);
-    }
-    public static async Task Remove(Game game, BlobService blobService)
-    {
-        List<Nation> nations = await game.GatherNationsAsync(blobService);
+    // public static async Task Remove(string gameName, BlobService blobService)
+    // {
+    //     Game game = await Game.RetrieveAsync(gameName, blobService);
+    //     await Remove(game, blobService);
+    // }
+    // public static async Task Remove(Game game, BlobService blobService)
+    // {
+    //     List<Nation> nations = await game.GatherNationsAsync(blobService);
 
-        List<BlobDescriptor> descriptors = [];
-        foreach (Nation nation in nations)
-        {
-            try
-            {
-                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(nation.PlayerName), blobService);
-                player.RemoveAllGames(game.Name);
-            }
-            catch { }
-        }
-        foreach (string playerName in game.Gamemasters)
-        {
-            try
-            {
-                Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(playerName), blobService);
-                player.RemoveAllGames(game.Name);
-            }
-            catch { }
-        }
-        try
-        {
-            Player creator = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(game.CreatorName), blobService);
-            creator.RemoveAllGames(game.Name);
-        }
-        catch { }
-        await blobService.SaveGroupAsync(descriptors);
-        await blobService.RemoveWithPrefix(Folders.Games, null, game.Name);
+    //     List<BlobDescriptor> descriptors = [];
+    //     foreach (Nation nation in nations)
+    //     {
+    //         try
+    //         {
+    //             Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(nation.PlayerName), blobService);
+    //             player.RemoveAllGames(game.Name);
+    //         }
+    //         catch { }
+    //     }
+    //     foreach (string playerName in game.Gamemasters)
+    //     {
+    //         try
+    //         {
+    //             Player player = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(playerName), blobService);
+    //             player.RemoveAllGames(game.Name);
+    //         }
+    //         catch { }
+    //     }
+    //     try
+    //     {
+    //         Player creator = await descriptors.RetrieveIfNotFoundAsync<Player>(Player.BlobPath(game.CreatorName), blobService);
+    //         creator.RemoveAllGames(game.Name);
+    //     }
+    //     catch { }
+    //     await blobService.SaveGroupAsync(descriptors);
+    //     await blobService.RemoveWithPrefix(Folders.Games, null, game.Name);
 
-    }
 }
+
 // public static class GameExtensions
 // {
 //     public static List<District> OwnedBy(this List<District> source, int? nationCode)

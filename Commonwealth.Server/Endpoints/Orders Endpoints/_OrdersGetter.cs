@@ -1,8 +1,4 @@
-
-using System.Diagnostics.CodeAnalysis;
-using System.Net.NetworkInformation;
 using Commonwealth.Server.Data;
-using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.MgrFactory;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.EndpointDTOs;
@@ -13,38 +9,17 @@ public static partial class OrdersEndpoints
 {
     public static async Task GetOrdersAsync(Nation nation, BlobService blobService, OrdersResponse response)
     {
-        Game game = await Game.RetrieveAsync(nation.Identity.GameName, blobService);
-        ConfirmSameSeason();
-        List<Nation> nations = await game.GatherNationsAsync(blobService);
-        //   List<Village> allVillages = GatherVillages(nations);
+        string gameName = nation.Identity.GameName;
         int nationCode = nation.Identity.NationCode;
-        List<District> ownedDistricts = game.Districts.OwnedBy(nationCode);
-        response.MgrPackage = MgrPackageFactory.Create(game, nation, nations, ownedDistricts);
-        response.InfoPackage = InfoPackageFactory.Create(game, nation, nations, response.MgrPackage);
+        VGame vGame = await VGame.Load(gameName, blobService);
+        nation.ConfirmSameSeason(vGame);
+        List<Nation> nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
+        List<Village> villages = nations.GatherVillages();
+        List<VDistrict> ownedDistricts = vGame.GatherOwnedDistricts(nationCode);
 
-        // response.GameName = game.Name;
-        // response.GameDate = game.GameDate;
-        // response.MarketPrices = GatherMarketPrices();
-        // response.NationNamings = nations.AssembleNationNamings();
-        // response.WorldNews = game.WorldNews;
-        // response.GameNews = game.GameNews;
-        // response.EconParms = game.EconParms;
-        // response.NationMgr = new NationMgr(nation);
-        // response.VillageMgrs = nation.AssembleVillageMgrs();
-        // //   response.ForeignVillageMgrs = nation.AssembleForeignVillageMgrs(allVillages, ownedDistricts);
-        // response.TradeMgrs = nation.AssembleTradeMgrs();
-        // response.SpyMgrs = nation.AssembleSpyMgrs();
-        // response.DistrictMgrs = ownedDistricts.AssembleDistrictMgrs(allVillages);
-        // response.ExpansionDistrictMgrs = nation.AssembleExpansionDistrictMgrs(game.Districts);
-        // response.ExpansionTargets = GatherConnections();
-        // response.OrdersState = nation.OrdersState;
+        response.MgrPackage = MgrPackageFactory.Create(vGame, nation, ownedDistricts, villages);
+        response.InfoPackage = InfoPackageFactory.Create(vGame, ownedDistricts, nations, nationCode, response.MgrPackage);
 
-        void ConfirmSameSeason()
-        {
-            if ((game.GameDate?.IsSame(nation.SeasonCount) ?? false) == false)
-                throw new AppException(ExceptionType.Endpoint, EndpointFailType.SeasonUpdated, $"{nation.Naming.Name}");
-
-        }
         // List<MarketPrice> GatherMarketPrices()
         // {
         //     List<MarketPrice> data = [];

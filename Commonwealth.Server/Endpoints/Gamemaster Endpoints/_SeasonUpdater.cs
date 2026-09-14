@@ -15,35 +15,37 @@ public static partial class GamemasterEndpoints
         BlobService blobService,
         ResponseBase response)
     {
-        Game game = await Game.RetrieveAsync(gameName, blobService);
-        game.ConfirmGamemasterAuthority(requestor);
+        VGame vGame = await VGame.Load(gameName, blobService);
+        vGame.ConfirmGamemasterAuthority(requestor);
+        GameStatus gameStatus = vGame.ExtractGameStatus();
         List<Nation> nations;
-        if (useHistory is true && game.GameDate?.SeasonCount >= 1)
+        if (useHistory is true && vGame.GameDate?.SeasonCount >= 1)
         {
-            History history = await History.RetrieveAsync(gameName, game.GameDate.SeasonCount - 1, blobService);
-            game = history.Game;
+            History history = await History.RetrieveAsync(gameName, vGame.GameDate.SeasonCount - 1, blobService);
+            GameSetup gameSetup = await GameSetup.RetrieveAsync(vGame.GameName, blobService);
+            vGame = new VGame(gameSetup, history.GameStatus);
             nations = history.Nations;
         }
         else
         {
-            nations = await game.GatherNationsAsync(blobService);
+            nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
             await SaveHistory();
         }
 
-        ServerEconomicMgr econUpdater = new(game, nations);
+        ServerEconomicMgr econUpdater = new(vGame, nations);
         econUpdater.DetermineResults();
         econUpdater.Immigration();
         econUpdater.UpdateForNextSeason();
 
         List<BlobDescriptor> descriptors = [];
-        descriptors.Add(game.BlobDescriptor());
+        descriptors.Add(gameStatus.BlobDescriptor());
         foreach (Nation nation in nations) descriptors.Add(nation.BlobDescriptor());
         await blobService.SaveGroupAsync(descriptors);
-        response.AddMessage($"{game.Name} has been updated for {game.GameDate}");
+        response.AddMessage($"{vGame.GameName} has been updated for {vGame.GameDate}");
 
         async Task SaveHistory()
         {
-            History history = new History(game, nations);
+            History history = new History(gameStatus, nations);
             await history.SaveAsync(blobService);
         }
     }

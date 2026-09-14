@@ -17,7 +17,7 @@ public partial class ServerEconomicMgr
             List<Movement> Movements = [];
             foreach (DistrictMgr mgr in AllDistrictMgrs)
             {
-                District? district = Game.Districts.FindDistrict(mgr.Name);
+                VDistrict? district = VGame.FindDistrict(mgr.Name);
                 if (district is null) continue;
                 foreach (string destination in district.Connections)
                 {
@@ -26,7 +26,7 @@ public partial class ServerEconomicMgr
                     double delta = target.FoodMetrics?.SeasonsOfFood ?? 0 - mgr.FoodMetrics?.SeasonsOfFood ?? 0;
                     if (delta <= 0) continue;
                     int amount = (int)Math.Floor(delta * EconParms.ImmigrationFactor);
-                    District? targetDistrict = Game.Districts.FindDistrict(target.Name);
+                    VDistrict? targetDistrict = VGame.FindDistrict(target.Name);
                     if (targetDistrict is null) continue;
                     Movements.Add(new Movement(mgr, target, amount));
                 }

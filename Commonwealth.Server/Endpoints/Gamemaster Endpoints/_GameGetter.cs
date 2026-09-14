@@ -12,14 +12,14 @@ public static partial class GamemasterEndpoints
 {
 
     public static async Task GetGameResponseAsync(string gameName, PlayerProfile requestor,
-            BlobService blobService, IdentityService identityService, GamemasterResponse response)
+            BlobService blobService, GamemasterResponse response)
     {
-        Game game = await Game.RetrieveAsync(gameName, blobService);
-        List<Nation> nations = await game.GatherNationsAsync(blobService);
-        game.ConfirmGameVisibilityAuthority(requestor, nations);
-        response.GameDTO = await game.CreateGameDTOAsync(identityService);
+        GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+        List<Nation> nations = await gameSetup.GatherNationsAsync(blobService);
+        gameSetup.ConfirmGameVisibilityAuthority(requestor, nations);
+        response.GameDTO = await gameSetup.CreateGameDTOAsync();
         response.LineupDTOs = await CreateLineupDTOAsync();
-        response.IsGamemaster = game.HasGamemasterAuthority(requestor);
+        response.IsGamemaster = gameSetup.HasGamemasterAuthority(requestor);
         if (response.IsGamemaster is true)
         {
             Player player = await Player.RetrieveAsync(requestor.UserName, blobService);

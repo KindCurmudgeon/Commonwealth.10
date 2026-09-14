@@ -4,7 +4,7 @@ using Commonwealth.Shared.EconomicMgrs;
 
 namespace Commonwealth.Server.MgrFactory;
 
-public static class VillageMgrHelpers
+public static class VillageMgrFactory
 {
      public static List<VillageMgr> AssembleVillageMgrs(this List<Nation> nations)
      {

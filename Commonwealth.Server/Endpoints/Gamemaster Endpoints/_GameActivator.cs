@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Commonwealth.Server.Data;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Parameters;
@@ -18,33 +19,39 @@ public static partial class GamemasterEndpoints
         ResponseBase response
     )
     {
-        Game game = await Game.RetrieveAsync(gameName, blobService);
-        game.ConfirmGamemasterAuthority(requestor);
+        GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+        gameSetup.ConfirmGamemasterAuthority(requestor);
 
-        List<Nation> nations = await game.GatherNationsAsync(blobService);
-        NamingFile namingFile = await NamingFile.RetrieveAsync("test", blobService);
-        InitParms initParms = new InitParms((game.InitFileInfo is null) ? null :
-            await InitParmsFile.RetrieveAsync(game.InitFileInfo, blobService));
+        //   GameStatus gameStatus = await GameStatus.RetrieveAsync(gameName, blobService);
+
+        List<Nation> nations = await gameSetup.GatherNationsAsync(blobService);
+        InitParms initParms = new InitParms((gameSetup.InitFileInfo is null) ? null :
+            await InitParmsFile.RetrieveAsync(gameSetup.InitFileInfo, blobService));
+        GameStatus gameStatus = GameStatus.Create(gameSetup, nations, initParms);
+        VGame vGame = new VGame(gameSetup, gameStatus);
 
         AssignNations();
-        FinalizeNationNaming();
-        game.Activate();
-        ActivateDistricts();  // Must Follow AssignNations
+        await FinalizeNationNamingAsync();
         ActivateNations();
-        ServerEconomicMgr econUpdater = new(game, nations);
+
+        ServerEconomicMgr econUpdater = new(vGame, nations);
         econUpdater.DetermineResults();
         econUpdater.UpdateForNextSeason();
 
+        vGame.Activate();
+        gameSetup = vGame.ExtractGameSetup();
+        gameStatus = vGame.ExtractGameStatus();
         List<BlobDescriptor> descriptors = [];
-        descriptors.Add(game.BlobDescriptor());
+        descriptors.Add(gameSetup.BlobDescriptor());
+        descriptors.Add(gameStatus.BlobDescriptor());
         foreach (Nation nation in nations) descriptors.Add(nation.BlobDescriptor());
         await blobService.SaveGroupAsync(descriptors);
 
         void AssignNations()
         {
-            List<string> availableHomes = game.GatherAvailableHomes(nations);
+            List<string> availableHomes = vGame.GatherAvailableHomes(nations);
 
-            if (game.HasPrescribedNationAssignments is false) Util.Shuffle(availableHomes);
+            if (vGame.HasPrescribedNationAssignments is false) Util.Shuffle(availableHomes);
             foreach (Nation nation in nations)
             {
                 if (nation.HomeDistrict is null)
@@ -54,11 +61,12 @@ public static partial class GamemasterEndpoints
                 }
             }
         }
-        void FinalizeNationNaming()
+        async Task FinalizeNationNamingAsync()
         {
+            NamingFile namingFile = await NamingFile.RetrieveAsync("test", blobService);
             List<NationNameOption> names = namingFile.NationNames;
             RemoveUsedNames();
-            if (game.HasPrescribedNationAssignments is false) Util.Shuffle(names);
+            if (vGame.HasPrescribedNationAssignments is false) Util.Shuffle(names);
             foreach (Nation nation in nations)
             {
                 if (nation.Naming.IsNamed()) continue;
@@ -84,14 +92,14 @@ public static partial class GamemasterEndpoints
 
             }
         }
-        void ActivateDistricts()
-        {
-            foreach (District district in game.Districts)
-            {
-                Nation? owningNation = nations.Find(n => n.HomeDistrict == district.Name);
-                district.Activate(owningNation?.Identity.NationCode ?? 0);
-            }
-        }
+        // void CreateDistrictStatuses()
+        // {
+        //     foreach (DistrictStatus district in game.Districts)
+        //     {
+        //         Nation? owningNation = nations.Find(n => n.HomeDistrict == district.Name);
+        //         district.Activate(owningNation?.Identity.NationCode ?? 0);
+        //     }
+        // }
         // void CreateDistrictReports()
         // {
         //     List<NationNaming> namings = NationNaming.GatherNationNamings(nations);
@@ -107,7 +115,7 @@ public static partial class GamemasterEndpoints
         {
             foreach (Nation nation in nations)
             {
-                nation.Activate(game, initParms);
+                nation.Activate(initParms);
             }
         }
         // void CreateNationReports()

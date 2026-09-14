@@ -14,7 +14,6 @@ public partial class Player : IBlobObject
     {
     }
 
-    public static string AllUsersPrefix() { return BlobService.CreateBlobPrefix(Folders.Players, null, null); }
 
     public Task SaveAsync(BlobService blobService)
     {

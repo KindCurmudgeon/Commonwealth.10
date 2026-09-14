@@ -49,8 +49,8 @@ public static class AdminActionEndpoint
                 string? prefix = null;
                 switch (listType)
                 {
-                    case FileTypes.Player: prefix = Player.AllUsersPrefix(); break;
-                    case FileTypes.Game: prefix = Game.AllGamesBlobPrefix(); break;
+                    case FileTypes.Player: prefix = Folders.AllPlayersPrefix(); break;
+                    case FileTypes.Game: prefix = Folders.AllGamesBlobPrefix(); break;
                     case FileTypes.Parm: prefix = ParmsBlobPath(); break;
                     case FileTypes.AllFiles: prefix = ""; break;
                     default: return false;
@@ -85,8 +85,8 @@ public static class AdminActionEndpoint
             {
                 if (gameFileName is null) return;
                 string gameName = Path.GetFileNameWithoutExtension(gameFileName);
-                Game game = await Game.RetrieveAsync(gameName, blobService);
-                List<Nation> nations = await game.GatherNationsAsync(blobService);
+                VGame vGame = await VGame.Load(gameName, blobService);
+                List<Nation> nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
                 //     response.Object = await blobService.RetrieveAsync<User>(userFileName);
             }
             async Task RemoveGameFromUser(string? userFileName)
@@ -192,7 +192,7 @@ public static class AdminActionEndpoint
             // }
             async Task GetGames()
             {
-                string prefix = Game.AllGamesBlobPrefix();
+                string prefix = Folders.AllGamesBlobPrefix();
                 List<string> gamefiles = await blobService.GetFileNamesWithPrefix(prefix);
                 foreach (string gamefile in gamefiles)
                 {
@@ -203,9 +203,11 @@ public static class AdminActionEndpoint
                 }
             }
             async Task RemoveGame(string? gameName)
+
             {
                 if (gameName is null) return;
-                await Game.Remove(gameName, blobService);
+                GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+                await GameSetup.Remove(gameSetup, blobService);
                 response.AddMessage($"Game '{gameName}' removed!");
             }
         });

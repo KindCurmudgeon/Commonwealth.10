@@ -31,10 +31,10 @@ public partial class Nation : IBlobObject
   [JsonConstructor] public Nation() { }
 
   [SetsRequiredMembers]
-  public Nation(Game game, int nationCode, string playerName)
+  public Nation(string gameName, int nationCode, string playerName)
   {
     Id = Guid.NewGuid();
-    Identity = new NationIdentity(game.Name, nationCode);
+    Identity = new NationIdentity(gameName, nationCode);
     PlayerName = playerName;
     SeasonCount = -1;
     Naming = new NationNaming() { NationCode = nationCode };

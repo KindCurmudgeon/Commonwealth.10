@@ -7,20 +7,20 @@ namespace Commonwealth.Server.Endpoints;
 
 public static partial class NationEndpoints
 {
-    public static async Task ProcessGet(Nation nation, Game game, BlobService blobService, NationResponse response)
+    public static async Task ProcessGet(Nation nation, VGame vGame, BlobService blobService, NationResponse response)
     {
         response.Identity = new NationIdentity(nation.Identity.GameName, nation.Identity.NationCode);
         response.Naming = nation.Naming;
         response.HomeDistrict = nation.HomeDistrict;
-        response.IsGameActivated = game.GameState == GameState.Activated;
+        response.IsGameActivated = vGame.GameState == GameState.Activated;
         response.AvailableHomes = await GatherHomeDistrictOptions();
 
         async Task<List<string>> GatherHomeDistrictOptions()
         {
             List<string> availHomes = [];
             if (nation.HomeDistrict is not null) availHomes.Add(nation.HomeDistrict);
-            List<Nation> allNations = await game.GatherNationsAsync(blobService);
-            availHomes.AddRange(game.GatherAvailableHomes(allNations));
+            List<Nation> allNations = await vGame.GatherNationsConfirmDatesAsync(blobService);
+            availHomes.AddRange(vGame.GatherAvailableHomes(allNations));
             return availHomes;
         }
 

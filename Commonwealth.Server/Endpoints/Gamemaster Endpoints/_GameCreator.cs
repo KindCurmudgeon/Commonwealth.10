@@ -18,7 +18,7 @@ public static partial class GamemasterEndpoints
         bool confirm = Util.IsLegalWindowsFilename(gameDTO.GameName);
         if (confirm is false) throw new AppException(ExceptionType.Endpoint, EndpointFailType.Invalid, "Illegal GameName");
         string? gameName = Util.TitleCase(gameDTO.GameName);
-        if (await Game.GameExists(gameName, blobService)) gameName = await FindUnique(gameName, blobService);
+        if (await GameSetup.GameExists(gameName, blobService)) gameName = await FindUnique(gameName, blobService);
         if (gameName is null)
         {
             throw new AppException(ExceptionType.Endpoint, EndpointFailType.NameExists, gameName);
@@ -30,33 +30,19 @@ public static partial class GamemasterEndpoints
         // use EconParmsFile if provided, otherwise load default EconParms    
         EconParms econParms = EconParmsHelpers.LoadEconParms(null);
 
-
         GeographyFile geogParmsFile = await GeographyFile.RetrieveAsync(gameDTO.GeogFileInfo, blobService);
 
-        Game game = Game.Create(gameDTO, creator, econParms, geogParmsFile, initParms);
-
-        // TestGame testGame = new TestGame(game);
-        //             string test = JsonSerializer.Serialize(testGame);
-        //             try {
-        //                 TestGame? DeSerialized  = JsonSerializer.Deserialize<TestGame>(test);
-        //             }
-        //             catch(Exception ex)
-        //             {
-        //               string msg = ex.Message;   
-        //             }
+        GameSetup gameSetup = GameSetup.Create(gameDTO, creator, econParms, geogParmsFile, initParms);
         Player creatorPlayer = await Player.RetrieveAsync(creator.UserName, blobService);
-        creatorPlayer.NationIdentities.Add(new NationIdentity(game.Name, -1)); // -1 => Creator
+        creatorPlayer.NationIdentities.Add(new NationIdentity(gameSetup.GameName, -1)); // -1 => Creator
         List<BlobDescriptor> descriptors = [];
-        descriptors.Add(game.BlobDescriptor());
-        //   descriptors.Add(gameParms.BlobDescriptor());
+        descriptors.Add(gameSetup.BlobDescriptor());
         descriptors.Add(creatorPlayer.BlobDescriptor());
 
-        await HandleAnyAddedNationsAsync(game, lineupDTOs, descriptors, blobService, identityService,response);
+        await HandleAnyAddedNationsAsync(gameSetup, lineupDTOs, descriptors, blobService, identityService, response);
         bool result = await blobService.SaveGroupAsync(descriptors);
-        if (result is true) response.AddMessage($"Game '{game.Name}' created!");
-        else response.AddError($"Trouble creating {game.Name}!");
-
-
+        if (result is true) response.AddMessage($"Game '{gameSetup.GameName}' created!");
+        else response.AddError($"Trouble creating {gameSetup.GameName}!");
     }
 
     public static class Defaults
@@ -70,7 +56,7 @@ public static partial class GamemasterEndpoints
     {
         if (++attempt >= 6) return null;
         string? newName = AppendNumber(name);
-        if (await Game.GameExists(newName, blobService) is true)
+        if (await GameSetup.GameExists(newName, blobService) is true)
             return await FindUnique(newName, blobService, attempt);
         else return newName;
 
