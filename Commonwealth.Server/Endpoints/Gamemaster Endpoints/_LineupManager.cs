@@ -8,7 +8,12 @@ namespace Commonwealth.Server.Endpoints;
 
 public static partial class GamemasterEndpoints
 {
-    public static async Task HandlePlayerChanges(GameSetup gameSetup, List<LineupDTO>? lineupDTOs, List<BlobDescriptor> descriptors, BlobService blobService)
+    public static async Task HandlePlayerChanges(
+        GameSetup setup,
+        GameStatus? status,
+        List<LineupDTO>? lineupDTOs,
+        List<BlobDescriptor> descriptors,
+        BlobService blobService)
     {
         if (lineupDTOs is null) return;
         foreach (LineupDTO dto in lineupDTOs.Where(r => r.OrdersState == OrdersState.Replaced))
@@ -38,6 +43,7 @@ public static partial class GamemasterEndpoints
 
     public static async Task HandleAnyAddedNationsAsync(
         GameSetup gameSetup,
+        GameStatus? gameStatus,
         List<LineupDTO>? lineupDTOs,
         List<BlobDescriptor> descriptors,
         BlobService blobService,
@@ -55,8 +61,7 @@ public static partial class GamemasterEndpoints
             descriptors.Add(nation.BlobDescriptor());
             if (gameSetup.GameState == GameState.Activated)
             {
-                //       gameSetup.WorldNews?.AddTextEntry($"Nation '{nation.Naming?.Name}' mangaged by '{nation.PlayerName}' has joined the game.");
-                descriptors.AddIfNotDuplicate(gameSetup.BlobDescriptor());
+                gameStatus?.WorldNews?.AddTextEntry($"Nation '{nation.Naming?.Name}' mangaged by '{nation.PlayerName}' has joined the game.");
             }
         }
 

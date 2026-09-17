@@ -12,7 +12,7 @@ public static partial class GamemasterEndpoints
     public static void GamemasterEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/", async (
-            GamemasterRequest request,
+            GamemasterRequest request, IConfiguration configuration,
             BlobService blobService, IdentityService identityService) =>
         {
             GamemasterResponse response = new();
@@ -30,7 +30,8 @@ public static partial class GamemasterEndpoints
                         await UpdateAsync(request.GameDTO!, request.LineupDTOs, requestor, blobService, identityService, response);
                         break;
                     case GM_RequestType.Activate:
-                        await ActivateAsync(request.GameName!, requestor, blobService, response);
+                    bool prescribedNations = configuration["GameDevelopment:PrescribedNationAssignment"] == "true";
+                        await ActivateAsync(request.GameName!, requestor, prescribedNations, blobService, response);
                         break;
                     case GM_RequestType.SeasonUpdate:
                         await SeasonUpdateAsync(request.GameName!, requestor, request.UseHistory, blobService, response);
@@ -51,6 +52,10 @@ public static partial class GamemasterEndpoints
                 switch (request.RequestType)
                 {
                     case GM_RequestType.Create:
+                        if (request.GameDTO is null) throw new AppException(ExceptionType.Endpoint, EndpointFailType.MissingData, "Game DTO is missing");
+                        bool confirm = Util.IsLegalWindowsFilename(request.GameDTO?.GameName);
+                        if (confirm is false) throw new AppException(ExceptionType.Endpoint, EndpointFailType.Invalid, "Illegal GameName");
+                        break;
                     case GM_RequestType.Update:
                         if (request.GameDTO is null) throw new AppException(ExceptionType.Endpoint, EndpointFailType.MissingData, "Game DTO is missing");
                         break;

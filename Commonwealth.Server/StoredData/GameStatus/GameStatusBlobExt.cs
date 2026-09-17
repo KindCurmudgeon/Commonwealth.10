@@ -5,9 +5,9 @@ namespace Commonwealth.Server.Data;
 public partial class GameStatus : IBlobObject
 {
     private static string FullFileName(string gameName) { return gameName.ToLower() + BlobNaming.GameStatusSuffix + BlobNaming.Json; }
-    private string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(GameName)); }
+    private string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, GameName, FullFileName(GameName)); }
     public BlobDescriptor BlobDescriptor() { return new BlobDescriptor(BlobPath(), this); }
-    private static string BlobPath(string gameName) { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(gameName)); }
+    private static string BlobPath(string gameName) { return BlobService.CreateBlobPath(Folders.Games, gameName, FullFileName(gameName)); }
     public static string AllGameFilesBlobPrefix(string gameName) { return BlobService.CreateBlobPrefix(Folders.Games, null, gameName); }
     public static string AllGamesBlobPrefix() { return BlobService.CreateBlobPrefix(Folders.Games, null, null); }
     public void Validate() { }

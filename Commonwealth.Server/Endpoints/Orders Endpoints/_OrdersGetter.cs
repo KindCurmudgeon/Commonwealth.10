@@ -11,14 +11,17 @@ public static partial class OrdersEndpoints
     {
         string gameName = nation.Identity.GameName;
         int nationCode = nation.Identity.NationCode;
-        VGame vGame = await VGame.Load(gameName, blobService);
-        nation.ConfirmSameSeason(vGame);
-        List<Nation> nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
+        GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+        GameStatus gameStatus = await GameStatus.RetrieveAsync(gameName, blobService);
+        gameStatus.ConfirmSameSeason(nation);
+        List<Nation> nations = await gameStatus.GatherNationsConfirmDatesAsync(blobService);
         List<Village> villages = nations.GatherVillages();
-        List<VDistrict> ownedDistricts = vGame.GatherOwnedDistricts(nationCode);
+        WorldStatus worldStatus = await WorldStatus.RetrieveAsync(gameName,blobService);
+        WorldSetup worldSetup = await WorldSetup.RetrieveAsync(gameName, blobService);
+        List<DistrictStatus> ownedDistricts =  worldStatus.GetOwnedDistricts(nationCode);
 
-        response.MgrPackage = MgrPackageFactory.Create(vGame, nation, ownedDistricts, villages);
-        response.InfoPackage = InfoPackageFactory.Create(vGame, ownedDistricts, nations, nationCode, response.MgrPackage);
+        response.MgrPackage = MgrPackageFactory.Create(nation, ownedDistricts, villages, worldSetup);
+        response.InfoPackage = InfoPackageFactory.Create(gameSetup, gameStatus, ownedDistricts, worldSetup, nations, nationCode, response.MgrPackage);
 
         // List<MarketPrice> GatherMarketPrices()
         // {

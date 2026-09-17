@@ -7,13 +7,13 @@ namespace Commonwealth.Server.MgrFactory;
 
 public static class MgrPackageFactory
 {
-     public static MgrPackage Create(VGame vGame, Nation nation, List<VDistrict> ownedDistricts, List<Village> villages)
+     public static MgrPackage Create(Nation nation, List<DistrictStatus> ownedDistricts, List<Village> villages, WorldSetup worldSetup)
      {
           return new MgrPackage()
           {
                NationMgr = nation.CreateMgr(),
                VillageMgrs = nation.AssembleVillageMgrs(),
-               DistrictMgrs = ownedDistricts.AssembleDistrictMgrs(villages),
+               DistrictMgrs = ownedDistricts.AssembleDistrictMgrs(worldSetup, villages),
                ExpansionDistrictMgrs = ownedDistricts.AssembleExpansionDistrictMgrs(villages, nation.Trades),
                SpyMgrs = nation.AssembleSpyMgrs(),
                TradeMgrs = nation.AssembleTradeMgrs(),

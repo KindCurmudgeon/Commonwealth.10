@@ -6,42 +6,42 @@ namespace Commonwealth.Server.Endpoints;
 
 public static class DistrictMgrFactory
 {
-     public static List<DistrictMgr> AssembleDistrictMgrs(this List<VDistrict> source, List<Village> villages)
+     public static List<DistrictMgr> AssembleDistrictMgrs(this List<DistrictStatus> source, WorldSetup worldSetup , List<Village> villages)
      {
           List<DistrictMgr> districtMgrs = [];
-          foreach (VDistrict vDistrict in source)
+          foreach (DistrictStatus status in source)
           {
-               string districtName = vDistrict.Name;
-               int foreignVillageCount = villages.Here(districtName).NotOwnedBy(vDistrict.Owner).Count;
+               string districtName = status.Name;
+               int foreignVillageCount = villages.Here(districtName).NotOwnedBy(status.Owner).Count;
                DistrictMgr mgr = new DistrictMgr()
                {
-                    Name = vDistrict.Name,
-                    Owner = vDistrict.Owner,
-                    Population = vDistrict.Population,
-                    AllowedVillages =vDistrict.AllowedVillages,
-                    FoodMetrics = vDistrict.FoodMetrics,
+                    Name = status.Name,
+                    Owner = status.Owner,
+                    Population = status.Population,
+                    AllowedVillages = worldSetup.GetDistrict(districtName).AllowedVillages,
+                    FoodMetrics = status.FoodMetrics,
                     ForeignVillageCount = foreignVillageCount,
-                    LastSeasonGoodsReport = vDistrict.LastSeasonGoodsReport,
-                    LastSeasonVillageReport = vDistrict.LastSeasonVillageReport
+                    LastSeasonGoodsReport = status.LastSeasonGoodsReport,
+                    LastSeasonVillageReport = status.LastSeasonVillageReport
                };
                districtMgrs.Add(mgr);
           }
           return districtMgrs;
      }
-     public static List<DistrictMgr> AssembleExpansionDistrictMgrs(this List<VDistrict> sources, List<Village>? villages, List<Trade>? trades)
+     public static List<DistrictMgr> AssembleExpansionDistrictMgrs(this List<DistrictStatus> sources, List<Village>? villages, List<Trade>? trades)
      //     List<DistrictStatus> districtStatus,
      //     List<Village>? allVillages,
      //     int nationCode,
      //     List<Trade>? trades)
      {
           List<DistrictMgr> expansionDistrictMgrs = [];
-          foreach (VDistrict vDistrict in sources)
+          foreach (DistrictStatus status in sources)
           {
-               if (AnyInterestsHere(vDistrict.Name))
+               if (AnyInterestsHere(status.Name))
                {
                     DistrictMgr districtMgr = new DistrictMgr()
                     {
-                         Name = vDistrict.Name
+                         Name = status.Name
                     };
                     expansionDistrictMgrs.Add(districtMgr);
                }

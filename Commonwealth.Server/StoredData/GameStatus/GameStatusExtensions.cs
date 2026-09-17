@@ -10,12 +10,13 @@ namespace Commonwealth.Server.Data;
 
 public partial class GameStatus
 {
-    public static GameStatus Create(GameSetup gameSetup, List<Nation> nations, InitParms initParms)
+    public static GameStatus Create(GameSetup gameSetup, WorldSetup worldSetup, InitParms initParms)
     {
         GameStatus gameStatus = new GameStatus()
         {
             Id = gameSetup.Id,
             GameName = gameSetup.GameName,
+            GameState = GameState.Created,
             GameDate = new GameDate(Util.GetRandomInclusive(initParms.InitialYearsStat ?? new Stat(600, 1300))),
             WorldNews = new Report("World News - Last Season"),
             GameNews = new Report("Game News - Last Season")
@@ -32,10 +33,10 @@ public partial class GameStatus
         {
             gameStatus.DistrictStatuses = [];
             List<DistrictStatus> stati = gameStatus.DistrictStatuses;
-            foreach (DistrictSetup setup in gameSetup.Districts)
+            foreach (DistrictSetup setup in worldSetup.Districts)
             {
-                int owner = nations.Find(n => n.HomeDistrict == setup.Name)?.Naming.NationCode ?? 0;
-                stati.Add(new DistrictStatus(setup, owner, initParms));
+                //        int owner = nations.Find(n => n.HomeDistrict == setup.Name)?.Naming.NationCode ?? 0;
+                stati.Add(new DistrictStatus(setup, initParms));
             }
         }
         // List<District> CreateDistricts()
@@ -127,7 +128,13 @@ public partial class GameStatus
             gameStatus.GameNews?.AddTextEntry($"Created: {gameSetup.CreationDate: yyyy.MM.dd HH:mm} GMT.");
             gameStatus.GameNews?.AddTextEntry($"Activated: {gameSetup.ActivationDate: YYYY.MM.dd HH:mm} GMT.");
         }
+
     }
+         public void ConfirmSameSeason(Nation nation)
+     {
+          if ((GameDate?.IsSame(nation.SeasonCount) ?? false) == false)
+               throw new AppException(ExceptionType.Endpoint, EndpointFailType.SeasonUpdated, $"{nation.Naming.Name}");
+     }
     // public void Activate(GameSetup gameSetup)
     // {
     //     gameSetup.GameState = GameState.Activated;
@@ -138,7 +145,7 @@ public partial class GameStatus
     //     GameNews?.AddTextEntry($"Orders Due: {OrdersDueDate:yyyy.MM.dd HH:mm} GMT");
     // }
 
- 
+
 
 
     // public District? FindDistrict(string name)
@@ -205,13 +212,51 @@ public partial class GameStatus
     //     }
     //     ConfirmGamemasterAuthority(player);
     // }
-    public int GetWaitingCount(List<Nation> nations, GameSetup gameSetup)
+    
+    //      public static void ConfirmSameSeason(this Nation nation, VGame vGame)
+//      {
+//           if ((vGame.GameDate?.IsSame(nation.SeasonCount) ?? false) == false)
+//                throw new AppException(ExceptionType.Endpoint, EndpointFailType.SeasonUpdated, $"{nation.Naming.Name}");
+//      }
+    public async Task<List<Nation>> GatherNationsConfirmDatesAsync(BlobService blobService)
+     {
+          List<string> fileNames = await blobService.GetFileNamesWithPrefix(Nation.BlobPrefix(GameName));
+          List<string> fileErrors = [];
+          List<Nation> nations = [];
+          foreach (string fileName in fileNames)
+          {
+               try
+               {
+                    Nation nation = await blobService.RetrieveAsync<Nation>(fileName);
+                    nations.Add(nation);
+               }
+               catch { fileErrors.Add($"Error retrieving {fileName}."); }
+
+               foreach (Nation nation in nations)
+               {
+                    if (this.GetType().GetProperty("GameDate") != null)
+                    {
+                         if (GameDate.IsSame(nation.SeasonCount) == false)
+                         {
+                              fileErrors.Add($"GameDate mismatch for {nation.Naming.Name}");
+                         }
+                    }
+               }
+          }
+          if (fileErrors.Count > 0)
+          {
+               string message = $"Errors found in nation files for game '{GameName}': {string.Join("; ", fileErrors)}";
+               throw new AppException(ExceptionType.Blob, BlobFailType.FileContent, message);
+          }
+          return nations;
+     }
+    public int GetWaitingCount(List<Nation> nations, GameState gameState)
     {
         //  if (nations.Count == 0) return null;
         int count = 0;
         foreach (Nation nation in nations)
         {
-            switch (gameSetup.GameState)
+            switch (gameState)
             {
                 case GameState.Created:
                     if (nation.LineupState != LineupState.Accepted) count++;
@@ -276,6 +321,39 @@ public partial class GameStatus
     //     await blobService.RemoveWithPrefix(Folders.Games, null, game.Name);
 
     // }
+    public void SeasonUpdate(List<String> worldNewsItems, GameSetup gameSetup, WorldStatus worldStatus)
+    {
+        OrdersDueDate = DateTime.UtcNow.Add(gameSetup.OrdersPeriod);
+        WorldReports();
+        GameReports();
+
+        void WorldReports()
+        {
+            WorldNews = new Report($"World News - Last Season");
+            WorldNews.AddTextEntry(AddFoodStatusNews(FoodStatus.FAMINE));
+            WorldNews.AddTextEntry(AddFoodStatusNews(FoodStatus.RATIONING));
+            WorldNews.AddTitledList("Other News", worldNewsItems);
+
+            string? AddFoodStatusNews(FoodStatus foodStatus)
+            {
+                List<string> districts = [];
+                foreach (DistrictStatus status in worldStatus.Districts)
+                {
+                    if (status.FoodMetrics?.FoodStatus == foodStatus)
+                    {
+                        districts.Add(status.Name);
+                    }
+                }
+                if (districts.Count == 0) return null;
+                return $"{Util.GetEnumString<FoodStatus>(foodStatus)} in {string.Join(", ", districts)}";
+            }
+        }
+        void GameReports()
+        {
+            GameNews = new Report($"Game News");
+            GameNews?.AddTextEntry($"Orders Due: {OrdersDueDate:yyyy.MM.dd HH:mm} GMT");
+        }
+    }
 }
 public static class GameStatusExtensions
 {
@@ -305,10 +383,11 @@ public partial class GameDate
         SeasonCount = -1;
         Year = year;
     }
-    public void SeasonUpdate()
+    public int SeasonUpdate()
     {
         SeasonCount++;
         Year++;
+        return SeasonCount;
     }
 
     public bool IsSame(int? otherSeasonCount)

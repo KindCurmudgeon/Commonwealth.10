@@ -4,21 +4,25 @@ using Commonwealth.Shared.EndpointDTOs;
 
 
 namespace Commonwealth.Server.Data;
+
 public partial class Nation : IBlobObject
 {
     private static string FullFileName(NationIdentity identity)
     {
         return identity.GameName + BlobNaming.NationSuffix + identity.NationCode.ToString() + BlobNaming.Json;
     }
-    public string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(Identity)); }
-    public static string BlobPath(NationIdentity identity) { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(identity)); }
+    public string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, Identity.GameName, FullFileName(Identity)); }
+    public static string BlobPath(NationIdentity identity)
+    {
+        return BlobService.CreateBlobPath(Folders.Games, identity.GameName, FullFileName(identity));
+    }
     public BlobDescriptor BlobDescriptor() { return new BlobDescriptor(BlobPath(), this); }
     public static BlobDescriptor BlobDescriptorRemove(NationIdentity identity)
     {
         return new(BlobPath(identity), true);
     }
 
-    public static string BlobPrefix(string gameName) { return BlobService.CreateBlobPath(Folders.Games, null, gameName + BlobNaming.NationSuffix); }
+    public static string BlobPrefix(string gameName) { return BlobService.CreateBlobPath(Folders.Games, gameName, gameName + BlobNaming.NationSuffix); }
 
     public void Validate()
     {

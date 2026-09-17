@@ -7,8 +7,10 @@ namespace Commonwealth.Server.Data;
 
 public partial class DistrictSetup : DistrictGeography
 {
+    
     public List<string>? Resources { get; set; } // Setup
     public List<string>? AllowedVillages { get; set; } //Setup
+    
     [JsonConstructor] public DistrictSetup() : base() { }
 
     public static DistrictSetup Create(DistrictParm geog, List<DistrictParm>? seas, EconParms econParms, InitParms initParms)

@@ -27,6 +27,9 @@ public static partial class UserEndpoints
                     case PlayerRequestType.NewPlayer:
                         await CreateNewPlayerAsync(playerProfile, blobService, response);
                         break;
+                    case PlayerRequestType.GetProfile:
+                        response.PlayerProfile = playerProfile;
+                        break;
                     case PlayerRequestType.GetPortfolio:
                         Player player = await Player.RetrieveAsync(playerProfile.UserName, blobService);
                         await GetPortfolioAsync(player, blobService, response);

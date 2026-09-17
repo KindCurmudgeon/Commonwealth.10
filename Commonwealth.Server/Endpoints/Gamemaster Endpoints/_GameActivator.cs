@@ -15,43 +15,45 @@ public static partial class GamemasterEndpoints
     public static async Task ActivateAsync(
         string gameName,
         PlayerProfile requestor,
+        bool prescribedNations,
         BlobService blobService,
         ResponseBase response
     )
     {
         GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+        //  VGame vGame = await VGame.Load(gameName, blobService);
         gameSetup.ConfirmGamemasterAuthority(requestor);
+          WorldSetup worldSetup = await WorldSetup.RetrieveAsync(gameName, blobService);
 
-        //   GameStatus gameStatus = await GameStatus.RetrieveAsync(gameName, blobService);
 
-        List<Nation> nations = await gameSetup.GatherNationsAsync(blobService);
         InitParms initParms = new InitParms((gameSetup.InitFileInfo is null) ? null :
-            await InitParmsFile.RetrieveAsync(gameSetup.InitFileInfo, blobService));
-        GameStatus gameStatus = GameStatus.Create(gameSetup, nations, initParms);
-        VGame vGame = new VGame(gameSetup, gameStatus);
-
+        await InitParmsFile.RetrieveAsync(gameSetup.InitFileInfo, blobService));       //   GameStatus gameStatus = await GameStatus.RetrieveAsync(gameName, blobService);
+        GameStatus gameStatus = GameStatus.Create(gameSetup, worldSetup, initParms);
+        List<Nation> nations = await gameSetup.GatherNationsAsync(blobService);
+  
         AssignNations();
         await FinalizeNationNamingAsync();
         ActivateNations();
 
-        ServerEconomicMgr econUpdater = new(vGame, nations);
-        econUpdater.DetermineResults();
-        econUpdater.UpdateForNextSeason();
+        WorldStatus worldStatus = new WorldStatus(worldSetup, nations, initParms);
+        ServerEconomicMgr econUpdater = new(gameSetup, gameStatus, worldSetup, worldStatus, nations);
+        //  econUpdater.DetermineResults();
+        econUpdater.UpdateForNextSeason();  // NEEDED ONLY FOR REPORTS ???
 
-        vGame.Activate();
-        gameSetup = vGame.ExtractGameSetup();
-        gameStatus = vGame.ExtractGameStatus();
+        gameSetup.GameState = GameState.Activated;
+
         List<BlobDescriptor> descriptors = [];
         descriptors.Add(gameSetup.BlobDescriptor());
         descriptors.Add(gameStatus.BlobDescriptor());
+        descriptors.Add(worldStatus.BlobDescriptor());
         foreach (Nation nation in nations) descriptors.Add(nation.BlobDescriptor());
         await blobService.SaveGroupAsync(descriptors);
 
         void AssignNations()
         {
-            List<string> availableHomes = vGame.GatherAvailableHomes(nations);
+            List<string> availableHomes = worldSetup.GatherAvailableHomes(nations);
 
-            if (vGame.HasPrescribedNationAssignments is false) Util.Shuffle(availableHomes);
+            if (prescribedNations is false) Util.Shuffle(availableHomes);
             foreach (Nation nation in nations)
             {
                 if (nation.HomeDistrict is null)
@@ -66,7 +68,7 @@ public static partial class GamemasterEndpoints
             NamingFile namingFile = await NamingFile.RetrieveAsync("test", blobService);
             List<NationNameOption> names = namingFile.NationNames;
             RemoveUsedNames();
-            if (vGame.HasPrescribedNationAssignments is false) Util.Shuffle(names);
+            if (prescribedNations is false) Util.Shuffle(names);
             foreach (Nation nation in nations)
             {
                 if (nation.Naming.IsNamed()) continue;

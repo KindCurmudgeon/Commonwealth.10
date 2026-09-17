@@ -16,14 +16,20 @@ public partial class ServerEconomicMgr
         UpdateDistricts();  // Villages before Districts due to potential Owner changes
         UpdateSpies();
         UpdateNations();
-        VGame.SeasonUpdate(WorldNewsItems);
-        AdvanceSeason();
+        GameStatus.SeasonUpdate(WorldNewsItems, GameSetup, WorldStatus);
+        AdvanceDates();
+
+        void AdvanceDates()
+        {
+            int newSeasonCount = GameStatus.GameDate.SeasonUpdate();
+            foreach (Nation nation in Nations) nation.SeasonCount = newSeasonCount;
+        }
 
         void UpdateMarket()
         {
-            foreach (MarketData marketData in VGame.MarketDatas ?? [])
+            foreach (MarketData marketData in GameStatus.MarketDatas ?? [])
             {
-                marketData.SeasonUpdate(AllTradeMgrs, VGame.MarketDatas ?? []);
+                marketData.SeasonUpdate(AllTradeMgrs, GameStatus.MarketDatas ?? []);
             }
             List<TradeMgr> marketTrades = AllTradeMgrs.Where(t => t.Order?.TradeType == TRADETYPE.MARKET).ToList();
         }
@@ -66,15 +72,15 @@ public partial class ServerEconomicMgr
                 }
 
                 Spy? spy = nation?.Spies?.Find(s => s.Id == mgr.Id);
-                spy?.SeasonUpdate(mgr, VGame, nation);
+                spy?.SeasonUpdate(mgr, WorldStatus, nation);
             }
         }
         void UpdateDistricts()
         {
-            foreach (VDistrict district in VGame.VDistricts)
+            foreach (DistrictStatus district in WorldStatus.Districts)
             {
                 DistrictMgr? mgr = AllDistrictMgrs.Find(d => d.Name == district.Name);
-                district.SeasonUpdate(mgr, AllVillageMgrs.Here(district.Name), VGame.WorldNews, NationNamings, EconParms);
+                district.SeasonUpdate(mgr, AllVillageMgrs.Here(district.Name), GameStatus.WorldNews, NationNamings, EconParms);
                 //  district?.CreateReport(Game.GameDate, Nations);
             }
         }
@@ -141,10 +147,40 @@ public partial class ServerEconomicMgr
         //     }
         // }
 
-        void AdvanceSeason()
-        {
-            VGame.GameDate.SeasonUpdate();
-            foreach (Nation nation in Nations) nation.SeasonCount = VGame.GameDate.SeasonCount;
-        }
+
     }
 }
+
+//     public void SeasonUpdate(List<String> worldNewsItems)
+//     {
+//         OrdersDueDate = DateTime.UtcNow.Add(OrdersPeriod);
+//         WorldReports();
+//         GameReports();
+
+//         void WorldReports()
+//         {
+//             WorldNews = new Report($"World News - Last Season");
+//             WorldNews.AddTextEntry(AddFoodStatusNews(FoodStatus.FAMINE));
+//             WorldNews.AddTextEntry(AddFoodStatusNews(FoodStatus.RATIONING));
+//             WorldNews.AddTitledList("Other News", worldNewsItems);
+
+//             string? AddFoodStatusNews(FoodStatus foodStatus)
+//             {
+//                 List<string> districts = [];
+//                 foreach (VDistrict status in VDistricts)
+//                 {
+//                     if (status.FoodMetrics?.FoodStatus == foodStatus)
+//                     {
+//                         districts.Add(status.Name);
+//                     }
+//                 }
+//                 if (districts.Count == 0) return null;
+//                 return $"{Util.GetEnumString<FoodStatus>(foodStatus)} in {string.Join(", ", districts)}";
+//             }
+//         }
+//         void GameReports()
+//         {
+//             GameNews = new Report($"Game News");
+//             GameNews?.AddTextEntry($"Orders Due: {OrdersDueDate:yyyy.MM.dd HH:mm} GMT");
+//         }
+//     }

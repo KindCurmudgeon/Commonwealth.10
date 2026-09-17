@@ -11,8 +11,11 @@ public static partial class OrdersEndpoints
 {
     public static async Task UpdateOrdersAsync(OrdersRequest request, Nation nation, BlobService blobService, OrdersResponse response)
     {
-        VGame vGame = await VGame.Load(nation.Identity.GameName, blobService);
-        nation.ConfirmSameSeason(vGame);
+        string gameName = nation.Identity.GameName;
+        int nationCode = nation.Identity.NationCode;
+        GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+        GameStatus gameStatus = await GameStatus.RetrieveAsync(gameName, blobService);
+        gameStatus.ConfirmSameSeason(nation);
         UpdateVillageOrders();
         UpdateDistrictOrders();
         UpdateSpyOrders();

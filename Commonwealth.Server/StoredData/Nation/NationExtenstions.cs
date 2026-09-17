@@ -105,5 +105,14 @@ public static class NationExtensions
     {
         return nations.Find(n => n.Identity.NationCode == nationCode)?.Naming.Name ?? "unknown";
     }
+    public static List<Village> GatherVillages(this List<Nation> nations)
+    {
+        List<Village> villages = [];
+        foreach (Nation nation in nations)
+        {
+            villages.AddRange(nation.Villages ?? []);
+        }
+        return villages;
+    }
 
 }

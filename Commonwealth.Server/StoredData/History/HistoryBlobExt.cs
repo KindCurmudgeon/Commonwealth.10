@@ -9,8 +9,11 @@ public partial class History : IBlobObject
     {
         return gameName + BlobNaming.HistorySuffix + seasonCount.ToString("D3") + BlobNaming.Json;
     }
-    private string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(GameStatus.GameName, GameStatus.GameDate.Year)); }
-    private static string BlobPath(string gameName, int seasonCount) { return BlobService.CreateBlobPath(Folders.Games, null, FullFileName(gameName, seasonCount)); }
+    private string BlobPath() { return BlobService.CreateBlobPath(Folders.Games, GameStatus.GameName, FullFileName(GameStatus.GameName, GameStatus.GameDate.Year)); }
+    private static string BlobPath(string gameName, int seasonCount)
+    {
+        return BlobService.CreateBlobPath(Folders.Games, gameName, FullFileName(gameName, seasonCount));
+    }
     public BlobDescriptor BlobDescriptor() { return new BlobDescriptor(BlobPath(), this); }
     public void Validate()
     {

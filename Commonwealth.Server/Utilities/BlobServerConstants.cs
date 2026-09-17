@@ -3,9 +3,12 @@ namespace Commonwealth.Server.Utilities;
 public static class BlobNaming
 {
     public const string Json = ".json";
-    public const string GameSuffix = "-game";
-    public const string GameSetupSuffix = "-setup";
-    public const string GameStatusSuffix = "-status";
+    public const string GameSetupSuffix = "-gamesetup";
+    public const string GameStatusSuffix = "-gamestatus";
+    public const string WorldSetupSuffix = "-worldsetup";
+    public const string WorldStatusSuffix = "-worldstatus";
+    // public const string GameSetupSuffix = "-setup";
+    // public const string GameStatusSuffix = "-status";
     public const string GameParmsSuffix = "-parms";
     public const string NationSuffix = "-nation-";
     public const string HistorySuffix = "-history-";

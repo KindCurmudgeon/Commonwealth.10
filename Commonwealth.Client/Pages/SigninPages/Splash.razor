@@ -77,7 +77,7 @@
             DataService.ShowErrorAlert("Trouble with Credentials.");
             return;
         }
-        PlayerRequest request = new PlayerRequest() { RequestType = PlayerRequestType.NewPlayer, Token = token };
+        PlayerRequest request = new PlayerRequest() { RequestType = PlayerRequestType.GetProfile, Token = token };
         PlayerResponse? response = await ApiService.SendRequest<PlayerRequest, PlayerResponse>(Endpoints.Player, request);
         if (response?.Response.Status is true)
         {

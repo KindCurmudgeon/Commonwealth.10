@@ -81,13 +81,16 @@ public static class AdminActionEndpoint
                     return $"{identity.GameName},{identity.NationCode}";
                 }
             }
+            
+
+            
             async Task GetGameUsers(string? gameFileName)
             {
-                if (gameFileName is null) return;
-                string gameName = Path.GetFileNameWithoutExtension(gameFileName);
-                VGame vGame = await VGame.Load(gameName, blobService);
-                List<Nation> nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
-                //     response.Object = await blobService.RetrieveAsync<User>(userFileName);
+                // if (gameFileName is null) return;
+                // string gameName = Path.GetFileNameWithoutExtension(gameFileName);
+                // VGame vGame = await VGame.Load(gameName, blobService);
+                // List<Nation> nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
+                // //     response.Object = await blobService.RetrieveAsync<User>(userFileName);
             }
             async Task RemoveGameFromUser(string? userFileName)
             {

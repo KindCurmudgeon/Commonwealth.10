@@ -16,19 +16,18 @@ public static class UserEndpointFactory
      //           Friends = user.Friends
      //      };
      // }
-     public static GameSummaryDTO CreateGameSummaryDTO(this VGame game, Nation? nation, int waitingCount, Player player)
+     public static GameSummaryDTO CreateGameSummaryDTO(GameSetup gameSetup, GameStatus? gameStatus, Nation? nation, string playerName, int waitingCount)
      {
-          bool isCreator = game.Creator == player.UserName;
+          bool isCreator = gameSetup.Creator == playerName;
           return new GameSummaryDTO()
           {
-               GameName = game.GameName,
+               GameName = gameSetup.GameName,
                IsCreator = isCreator,
-               IsGamemaster = isCreator || game.Gamemasters.Contains(player.UserName),
-               GameState = game.GameState,
-               IsDevelopmentGame = game.IsDevelopmentGame,
+               IsGamemaster = isCreator || gameSetup.Gamemasters.Contains(playerName),
+               GameState = gameSetup.GameState,
                WaitingCount = waitingCount,
-               GameDate = game.GameDate?.ToString(),
-               TimedOut = game.OrdersDueDate < DateTime.UtcNow,
+               GameDate = gameStatus?.GameDate?.ToString(),
+               TimedOut = gameStatus?.OrdersDueDate < DateTime.UtcNow,
                NationSummary = nation?.CreateNationSummaryDTO()
           };
      }

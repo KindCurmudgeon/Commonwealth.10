@@ -11,24 +11,30 @@ namespace Commonwealth.Server.ServerEconomics;
 
 public partial class ServerEconomicMgr : EconomicMgr
 {
-    public VGame VGame { get; set; }
+    public GameSetup GameSetup {get;set;}
+    public GameStatus GameStatus {get;set;}
+    public WorldSetup WorldSetup {get;set;}
+    public WorldStatus WorldStatus {get;set;}
     public List<Nation> Nations { get; set; }
     public List<NationNaming> NationNamings { get; set; }
     public List<string> WorldNewsItems { get; set; }
     [SetsRequiredMembers]
-    public ServerEconomicMgr(VGame vGame, List<Nation> nations) : base(vGame.EconParms)
+    public ServerEconomicMgr(GameSetup gameSetup, GameStatus gameStatus, WorldSetup worldSetup, WorldStatus worldStatus,  List<Nation> nations) : base(gameSetup.EconParms)
     {
         List<Village> allVillages = nations.GatherVillages();
-        VGame = vGame;
+        GameSetup = gameSetup;
+        GameStatus = gameStatus;
+        WorldSetup = worldSetup;
+        WorldStatus = worldStatus;
         Nations = nations;
-        EconParms = vGame.EconParms;
+     //   EconParms = vGame.EconParms;
         AllNationMgrs = nations.AssembleNationMgrs();
         AllVillageMgrs = nations.AssembleVillageMgrs();
-        AllDistrictMgrs = vGame.VDistricts.AssembleDistrictMgrs(allVillages);
+        AllDistrictMgrs = worldStatus.Districts.AssembleDistrictMgrs(worldSetup, allVillages);
         AllTradeMgrs = nations.AssembleTradeMgrs();
         AllSpyMgrs = nations.AssembleSpyMgrs();
         WorldNewsItems = [];
-        MarketPrices = VGame.MarketDatas.AssembleMarketPrices();
+        MarketPrices = gameStatus.MarketDatas.AssembleMarketPrices();
         NationNamings = nations.AssembleNationNamings();
     }
 }

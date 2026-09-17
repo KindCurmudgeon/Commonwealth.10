@@ -13,9 +13,6 @@ public static class GameEndpointFactory
         return new GameDTO()
         {
             GameName = gameSetup.GameName,
-            EconFileInfo = gameSetup.EconFileInfo,
-            GeogFileInfo = gameSetup.GeogFileInfo,
-            OrdersPeriod = gameSetup.OrdersPeriod,
             GameState = gameSetup.GameState,
             Creator = gameSetup.Creator,
             Gamemasters = gameSetup.Gamemasters,
@@ -49,6 +46,35 @@ public static class GameEndpointFactory
             LineupState = nation.LineupState,
             OrdersState = nation.OrdersState
         };
+    }
+    public static int GetProperWaitingCount(this List<Nation> nations, GameState gameState)
+    {
+        if (gameState == GameState.Activated) return nations.OrdersWaitingCount();
+        return nations.AccepetedWaitingCount();
+    }
+    public static int AccepetedWaitingCount(this List<Nation> nations)
+    {
+        if (nations.Count == 0) return 0;
+        int count = 0;
+        foreach (Nation nation in nations)
+        {
+            if (nation.LineupState != LineupState.Accepted) count++;
+        }
+        return count;
+    }
+    public static int OrdersWaitingCount(this List<Nation> nations)
+    {
+        if (nations.Count == 0) return 0;
+        int count = 0;
+        foreach (Nation nation in nations)
+        {
+            if (nation.OrdersState != OrdersState.OrdersSubmitted) count++;
+        }
+        return count;
+    }
+    public static Nation GetNation(this List<Nation> nations, NationIdentity identity)
+    {
+        return nations.First(n=>n.Identity.NationCode == identity.NationCode);
     }
     // public static PlayerDTO CreatePlayerDTO(this ProfileDTO profile)
     // {

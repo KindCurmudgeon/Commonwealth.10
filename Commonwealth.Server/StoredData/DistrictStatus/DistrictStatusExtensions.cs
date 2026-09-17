@@ -9,17 +9,8 @@ using Commonwealth.Shared.EndpointDTOs;
 
 namespace Commonwealth.Server.Data;
 
-public partial class DistrictStatus
+public partial class DistrictStatus 
 {
-[SetsRequiredMembers]
-    public DistrictStatus(DistrictSetup districtSetup, int owner, InitParms initParms)
-    {
-        Name = districtSetup.Name;
-        Owner = owner;
-        Population = Util.GetRandomInclusive(initParms.InitialDistrictPopulationStat);
-        Goods = GoodStat.GetRandomGoodStat(initParms.InitialDistrictGoods);
-    }
-
     public void SeasonUpdate(DistrictMgr? districtMgr,
                 List<VillageMgr> villageMgrsHere,
                 Report? WorldNews,
@@ -161,6 +152,7 @@ public partial class DistrictStatus
         public int ActiveVillageCount { get; set; } = activeVillageCount;
         public bool IsMax { get; set; } = false;
     }
+
 
     // public void CreateReport(DistrictMgr mgr, GameDate gameDate, List<Village>? VillagesHere, List<NationNaming> namings, List<VillageParm> villageParms)
     // {

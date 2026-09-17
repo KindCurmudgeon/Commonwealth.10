@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Commonwealth.Server.Parameters;
 using Commonwealth.Server.Utilities;
@@ -6,7 +7,8 @@ using Commonwealth.Shared.EconomicMgrs;
 
 namespace Commonwealth.Server.Data;
 
-public partial class DistrictStatus {
+public partial class DistrictStatus 
+{
     public required string Name {get;set;} 
     public int Population { get; set; } // Season
     public int DeltaPopulation { get; set; }// Season
@@ -19,15 +21,15 @@ public partial class DistrictStatus {
     public int? ForeignVillageCount { get; set; } // Season
     [JsonConstructor] public DistrictStatus() {}
 
-}
-// public partial class DistrictGeography
-// {
-//     public required string Name { get; set; }
-//    // public required string Possessive { get; set; }
-//     public required string Region { get; set; }
-//     public required List<string> Connections { get; set; }
-//     public List<Feature>? Features { get; set; }
-//     [JsonConstructor] public DistrictGeography() { }
+    [SetsRequiredMembers]
+    public DistrictStatus(DistrictSetup districtSetup, InitParms initParms)
+    {
+        Name = districtSetup.Name;
+        Owner = 0;
+        Population = Util.GetRandomInclusive(initParms.InitialDistrictPopulationStat);
+        Goods = GoodStat.GetRandomGoodStat(initParms.InitialDistrictGoods);
+    }
 
-// }
+}
+
 

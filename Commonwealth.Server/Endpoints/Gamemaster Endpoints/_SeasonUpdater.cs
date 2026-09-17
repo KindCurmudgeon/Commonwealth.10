@@ -15,24 +15,25 @@ public static partial class GamemasterEndpoints
         BlobService blobService,
         ResponseBase response)
     {
-        VGame vGame = await VGame.Load(gameName, blobService);
-        vGame.ConfirmGamemasterAuthority(requestor);
-        GameStatus gameStatus = vGame.ExtractGameStatus();
+        GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
+        gameSetup.ConfirmGamemasterAuthority(requestor);
+        GameStatus gameStatus = await GameStatus.RetrieveAsync(gameName, blobService);
         List<Nation> nations;
-        if (useHistory is true && vGame.GameDate?.SeasonCount >= 1)
+        if (useHistory is true && gameStatus?.GameDate?.SeasonCount >= 1)
         {
-            History history = await History.RetrieveAsync(gameName, vGame.GameDate.SeasonCount - 1, blobService);
-            GameSetup gameSetup = await GameSetup.RetrieveAsync(vGame.GameName, blobService);
-            vGame = new VGame(gameSetup, history.GameStatus);
+            History history = await History.RetrieveAsync(gameName, gameStatus.GameDate.SeasonCount - 1, blobService);
+            gameStatus = history.GameStatus;
             nations = history.Nations;
         }
         else
         {
-            nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
+            nations = await gameStatus!.GatherNationsConfirmDatesAsync(blobService);
             await SaveHistory();
         }
 
-        ServerEconomicMgr econUpdater = new(vGame, nations);
+        WorldSetup worldSetup = await WorldSetup.RetrieveAsync(gameName, blobService);
+        WorldStatus worldStatus = await WorldStatus.RetrieveAsync(gameName, blobService);
+        ServerEconomicMgr econUpdater = new(gameSetup, gameStatus, worldSetup, worldStatus, nations);
         econUpdater.DetermineResults();
         econUpdater.Immigration();
         econUpdater.UpdateForNextSeason();
@@ -41,7 +42,7 @@ public static partial class GamemasterEndpoints
         descriptors.Add(gameStatus.BlobDescriptor());
         foreach (Nation nation in nations) descriptors.Add(nation.BlobDescriptor());
         await blobService.SaveGroupAsync(descriptors);
-        response.AddMessage($"{vGame.GameName} has been updated for {vGame.GameDate}");
+        response.AddMessage($"{gameStatus.GameName} has been updated for {gameStatus.GameDate.ToString()}");
 
         async Task SaveHistory()
         {

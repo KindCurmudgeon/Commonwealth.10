@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs.Models;
 using Commonwealth.Server.Data;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
@@ -24,8 +25,9 @@ public static partial class NationEndpoints
                 switch (request.RequestType)
                 {
                     case NationRequestType.Get:
-                        VGame vGame = await VGame.Load(nation.Identity.GameName, blobService);
-                        await ProcessGet(nation, vGame, blobService, response);
+                        WorldSetup worldSetup = await WorldSetup.RetrieveAsync(request.Identity.GameName, blobService);
+                        GameStatus gameStatus = await GameStatus.RetrieveAsync(request.Identity.GameName, blobService);
+                        await ProcessGet(nation, worldSetup, gameStatus, blobService, response);
                         break;
                     case NationRequestType.Update:
                     case NationRequestType.AcceptReject:

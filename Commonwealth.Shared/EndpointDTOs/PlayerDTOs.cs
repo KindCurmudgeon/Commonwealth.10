@@ -8,7 +8,7 @@ public class PlayerRequest : RequestBase
     public PlayerRequestType? RequestType { get; set; }
     public List<Guid>? FriendIds { get; set; }
 }
-public enum PlayerRequestType { NONE = 0, GetPortfolio = 10, GetFriends = 20, AddFriends = 25, RemoveFriends = 29, NewPlayer = 90, RemovePlayer = 99 };
+public enum PlayerRequestType { NONE = 0, GetProfile=10, GetPortfolio = 20, GetFriends = 30, AddFriends = 35, RemoveFriends = 39, NewPlayer = 90, RemovePlayer = 99 };
 
 public class PlayerResponse : ResponseBase
 {
@@ -22,7 +22,6 @@ public class GameSummaryDTO
     public string? GameName { get; set; }
     public GameState? GameState { get; set; }
     public bool IsGamemaster { get; set; }
-    public bool? IsDevelopmentGame { get; set; }
     public bool IsCreator { get; set; }
     public string? GameDate { get; set; }
     public int? WaitingCount { get; set; }

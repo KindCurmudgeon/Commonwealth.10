@@ -12,9 +12,10 @@ public static partial class UserEndpoints
         List<GameSummaryDTO> summaries = [];
         foreach (NationIdentity identity in player.NationIdentities ?? [])
         {
-            VGame vGame = await VGame.Load(identity.GameName, blobService);
-            List<Nation> nations = await vGame.GatherNationsConfirmDatesAsync(blobService);
-            int waitingCount = vGame.GetWaitingCount(nations);
+            GameSetup gameSetup = await GameSetup.RetrieveAsync(identity.GameName, blobService);
+            GameStatus? gameStatus = await GameStatus.RetrieveIfExistsAsync(identity.GameName, blobService);
+            List<Nation> nations = await gameSetup.GatherNationsAsync(blobService);
+            int waitingCount = nations.GetProperWaitingCount(gameSetup.GameState);
             Nation? myNation = null;
             if (identity.NationCode < 0)
             {
@@ -23,78 +24,82 @@ public static partial class UserEndpoints
                 NationIdentity? match = player.NationIdentities?.Find(i => i.GameName == identity.GameName && i.NationCode > 0);
                 if (match is not null) continue;
             }
-            else myNation = nations.Find(n => n.Identity.NationCode == identity.NationCode);
-            summaries.Add(vGame.CreateGameSummaryDTO(myNation, waitingCount, player));
+            else myNation = nations.GetNation(identity);
+            summaries.Add(UserEndpointFactory.CreateGameSummaryDTO(gameSetup, gameStatus, myNation, player.UserName, waitingCount));
+
+
         }
         response.GameSummaries = summaries;
     }
-    //}
-    // public static async Task GetPortfolioAsync(User user, BlobService blobService, UserResponse response)
-    // {
-    //     response.ParticipantInfos = await GetParticipantInfosAsync();
-    //     response.GamemasterInfos = await GetGameMasterGamesAsync();
 
-    //     async Task<List<ParticipantInfo>> GetParticipantInfosAsync()
-    //     {
-    //         List<ParticipantInfo> infos = [];
-    //         foreach (NationIdentity identity in user.ParticipantGames)
-    //         {
-    //             try
-    //             {
-    //                 //      NationStatus? status = null;
-    //                 //      Season? season = null;
-    //                 Game game = await Game.RetrieveAsync(identity.GameName, blobService);
-    //                 Nation nation = await Nation.RetrieveAsync(identity, blobService);
-    //                 if (game.GameState == GameState.Activated)
-    //                 {
-    //                     //        status = await NationStatus.RetrieveAsync(identity, blobService);
-    //                     //      season = await Season.RetrieveAsync(identity.GameName, blobService);
-    //                 }
-    //                 infos.Add(new ParticipantInfo(user, game, nation));
-    //             }
-    //             catch
-    //             {
-    //                 response.AddError(Message.FileNotFoundContinue($"Participant info for {identity.GameName}"));
-    //                 continue;
-    //             }
-    //         }
-    //         return infos;
-    //     }
-
-    //     async Task<List<GamemasterInfo>> GetGameMasterGamesAsync()
-    //     {
-    //         List<GamemasterInfo> gamemasterInfos = [];
-    //         foreach (string gameName in user.GamemasterGames)
-    //         {
-    //             try
-    //             {
-    //                 Game game = await Game.RetrieveAsync(gameName, blobService);
-    //                 //   Season? season = null;
-    //                 int waitingCount = 0;
-    //                 List<Nation> nations = await game.GatherNationsAsync(blobService);
-    //                 if (game.GameState == GameState.Created)
-    //                 {
-    //                     //   List<Nation> nations = await game.GatherAllNationsAsync(blobService);
-    //                     foreach (Nation nation in nations) if (nation.EntryStatus != EntryState.Accepted) waitingCount++;
-    //                 }
-    //                 if (game.GameState == GameState.Activated)
-    //                 {
-    //                     //   season = await Season.RetrieveAsync(game.Name, blobService);
-    //                     //   List<NationStatus> statuses = await game.GatherAllNationStatusesAsync(blobService);
-    //                     foreach (Nation status in nations) if (status.Orders?.OrdersState != OrdersState.OrdersSubmitted) waitingCount++;
-    //                 }
-    //                 gamemasterInfos.Add(new GamemasterInfo(game, waitingCount));
-    //             }
-    //             catch
-    //             {
-    //                 response.AddError(Message.FileNotFoundContinue($"Gamemaster info for {gameName}"));
-    //                 continue;
-    //             }
-    //         }
-    //         return gamemasterInfos;
-    //     }
-    // }
 }
+//}
+// public static async Task GetPortfolioAsync(User user, BlobService blobService, UserResponse response)
+// {
+//     response.ParticipantInfos = await GetParticipantInfosAsync();
+//     response.GamemasterInfos = await GetGameMasterGamesAsync();
+
+//     async Task<List<ParticipantInfo>> GetParticipantInfosAsync()
+//     {
+//         List<ParticipantInfo> infos = [];
+//         foreach (NationIdentity identity in user.ParticipantGames)
+//         {
+//             try
+//             {
+//                 //      NationStatus? status = null;
+//                 //      Season? season = null;
+//                 Game game = await Game.RetrieveAsync(identity.GameName, blobService);
+//                 Nation nation = await Nation.RetrieveAsync(identity, blobService);
+//                 if (game.GameState == GameState.Activated)
+//                 {
+//                     //        status = await NationStatus.RetrieveAsync(identity, blobService);
+//                     //      season = await Season.RetrieveAsync(identity.GameName, blobService);
+//                 }
+//                 infos.Add(new ParticipantInfo(user, game, nation));
+//             }
+//             catch
+//             {
+//                 response.AddError(Message.FileNotFoundContinue($"Participant info for {identity.GameName}"));
+//                 continue;
+//             }
+//         }
+//         return infos;
+//     }
+
+//     async Task<List<GamemasterInfo>> GetGameMasterGamesAsync()
+//     {
+//         List<GamemasterInfo> gamemasterInfos = [];
+//         foreach (string gameName in user.GamemasterGames)
+//         {
+//             try
+//             {
+//                 Game game = await Game.RetrieveAsync(gameName, blobService);
+//                 //   Season? season = null;
+//                 int waitingCount = 0;
+//                 List<Nation> nations = await game.GatherNationsAsync(blobService);
+//                 if (game.GameState == GameState.Created)
+//                 {
+//                     //   List<Nation> nations = await game.GatherAllNationsAsync(blobService);
+//                     foreach (Nation nation in nations) if (nation.EntryStatus != EntryState.Accepted) waitingCount++;
+//                 }
+//                 if (game.GameState == GameState.Activated)
+//                 {
+//                     //   season = await Season.RetrieveAsync(game.Name, blobService);
+//                     //   List<NationStatus> statuses = await game.GatherAllNationStatusesAsync(blobService);
+//                     foreach (Nation status in nations) if (status.Orders?.OrdersState != OrdersState.OrdersSubmitted) waitingCount++;
+//                 }
+//                 gamemasterInfos.Add(new GamemasterInfo(game, waitingCount));
+//             }
+//             catch
+//             {
+//                 response.AddError(Message.FileNotFoundContinue($"Gamemaster info for {gameName}"));
+//                 continue;
+//             }
+//         }
+//         return gamemasterInfos;
+//     }
+// }
+
 
 // public partial class GameSummaryDTO
 // {

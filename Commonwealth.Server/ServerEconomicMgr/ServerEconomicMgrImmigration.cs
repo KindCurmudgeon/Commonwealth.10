@@ -17,17 +17,17 @@ public partial class ServerEconomicMgr
             List<Movement> Movements = [];
             foreach (DistrictMgr mgr in AllDistrictMgrs)
             {
-                VDistrict? district = VGame.FindDistrict(mgr.Name);
-                if (district is null) continue;
-                foreach (string destination in district.Connections)
+                DistrictSetup districtSetup = WorldSetup.GetDistrict(mgr.Name);
+
+                foreach (string destination in districtSetup.Connections)
                 {
                     DistrictMgr? target = AllDistrictMgrs.Find(e => e.Name == destination);
                     if (target is null) continue;
                     double delta = target.FoodMetrics?.SeasonsOfFood ?? 0 - mgr.FoodMetrics?.SeasonsOfFood ?? 0;
                     if (delta <= 0) continue;
                     int amount = (int)Math.Floor(delta * EconParms.ImmigrationFactor);
-                    VDistrict? targetDistrict = VGame.FindDistrict(target.Name);
-                    if (targetDistrict is null) continue;
+                 //   VDistrict? targetDistrict = VGame.FindVDistrict(target.Name);
+                 //   if (targetDistrict is null) continue;
                     Movements.Add(new Movement(mgr, target, amount));
                 }
             }

@@ -9,26 +9,28 @@ namespace Commonwealth.Server.Endpoints;
 public static class InfoPackageFactory
 {
     public static InfoPackage Create(
-   VGame vGame,
-        List<VDistrict> ownedDistricts,
+ GameSetup gameSetup,
+ GameStatus gamestatus,
+        List<DistrictStatus> ownedDistricts,
+        WorldSetup worldSetup,
         List<Nation> nations,
         int nationCode,
         MgrPackage mgrPackage)
     {
-        EconParms econParms = vGame.EconParms;
-        List<string> connections = vGame.GatherConnections(ownedDistricts);
+        EconParms econParms = gameSetup.EconParms;
+        List<string> connections = worldSetup.GatherConnections(ownedDistricts);
         return new InfoPackage()
         {
-            GameName = vGame.GameName,
-            SeasonString = vGame.GameDate.ToString(),
+            GameName = gameSetup.GameName,
+            SeasonString = gamestatus.GameDate.ToString(),
             EconParms = econParms,
             NationGoodNames = econParms.GoodParms.Select(p => p.Name).ToList(),
             DistrictGoodNames = econParms.GoodParms.Where(p => p.Type != GOODTYPE.CURRENCY).Select(g => g.Name).ToList(),
             VillageNames = econParms.VillageParms.Select(v => v.Name).ToList(),
             NationNamings = nations.Select(n => n.Naming).ToList(),
-            MarketPrices = vGame.MarketDatas.AssembleMarketPrices(),
-            WorldNews = vGame.WorldNews,
-            GameNews = vGame.GameNews,
+            MarketPrices = gamestatus.MarketDatas.AssembleMarketPrices(),
+            WorldNews = gamestatus.WorldNews,
+            GameNews = gamestatus.GameNews,
             SpyTargets = CreateSpyTargets(connections),
             DistrictTradeTargets = CreateDistrictTradeTargets(mgrPackage.DistrictMgrs, connections),
             NationTradeTargets = CreateNationTradeTargets(nations, nationCode)

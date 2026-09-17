@@ -19,7 +19,7 @@ public partial class GameSetup : GameAuthority
             CreationDate = DateTime.UtcNow,
             Gamemasters = [],
             OrdersPeriod = dto.OrdersPeriod ?? new TimeSpan(7, 0, 0, 0),
-            Districts = CreateDistricts(),
+  //          Districts = CreateDistricts(),
             EconParms = econParms,
             GeogFileInfo = dto.GeogFileInfo ?? GeographyFile.DefaultFileInfo,
             InitFileInfo = dto.InitFileInfo,
@@ -28,79 +28,12 @@ public partial class GameSetup : GameAuthority
             //  GameNews = new Report("Game News - Last Season")
         };
 
-        AssignResources();
-        IdentifyAllowedVillages();
+     //   AssignResources();
+     //   IdentifyAllowedVillages();
         // InitializeMarket();
         return setup;
 
-        List<DistrictSetup> CreateDistricts()
-        {
-            List<DistrictSetup> districts = [];
-            foreach (DistrictParm districtParm in geogParmsFile.Districts)
-            {
-                DistrictSetup district = DistrictSetup.Create(districtParm, geogParmsFile.Seas, econParms, initParms);
-                districts.Add(district);
-            }
-            return districts;
-        }
-        void AssignResources()
-        {
-            foreach (Resource resource in econParms.Resources)
-            {
-                List<DistrictSetup> elgible = setup.Districts.Where(s => s.HasFeature(resource.Constraint)).ToList();
-                Util.Shuffle(elgible);
-                int netDistricts = (int)((resource.Existence ?? 1.0) * elgible.Count);
-                while (netDistricts-- > 0)
-                {
-                    DistrictSetup district = elgible[0];
-                    (district.Resources ??= []).Add(resource.Name);
-                    elgible.RemoveAt(0);
-                }
-            }
-            foreach (DistrictSetup district in setup.Districts)
-            {
-                int shortfall = initParms.MinResourcePerDistrict - (district.Resources?.Count ?? 0);
-                while (shortfall > 0)
-                {
-                    List<Resource> elgible = econParms.Resources.Where(r => district.HasFeature(r.Constraint)).ToList();
-                    RemoveExisting(elgible);
-                    string? resource = Util.PickRandomFromList<Resource>(elgible)?.Name;
-                    if (resource is null) continue;
-                    (district.Resources ??= []).Add(resource);
-                    shortfall--;
-                }
 
-                void RemoveExisting(List<Resource> items)
-                {
-                    foreach (string resourceName in district.Resources ?? [])
-                    {
-                        items.RemoveAll(i => i.Name == resourceName);
-                    }
-                }
-            }
-        }
-
-        void IdentifyAllowedVillages()  // SHould this go somewhere else after EconParms.VillageParms are created.
-        {
-            foreach (DistrictSetup district in setup.Districts)
-            {
-                foreach (string resource in district.Resources ?? [])
-                {
-                    VillageParm? villageParm = econParms.VillageParms.Find(p => p.Resource == resource);
-                    district.AllowedVillages ??= [];
-                    district.AllowedVillages.AddIfNotNull(villageParm?.Name);
-                }
-                foreach (VillageParm tradingVillageParm in econParms.VillageParms.Where(p => p.Type == VILLAGETYPE.TRADING))
-                {
-                    Feature? constraint = tradingVillageParm.Constraint;
-                    if (district.HasFeature(constraint))
-                    {
-                        district.AllowedVillages ??= [];
-                        district.AllowedVillages?.Add(tradingVillageParm.Name);
-                    }
-                }
-            }
-        }
         // void InitializeMarket()
         // {
         //     setup.MarketDatas = [];
@@ -122,11 +55,12 @@ public partial class GameSetup : GameAuthority
         //     setup.GameNews?.AddTextEntry($"Created: {setup.CreationDate: yyyy.MM.dd HH:mm} GMT.");
         // }
     }
+    
 
-   public static async Task Remove(GameSetup gameSetup, BlobService blobService)
+    public static async Task Remove(GameSetup gameSetup, BlobService blobService)
     {
         await gameSetup.RemoveGameFromPlayers(blobService);
-        await blobService.RemoveWithPrefix(Folders.Games, null, gameSetup.GameName);
+        await blobService.RemoveWithPrefix(Folders.Games, gameSetup.GameName, gameSetup.GameName);
     }
     public async Task RemoveGameFromPlayers(BlobService blobService)
     {
@@ -144,10 +78,7 @@ public partial class GameSetup : GameAuthority
         }
         await blobService.SaveGroupAsync(descriptors);
     }
-    public DistrictSetup? FindDistrict(string districtName)
-    {
-        return Districts.Find(d => d.Name == districtName);
-    }
+
     public async Task<List<Nation>> GatherNationsAsync(BlobService blobService)
     {
         List<string> fileNames = await blobService.GetFileNamesWithPrefix(Nation.BlobPrefix(GameName));
@@ -169,6 +100,9 @@ public partial class GameSetup : GameAuthority
         }
         return nations;
     }
+
+ 
+
     // public void Activate()
     // {
     //     GameState = GameState.Activated;
@@ -220,7 +154,7 @@ public partial class GameSetup : GameAuthority
     // }
     public static async Task<bool> GameExists(string gameName, BlobService blobService)
     {
-        return await blobService.IsExisting(BlobPath(gameName));
+        return await blobService.IsExisting(GameSetup.BlobPath(gameName));
     }
 
 

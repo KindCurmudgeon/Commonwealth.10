@@ -12,23 +12,26 @@ public static partial class GamemasterEndpoints
     public static async Task UpdateAsync(GameDTO gameDTO, List<LineupDTO>? lineupDTOs, PlayerProfile requestor, BlobService blobService,
         IdentityService identityService, ResponseBase response)
     {
-        GameSetup gameSetup = await GameSetup.RetrieveAsync(gameDTO.GameName!, blobService);
+        string gameName = gameDTO.GameName!;
+  GameSetup gameSetup = await GameSetup.RetrieveAsync(gameName, blobService);
         gameSetup.ConfirmGamemasterAuthority(requestor);
         List<BlobDescriptor> descriptors = [];
-        if (await ProcessGameUpdates() is true) descriptors.Add(gameSetup.BlobDescriptor());
-        await HandleAnyAddedNationsAsync(gameSetup, lineupDTOs, descriptors, blobService, identityService, response);
+        if (await ProcessGameUpdates() is true) {
+            descriptors.Add(gameSetup.BlobDescriptor());
+        }
+        GameStatus? gameStatus = await GameStatus.RetrieveIfExistsAsync(gameName, blobService);
+        await HandleAnyAddedNationsAsync(gameSetup, gameStatus, lineupDTOs, descriptors, blobService, identityService, response);
         await HandleAnyRemovedNationsAsync(gameSetup, lineupDTOs, descriptors, blobService, response);
-        await HandlePlayerChanges(gameSetup, lineupDTOs, descriptors, blobService);
+        await HandlePlayerChanges(gameSetup, gameStatus, lineupDTOs, descriptors, blobService);
         bool result = await blobService.SaveGroupAsync(descriptors);
-        if (result is true) response.AddMessage($"Game '{gameSetup.GameName}' updated!");
-        else response.AddError($"Trouble updating {gameSetup.GameName}!");
+        if (result is true) response.AddMessage($"Game '{gameName}' updated!");
+        else response.AddError($"Trouble updating {gameName}!");
 
         async Task<bool> ProcessGameUpdates()
         {
             if (gameDTO.ArchiveGame is true)
             {
-         //
-                await GamemasterEndpoints.RemoveGameAsync(gameSetup.GameName, requestor, blobService, response);
+                await GamemasterEndpoints.RemoveGameAsync(gameName, requestor, blobService, response);
                 return true;
             }
             if (gameDTO.OrdersPeriod != gameSetup.OrdersPeriod)
