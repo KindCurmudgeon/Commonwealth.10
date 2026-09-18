@@ -11,13 +11,11 @@ public partial class Nation : IBlobObject
   public int Version { get; set; } = 1;
   public Guid Id { get; set; }
   public required NationIdentity Identity { get; set; }
-  //  public required string UserName { get; set; }
   public required string PlayerName { get; set; }
   public required NationNaming Naming { get; set; }
   public string? HomeDistrict { get; set; }
   public LineupState LineupState { get; set; }
   public int SeasonCount { get; set; }
-  // public required GameDate GameDate { get; set; }
   public OrdersState OrdersState { get; set; }
   public List<Village>? Villages { get; set; }
   public List<Spy>? Spies { get; set; }

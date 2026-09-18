@@ -2,7 +2,7 @@
 using Commonwealth.Server.Data;
 using Commonwealth.Shared.EconomicMgrs;
 
-namespace Commonwealth.Server.Endpoints;
+namespace Commonwealth.Server.MgrFactory;
 
 public static class DistrictMgrFactory
 {

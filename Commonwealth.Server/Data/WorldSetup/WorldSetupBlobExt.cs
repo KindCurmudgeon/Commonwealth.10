@@ -1,17 +1,7 @@
-using System.Text.Json.Serialization;
 using Commonwealth.Server.Endpoints.ExceptionHandling;
 using Commonwealth.Server.Utilities;
 
 namespace Commonwealth.Server.Data;
-
-public partial class WorldSetup : IBlobObject
-{
-     public required string GameName { get; set; }
-     public required List<DistrictSetup> Districts { get; set; }
-     [JsonConstructor] public WorldSetup() { }
-}
-
-
 public partial class WorldSetup
 {
      private static string FullFileName(string gameName) { return gameName + BlobNaming.WorldSetupSuffix + BlobNaming.Json; }
@@ -40,26 +30,5 @@ public partial class WorldSetup
                ex.AddFailedItem($"World Setup: '{gameName}'");
                throw;
           }
-     }
-}
-public partial class WorldSetup : IBlobObject
-{
-     public DistrictSetup GetDistrict(string districtName)
-     {
-          return Districts.First(d => d.Name == districtName);
-     }
-     public List<string> GatherConnections(List<DistrictStatus> districts)
-     {
-          List<string> connections = [];
-          foreach (DistrictStatus status in districts)
-          {
-               DistrictSetup setup = GetDistrict(status.Name);
-               foreach (string connection in setup.Connections)
-               {
-                    string? match = setup.Connections.Find(c => c == connection);
-                    if (match is not null) connections.AddIfNotDuplicate(connection);
-               }
-          }
-          return connections;
      }
 }

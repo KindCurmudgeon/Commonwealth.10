@@ -1,4 +1,4 @@
-using Commonwealth.Server.Data;
+using System.Text.Json.Serialization;
 using Commonwealth.Server.Parameters;
 using Commonwealth.Server.Utilities;
 using Commonwealth.Shared.Common;
@@ -7,13 +7,21 @@ namespace Commonwealth.Server.Data;
 
 public partial class WorldSetup : IBlobObject
 {
+     public required string GameName { get; set; }
+     public required List<DistrictSetup> Districts { get; set; }
+     [JsonConstructor] public WorldSetup() { }
+}
+
+public partial class WorldSetup: IBlobObject
+{
      public static WorldSetup Create(string gameName, GeographyFile geogParmsFile, InitParms initParms, EconParms econParms)
      {
           List<DistrictSetup> districts = [];
           CreateDistrictSetups();
           AssignResources();
           IdentifyAllowedVillages();
-          return new WorldSetup() {
+          return new WorldSetup()
+          {
                GameName = gameName,
                Districts = districts
           };
@@ -22,7 +30,7 @@ public partial class WorldSetup : IBlobObject
           {
                foreach (DistrictParm districtParm in geogParmsFile.Districts)
                {
-                    DistrictSetup district = DistrictSetup.Create(districtParm, geogParmsFile.Seas, econParms, initParms);
+                    DistrictSetup district = new DistrictSetup(districtParm, geogParmsFile.Seas);
                     districts.Add(district);
                }
           }
@@ -86,12 +94,4 @@ public partial class WorldSetup : IBlobObject
                }
           }
      }
-
-     public List<string> GatherAvailableHomes(List<Nation> nations)
-    {
-        List<string> available = Districts.Select(r => r.Name).ToList();
-        List<string> taken = nations.Where(l => l.HomeDistrict is not null).Select(l => l.HomeDistrict!).ToList();
-        foreach (string name in taken) available.Remove(name);
-        return available;
-    }
 }
